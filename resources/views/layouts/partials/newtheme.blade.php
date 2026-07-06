@@ -1,7 +1,8 @@
-{{-- New design theme: violet/green dark crypto theme ported from laravel-crypto-investment-design --}}
+{{-- New design theme: violet/green dark crypto theme. Single soft font (DM Sans) for fast, cohesive typography. --}}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
     :root {
         --color-ink: #05060a;
@@ -12,10 +13,15 @@
         --color-brand: #b57bff;
         --color-brand-2: #7c3aed;
         --color-accent: #22e58a;
+        --font-soft: "DM Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
     }
 
-    .font-display { font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif; }
-    .font-sans-new { font-family: "Inter", ui-sans-serif, system-ui, sans-serif; }
+    /* Soft, rounded typography applied globally */
+    body, .font-sans-new { font-family: var(--font-soft); }
+    .font-display { font-family: var(--font-soft); letter-spacing: -0.01em; }
+    h1, h2, h3, h4, h5, h6 { font-family: var(--font-soft); letter-spacing: -0.015em; }
+    /* Keep legacy helper classes soft too (they used to load Poppins/Manrope) */
+    .poppins-light, .poppins-regular, .poppins-medium, .poppins-semibold, .poppins-bold, .manrope { font-family: var(--font-soft); }
 
     /* Signature helpers */
     .brand-gradient {

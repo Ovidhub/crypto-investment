@@ -11,11 +11,6 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
@@ -26,15 +21,14 @@
     @include('layouts.partials.newtheme')
 
     <style>
-        .poppins-light { font-family: "Poppins", sans-serif; font-weight: 300; }
-        .poppins-regular { font-family: "Poppins", sans-serif; font-weight: 400; }
-        .poppins-medium { font-family: "Poppins", sans-serif; font-weight: 500; }
-        .poppins-semibold { font-family: "Poppins", sans-serif; font-weight: 600; }
-        .poppins-bold { font-family: "Poppins", sans-serif; font-weight: 700; }
-        .manrope { font-family: "Manrope", sans-serif; }
+        .poppins-light { font-family: "DM Sans", sans-serif; font-weight: 300; }
+        .poppins-regular { font-family: "DM Sans", sans-serif; font-weight: 400; }
+        .poppins-medium { font-family: "DM Sans", sans-serif; font-weight: 500; }
+        .poppins-semibold { font-family: "DM Sans", sans-serif; font-weight: 600; }
+        .poppins-bold { font-family: "DM Sans", sans-serif; font-weight: 700; }
+        .manrope { font-family: "DM Sans", sans-serif; }
 
-        body { font-family: "Inter", "Manrope", sans-serif; overflow-x: hidden; background-color: #05060a; }
-        h1, h2, h3, .font-display { font-family: "Space Grotesk", "Manrope", sans-serif; }
+        body { overflow-x: hidden; background-color: #05060a; }
 
         .owl-item { display: flex; align-items: center; justify-content: center; }
         .owl-carousel .item img { height: 100px; object-fit: contain; max-width: 100%; }
@@ -51,8 +45,8 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        display: ['"Space Grotesk"', 'sans-serif'],
-                        sans: ['Inter', 'Manrope', 'sans-serif'],
+                        display: ['"DM Sans"', 'sans-serif'],
+                        sans: ['"DM Sans"', 'sans-serif'],
                     },
                     colors: {
                         'primary': '#7c3aed',

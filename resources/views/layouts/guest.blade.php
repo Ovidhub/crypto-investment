@@ -17,8 +17,8 @@
             extend: {
                 screens: { 'xs': '375px' },
                 fontFamily: {
-                    display: ['"Space Grotesk"', 'sans-serif'],
-                    sans: ['Inter', 'sans-serif'],
+                    display: ['"DM Sans"', 'sans-serif'],
+                    sans: ['"DM Sans"', 'sans-serif'],
                 },
                 colors: {
                     primary: {
@@ -47,8 +47,7 @@
 
     @section('styles')
     <style>
-        body { font-family: "Inter", sans-serif; }
-        h1, h2, h3 { font-family: "Space Grotesk", sans-serif; }
+        body, h1, h2, h3 { font-family: "DM Sans", sans-serif; }
     </style>
     @show
 </head>

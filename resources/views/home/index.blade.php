@@ -65,7 +65,8 @@
             <div class="relative mx-auto aspect-square w-full max-w-[520px]">
                 <div class="absolute inset-0 animate-spin-slow rounded-full border border-brand/20"></div>
                 <div class="absolute inset-10 rounded-full border border-white/5"></div>
-                <img src="{{ asset('temp/assets/images/heros.png') }}" alt="Crypto investing"
+                <img src="{{ asset('temp/assets/images/heros.webp') }}" alt="Crypto investing"
+                     width="900" height="359" fetchpriority="high" decoding="async"
                      class="animate-float relative z-10 h-full w-full object-contain drop-shadow-[0_30px_60px_rgba(124,58,237,0.35)]">
             </div>
 
@@ -221,7 +222,7 @@
                 </a>
             </div>
             <div class="w-full lg:w-1/2 flex justify-center">
-                 <img src="{{ asset('temp/assets/images/man-shades.webp') }}" class="w-full max-w-md object-contain" alt="Investor">
+                 <img src="{{ asset('temp/assets/images/man-shades.webp') }}" loading="lazy" decoding="async" width="448" height="448" class="w-full max-w-md object-contain" alt="Investor">
             </div>
         </div>
     </div>

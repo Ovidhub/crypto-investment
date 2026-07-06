@@ -11,9 +11,8 @@
     <link rel="icon" href="{{ asset('storage/app/public/' . $settings->favicon) }}" type="image/png" />
 
     <!-- Core CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <script>
     tailwind.config = {
         darkMode: 'class',
@@ -21,6 +20,11 @@
             extend: {
                 screens: {
                     'xs': '375px',
+                },
+                fontFamily: {
+                    display: ['"DM Sans"', 'sans-serif'],
+                    sans: ['"DM Sans"', 'sans-serif'],
+                    body: ['"DM Sans"', 'sans-serif'],
                 },
                 colors: {
                     // Primary: Violet (new brand)
@@ -145,7 +149,6 @@
         }
     }
 </script>
- <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Lucide Icons -->
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 
