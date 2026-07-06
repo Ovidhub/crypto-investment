@@ -18,10 +18,12 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
+
     <!-- Owl Carousel -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
+    @include('layouts.partials.newtheme')
 
     <style>
         .poppins-light { font-family: "Poppins", sans-serif; font-weight: 300; }
@@ -30,27 +32,40 @@
         .poppins-semibold { font-family: "Poppins", sans-serif; font-weight: 600; }
         .poppins-bold { font-family: "Poppins", sans-serif; font-weight: 700; }
         .manrope { font-family: "Manrope", sans-serif; }
-        
-        body { font-family: "Manrope", sans-serif; overflow-x: hidden; }
-        
+
+        body { font-family: "Inter", "Manrope", sans-serif; overflow-x: hidden; background-color: #05060a; }
+        h1, h2, h3, .font-display { font-family: "Space Grotesk", "Manrope", sans-serif; }
+
         .owl-item { display: flex; align-items: center; justify-content: center; }
         .owl-carousel .item img { height: 100px; object-fit: contain; max-width: 100%; }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        /* Custom scrollbar (dark) */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0a0d14; }
+        ::-webkit-scrollbar-thumb { background: #232a36; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #333c4c; }
     </style>
-    
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        display: ['"Space Grotesk"', 'sans-serif'],
+                        sans: ['Inter', 'Manrope', 'sans-serif'],
+                    },
                     colors: {
-                        'primary': '#FF6B00',
-                        'primary-dark': '#E65100',
-                        'primary-light': '#FFF3E0',
+                        'primary': '#7c3aed',
+                        'primary-dark': '#6b28d9',
+                        'primary-light': '#b57bff',
+                        'brand': '#b57bff',
+                        'brand-2': '#7c3aed',
+                        'accent': '#22e58a',
+                        'ink': '#05060a',
+                        'panel': '#0b0e15',
+                        'panel-2': '#10141d',
+                        'card': '#121722',
+                        'line': '#1e2530',
                     }
                 }
             }
@@ -81,17 +96,17 @@
             </div>
 
             <div class="hidden md:flex items-center gap-10">
-                <a href="index" class="text-white text-sm font-medium hover:text-blue-500 transition-colors">Home</a>
-                <a href="about" class="text-slate-400 text-sm font-medium hover:text-blue-500 transition-colors">About</a>
-                <a href="services" class="text-slate-400 text-sm font-medium hover:text-blue-500 transition-colors">Services</a>
-                <a href="contact" class="text-slate-400 text-sm font-medium hover:text-blue-500 transition-colors">Contact</a>
+                <a href="index" class="text-white text-sm font-medium hover:text-brand transition-colors">Home</a>
+                <a href="about" class="text-slate-400 text-sm font-medium hover:text-brand transition-colors">About</a>
+                <a href="services" class="text-slate-400 text-sm font-medium hover:text-brand transition-colors">Services</a>
+                <a href="contact" class="text-slate-400 text-sm font-medium hover:text-brand transition-colors">Contact</a>
             </div>
 
             <div class="flex items-center gap-3">
                 <a href="login" class="hidden md:block text-slate-400 hover:text-white text-sm font-medium px-3 py-2 transition-colors">
                     Login
                 </a>
-                <a href="register" class="bg-primary hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-all shadow-lg shadow-blue-900/20">
+                <a href="register" class="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-all shadow-lg shadow-brand-2/30">
                     Sign Up
                 </a>
             </div>
@@ -107,17 +122,17 @@
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-            <a href="index" class="text-xl font-medium text-white hover:text-blue-500 transition-colors block">Home</a>
-            <a href="about" class="text-xl font-medium text-slate-300 hover:text-blue-500 transition-colors block">About</a>
-            <a href="services" class="text-xl font-medium text-slate-300 hover:text-blue-500 transition-colors block">Services</a>
-            <a href="contact" class="text-xl font-medium text-slate-300 hover:text-blue-500 transition-colors block">Contact</a>
+            <a href="index" class="text-xl font-medium text-white hover:text-brand transition-colors block">Home</a>
+            <a href="about" class="text-xl font-medium text-slate-300 hover:text-brand transition-colors block">About</a>
+            <a href="services" class="text-xl font-medium text-slate-300 hover:text-brand transition-colors block">Services</a>
+            <a href="contact" class="text-xl font-medium text-slate-300 hover:text-brand transition-colors block">Contact</a>
         </div>
 
         <div class="p-6 border-t border-white/5 grid gap-3">
             <a href="login" class="flex items-center justify-center py-3 rounded-lg bg-white/5 text-white font-medium hover:bg-white/10 transition-colors">
                 Log In
             </a>
-            <a href="register" class="flex items-center justify-center py-3 rounded-lg bg-primary text-white font-medium hover:bg-blue-700 transition-colors">
+            <a href="register" class="flex items-center justify-center py-3 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark transition-colors">
                 Create Account
             </a>
         </div>
@@ -133,7 +148,7 @@
 
     <div class="bg-[#020617] font-outfit text-slate-400 relative">
     
-        <div class="h-px w-full bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+        <div class="h-px w-full bg-gradient-to-r from-transparent via-brand/40 to-transparent"></div>
 
         <footer class="pt-16 pb-8 px-4 md:px-8 container mx-auto relative z-10 font-outfit">
         
@@ -151,7 +166,7 @@
                         </div>
                     </div>
                     
-                    <a href="register" class="inline-flex items-center px-8 py-3.5 bg-primary text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-900/10">
+                    <a href="register" class="inline-flex items-center px-8 py-3.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-colors shadow-lg shadow-brand-2/20">
                         Get Started Now
                         <i class="fa-solid fa-arrow-right ml-3 text-sm"></i>
                     </a>
@@ -176,38 +191,38 @@
                 <div>
                     <h3 class="text-white font-semibold mb-4 text-sm">Company</h3>
                     <ul class="space-y-3">
-                        <li><a href="about" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">About Us</a></li>
-                        <li><a href="services" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Services</a></li>
-                        <li><a href="contact" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Contact</a></li>
-                        <li><a href="terms" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Terms</a></li>
+                        <li><a href="about" class="text-slate-400 hover:text-brand text-sm transition-colors">About Us</a></li>
+                        <li><a href="services" class="text-slate-400 hover:text-brand text-sm transition-colors">Services</a></li>
+                        <li><a href="contact" class="text-slate-400 hover:text-brand text-sm transition-colors">Contact</a></li>
+                        <li><a href="terms" class="text-slate-400 hover:text-brand text-sm transition-colors">Terms</a></li>
                     </ul>
                 </div>
                 
                 <div>
                     <h3 class="text-white font-semibold mb-4 text-sm">Products</h3>
                     <ul class="space-y-3">
-                        <li><a href="services" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Trading</a></li>
-                        <li><a href="services" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Investment</a></li>
-                        <li><a href="services" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Crypto</a></li>
-                        <li><a href="services" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Stocks</a></li>
+                        <li><a href="services" class="text-slate-400 hover:text-brand text-sm transition-colors">Trading</a></li>
+                        <li><a href="services" class="text-slate-400 hover:text-brand text-sm transition-colors">Investment</a></li>
+                        <li><a href="services" class="text-slate-400 hover:text-brand text-sm transition-colors">Crypto</a></li>
+                        <li><a href="services" class="text-slate-400 hover:text-brand text-sm transition-colors">Stocks</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <h3 class="text-white font-semibold mb-4 text-sm">Support</h3>
                     <ul class="space-y-3">
-                        <li><a href="contact" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Help Center</a></li>
-                        <li><a href="contact" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">FAQ</a></li>
-                        <li><a href="contact" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Support</a></li>
+                        <li><a href="contact" class="text-slate-400 hover:text-brand text-sm transition-colors">Help Center</a></li>
+                        <li><a href="contact" class="text-slate-400 hover:text-brand text-sm transition-colors">FAQ</a></li>
+                        <li><a href="contact" class="text-slate-400 hover:text-brand text-sm transition-colors">Support</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <h3 class="text-white font-semibold mb-4 text-sm">Legal</h3>
                     <ul class="space-y-3">
-                        <li><a href="terms" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Privacy Policy</a></li>
-                        <li><a href="terms" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Terms of Service</a></li>
-                        <li><a href="terms" class="text-slate-400 hover:text-blue-500 text-sm transition-colors">Cookie Policy</a></li>
+                        <li><a href="terms" class="text-slate-400 hover:text-brand text-sm transition-colors">Privacy Policy</a></li>
+                        <li><a href="terms" class="text-slate-400 hover:text-brand text-sm transition-colors">Terms of Service</a></li>
+                        <li><a href="terms" class="text-slate-400 hover:text-brand text-sm transition-colors">Cookie Policy</a></li>
                     </ul>
                 </div>
 
@@ -215,11 +230,11 @@
                     <h3 class="text-white font-semibold mb-4 text-sm">Connect With Us</h3>
                     <ul class="space-y-3">
                         <li class="flex items-center gap-3">
-                            <i class="fas fa-envelope text-blue-500 text-sm"></i>
+                            <i class="fas fa-envelope text-brand text-sm"></i>
                             <span class="text-slate-400 text-sm hover:text-white transition-colors cursor-pointer">{{$settings->contact_email}}</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <i class="fas fa-map-marker-alt text-blue-500 text-sm"></i>
+                            <i class="fas fa-map-marker-alt text-brand text-sm"></i>
                             <span class="text-slate-400 text-sm hover:text-white transition-colors">{{ $settings->address_o }}</span>
                         </li>
                     </ul>
@@ -234,13 +249,13 @@
                 </div>
                 
                 <div class="flex items-center gap-3">
-                    <a href="https://facebook.com" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all text-sm">
+                    <a href="https://facebook.com" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:bg-brand-2 hover:text-white transition-all text-sm">
                         <i class="fab fa-facebook-f"></i>
                     </a>
                     <a href="https://twitter.com" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:bg-sky-500 hover:text-white transition-all text-sm">
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="https://linkedin.com" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:bg-blue-700 hover:text-white transition-all text-sm">
+                    <a href="https://linkedin.com" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary-dark hover:text-white transition-all text-sm">
                         <i class="fab fa-linkedin-in"></i>
                     </a>
                     <a href="https://instagram.com" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:bg-pink-600 hover:text-white transition-all text-sm">
@@ -250,7 +265,7 @@
             </div>
 
             <!-- Footer background, now responsive -->
-            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[200vw] max-w-full h-[300px] bg-blue-600/5 blur-[120px] -z-10 rounded-full"></div>
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[200vw] max-w-full h-[300px] bg-brand-2/10 blur-[120px] -z-10 rounded-full"></div>
         </footer>
     </div>
 

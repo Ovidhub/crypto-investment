@@ -9,89 +9,123 @@
 
 @section('content')
 
-<section class="relative min-h-screen flex items-center pt-20 pb-12 overflow-hidden bg-[#010522]">
-    <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px]"></div>
-    
-    <div class="container mx-auto px-6 relative z-10">
-        <div class="flex flex-col lg:flex-row items-center gap-12">
-            <div class="w-full lg:w-1/2 text-center lg:text-center space-y-8 mx-auto">
-                <div class="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mx-auto">
-                    <span class="relative flex h-2 w-2">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                    </span>
-                    Live Trading Active
-                </div>
-            
-                <h1 class="text-4xl md:text-7xl font-bold text-white leading-tight tracking-wider">
-                    Empower Your Wealth <br>
-                    <span class="text-primary tracking-widest"> & Master the Markets </span>
-                </h1>
+{{-- ===================== HERO ===================== --}}
+<section id="top" class="relative overflow-hidden pt-16 pb-16 sm:pt-24 bg-ink">
+    <div class="pointer-events-none absolute inset-0 -z-0">
+        <div class="absolute inset-0 grid-bg"></div>
+        <div class="absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-brand-2/25 blur-[130px]"></div>
+        <div class="absolute right-0 top-40 h-[380px] w-[380px] rounded-full bg-accent/15 blur-[120px]"></div>
+    </div>
 
-            
-                <p class="text-gray-400 text-lg md:text-xl max-w-xl mx-auto">
-                    Invest, Trade, Stake & Grow Your Wealth with the world's most intuitive financial ecosystem.
-                </p>
-            
-                <div class="flex flex-wrap justify-center gap-4">
-                    <a href="{{ route('register') }}" class="px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold transition-all transform hover:-translate-y-1 shadow-lg shadow-primary/25">
-                        Start Investing
-                    </a>
-                    <a href="services" class="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl font-bold transition-all">
-                        View Services
-                    </a>
-                </div>
+    <div class="container relative z-10 mx-auto grid max-w-7xl items-center gap-10 px-6 lg:grid-cols-2">
+        <div class="animate-fade-up text-center lg:text-left">
+            <span class="inline-flex items-center gap-2 rounded-full border border-line bg-white/5 px-4 py-1.5 text-xs font-medium text-[#c7cedb]">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                    <span class="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
+                </span>
+                Crypto investing platform of the future
+            </span>
+
+            <h1 class="mt-6 font-display text-[clamp(2.4rem,6vw,4.4rem)] font-bold leading-[1.02] tracking-tight text-white">
+                Invest In <span class="brand-gradient">Crypto</span>, Earn
+                Passive <span class="brand-gradient">Income</span> Easily
+            </h1>
+
+            <p class="mt-6 max-w-md mx-auto lg:mx-0 text-base leading-relaxed text-[#9aa3b2]">
+                {{ $settings->site_name }} makes it simple to buy, sell and grow 100+ digital assets.
+                Bank-grade security, real-time market data and a portfolio that works for you around the clock.
+            </p>
+
+            <div class="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-4">
+                <a href="{{ route('register') }}" class="brand-btn rounded-full px-7 py-3.5 text-sm font-semibold text-white">
+                    Start Investing
+                </a>
+                <a href="services" class="flex items-center gap-2 rounded-full border border-line bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+                    <span class="grid h-6 w-6 place-items-center rounded-full bg-white text-ink text-xs">▶</span>
+                    View Services
+                </a>
             </div>
 
-            <div class="w-full lg:w-1/2 relative">
-                <img src="{{ asset('temp/assets/images/heros.png') }}" alt="Trading Platform" class="relative z-10 w-full h-auto drop-shadow-2xl">
+            <div class="mt-10 flex items-center justify-center lg:justify-start gap-6">
+                <div class="flex -space-x-3">
+                    @foreach(['#f7931a', '#627eea', '#22e58a', '#b57bff'] as $c)
+                        <span class="h-9 w-9 rounded-full border-2 border-ink" style="background: linear-gradient(135deg,{{ $c }},{{ $c }}aa)"></span>
+                    @endforeach
+                </div>
+                <div class="text-left">
+                    <p class="font-display text-lg font-bold text-white counter" data-count="{{ max(9430, $total_users) }}">0</p>
+                    <p class="text-xs text-[#9aa3b2]">investors already onboard</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Visual --}}
+        <div class="relative animate-fade-up [animation-delay:120ms]">
+            <div class="relative mx-auto aspect-square w-full max-w-[520px]">
+                <div class="absolute inset-0 animate-spin-slow rounded-full border border-brand/20"></div>
+                <div class="absolute inset-10 rounded-full border border-white/5"></div>
+                <img src="{{ asset('temp/assets/images/heros.png') }}" alt="Crypto investing"
+                     class="animate-float relative z-10 h-full w-full object-contain drop-shadow-[0_30px_60px_rgba(124,58,237,0.35)]">
+            </div>
+
+            <div class="absolute left-0 top-10 hidden rounded-2xl border border-line glass px-4 py-3 sm:block">
+                <p class="text-[10px] text-[#9aa3b2]">BTC / USD</p>
+                <p class="font-display text-lg font-bold text-white">$<span id="bitcoin-price">---</span></p>
+                <p class="text-xs font-semibold text-accent">Live</p>
+            </div>
+            <div class="absolute bottom-6 right-0 hidden rounded-2xl border border-line glass px-4 py-3 sm:block">
+                <p class="text-[10px] text-[#9aa3b2]">Portfolio</p>
+                <p class="font-display text-lg font-bold text-white">+24.6%</p>
+                <p class="text-xs font-semibold text-accent">this month</p>
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-20 bg-white relative overflow-hidden">
-    <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+{{-- ===================== MARKETS ===================== --}}
+<section id="markets" class="relative py-20 bg-ink">
+    <div class="container mx-auto px-6 max-w-7xl">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
             <div class="space-y-2">
-                <h4 class="text-primary font-bold tracking-widest text-sm uppercase">Market Overview</h4>
-                <h2 class="text-3xl md:text-5xl font-bold text-[#010522]">Buy, sell & manage <br><span class="text-gray-400 font-light text-2xl md:text-4xl">over 100 crypto assets</span></h2>
+                <h4 class="text-brand font-semibold tracking-widest text-xs uppercase">Market Overview</h4>
+                <h2 class="font-display text-3xl md:text-5xl font-bold text-white">Buy, sell &amp; manage <br><span class="text-[#9aa3b2] font-light text-2xl md:text-4xl">over 100 crypto assets</span></h2>
             </div>
-            <a href="#" class="text-primary font-bold flex items-center gap-2 hover:gap-4 transition-all group">
+            <a href="{{ route('register') }}" class="text-brand font-semibold flex items-center gap-2 hover:gap-4 transition-all">
                 Explore all assets <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            @php 
+            @php
                 $assets = [
-                    ['name' => 'Bitcoin', 'sym' => 'BTC', 'id' => 'bitcoin', 'color' => 'bg-orange-500', 'icon' => 'fa-bitcoin'],
-                    ['name' => 'Ethereum', 'sym' => 'ETH', 'id' => 'ethereum', 'color' => 'bg-indigo-600', 'icon' => 'fa-ethereum'],
-                    ['name' => 'Solana', 'sym' => 'SOL', 'id' => 'solana', 'color' => 'bg-purple-500', 'icon' => 'fa-bolt'],
-                    ['name' => 'XRP', 'sym' => 'XRP', 'id' => 'xrp', 'color' => 'bg-gray-800', 'icon' => 'fa-x']
+                    ['name' => 'Bitcoin', 'sym' => 'BTC', 'id' => 'bitcoin', 'color' => 'from-orange-400 to-orange-600', 'icon' => 'fa-bitcoin'],
+                    ['name' => 'Ethereum', 'sym' => 'ETH', 'id' => 'ethereum', 'color' => 'from-indigo-400 to-indigo-600', 'icon' => 'fa-ethereum'],
+                    ['name' => 'Solana', 'sym' => 'SOL', 'id' => 'solana', 'color' => 'from-purple-400 to-fuchsia-600', 'icon' => 'fa-bolt'],
+                    ['name' => 'Tether', 'sym' => 'USDT', 'id' => 'tether', 'color' => 'from-emerald-400 to-emerald-600', 'icon' => 'fa-dollar-sign']
                 ];
             @endphp
 
             @foreach($assets as $asset)
-            <div class="p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:border-primary/30 transition-all hover:bg-white hover:shadow-xl group">
+            <div class="rounded-2xl border border-line bg-card p-6 transition-all hover:border-brand/40 hover:-translate-y-1 hover:glow-brand">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 {{ $asset['color'] }} rounded-xl flex items-center justify-center text-white shadow-lg">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white bg-gradient-to-br {{ $asset['color'] }} shadow-lg">
                             <i class="fab {{ $asset['icon'] }} text-2xl"></i>
                         </div>
                         <div>
-                            <h5 class="font-bold text-[#010522]">{{ $asset['name'] }}</h5>
-                            <span class="text-xs text-gray-500 font-medium">{{ $asset['sym'] }}</span>
+                            <h5 class="font-bold text-white">{{ $asset['name'] }}</h5>
+                            <span class="text-xs text-[#9aa3b2] font-medium">{{ $asset['sym'] }}</span>
                         </div>
                     </div>
-                    <div class="h-8 w-20 bg-primary/5 rounded-md flex items-center justify-center">
-                        <span class="text-[10px] font-bold text-primary uppercase">Trending</span>
+                    <div class="h-7 px-3 bg-accent/10 rounded-md flex items-center justify-center">
+                        <span class="text-[10px] font-bold text-accent uppercase">Trending</span>
                     </div>
                 </div>
                 <div class="space-y-1">
-                    <div class="text-2xl font-bold text-[#010522]">$<span id="{{ $asset['id'] }}-price">---</span></div>
-                    <div class="flex items-center gap-2 text-red-500 text-sm font-bold">
-                        <i class="fa-solid fa-caret-down"></i>
+                    <div class="text-2xl font-bold text-white font-display">$<span id="{{ $asset['id'] }}-price">---</span></div>
+                    <div class="flex items-center gap-2 text-accent text-sm font-bold">
+                        <i class="fa-solid fa-caret-up"></i>
                         <span>Live Data</span>
                     </div>
                 </div>
@@ -101,125 +135,116 @@
     </div>
 </section>
 
-<section class="py-24 bg-[#f8faff]">
-    <div class="container mx-auto px-6">
+{{-- ===================== FEATURES ===================== --}}
+<section id="features" class="py-24 bg-panel border-y border-line">
+    <div class="container mx-auto px-6 max-w-7xl">
         <div class="max-w-3xl mb-16 space-y-4">
-            <h2 class="text-primary font-bold tracking-widest text-sm uppercase">Comprehensive Platform</h2>
-            <h3 class="text-4xl md:text-5xl font-bold text-[#010522] leading-tight">
+            <h2 class="text-brand font-semibold tracking-widest text-xs uppercase">Comprehensive Platform</h2>
+            <h3 class="font-display text-3xl md:text-5xl font-bold text-white leading-tight">
                 All-in-one investment and trading solution for modern investors
             </h3>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                    <i class="fas fa-chart-line text-primary text-2xl"></i>
-                </div>
-                <h4 class="text-xl font-bold text-[#010522] mb-3">Investment Plans</h4>
-                <p class="text-gray-600 leading-relaxed text-sm">
-                    Flexible investment packages with competitive daily ROI. Choose from multiple tiers designed for every portfolio size.
-                </p>
-            </div>
-            
-            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                    <i class="fas fa-robot text-primary text-2xl"></i>
-                </div>
-                <h4 class="text-xl font-bold text-[#010522] mb-3">Automated Bot Trading</h4>
-                <p class="text-gray-600 leading-relaxed text-sm">
-                    AI-powered trading bots executing strategies 24/7. Choose from scalping or swing trading algorithms.
-                </p>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @php
+                $features = [
+                    ['icon' => 'fa-chart-line', 'title' => 'Investment Plans', 'desc' => 'Flexible investment packages with competitive daily ROI. Choose from multiple tiers designed for every portfolio size.'],
+                    ['icon' => 'fa-robot', 'title' => 'Automated Bot Trading', 'desc' => 'AI-powered trading bots executing strategies 24/7. Choose from scalping or swing trading algorithms.'],
+                    ['icon' => 'fa-shield-halved', 'title' => 'Bank-Grade Security', 'desc' => 'Protected with strong encryption, two-factor authentication, and cold storage for digital assets.'],
+                    ['icon' => 'fa-copy', 'title' => 'Copy Trading', 'desc' => 'Mirror the moves of expert traders automatically and grow your portfolio while you learn.'],
+                    ['icon' => 'fa-coins', 'title' => 'Crypto Staking', 'desc' => 'Put idle assets to work and earn steady staking rewards on supported coins.'],
+                    ['icon' => 'fa-wallet', 'title' => 'Connect Your Wallet', 'desc' => 'Link your public wallet address (MetaMask, Trust Wallet & more) and unlock daily rewards.'],
+                ];
+            @endphp
 
-            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                    <i class="fas fa-shield-alt text-primary text-2xl"></i>
+            @foreach($features as $f)
+            <div class="rounded-3xl border border-line bg-card p-8 transition-all hover:border-brand/40 hover:-translate-y-1">
+                <div class="w-14 h-14 bg-brand/10 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas {{ $f['icon'] }} text-brand text-2xl"></i>
                 </div>
-                <h4 class="text-xl font-bold text-[#010522] mb-3">Bank-Grade Security</h4>
-                <p class="text-gray-600 leading-relaxed text-sm">
-                    Protected with military-grade encryption, two-factor authentication, and cold storage for digital assets.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="py-24 bg-white">
-    <div class="container mx-auto px-6">
-        <div class="text-center max-w-2xl mx-auto mb-16">
-            <h2 class="text-primary font-bold mb-4 uppercase tracking-widest text-sm">Investment Options</h2>
-            <h3 class="text-4xl font-bold text-[#010522]">Tailored Plans for Every Strategy</h3>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            @foreach($plans as $plan)
-            <div class="relative p-1 rounded-[2rem] bg-gradient-to-b from-gray-100 to-transparent hover:from-primary/40 transition-all group">
-                <div class="bg-white p-8 rounded-[1.9rem] h-full flex flex-col">
-                    <h4 class="text-xl font-bold text-gray-500 mb-2">{{ $plan->name }}</h4>
-                    <div class="text-3xl font-bold text-[#010522] mb-6">
-                        ${{ number_format($plan->min_price) }} <span class="text-sm font-medium text-gray-400">/min</span>
-                    </div>
-                    
-                    <ul class="space-y-4 mb-8 flex-grow">
-                        <li class="flex items-center gap-3 text-sm font-medium text-gray-600">
-                            <i class="fa-solid fa-circle-check text-primary"></i>
-                            Daily ROI: {{ $plan->increment_amount }}%
-                        </li>
-                        <li class="flex items-center gap-3 text-sm font-medium text-gray-600">
-                            <i class="fa-solid fa-circle-check text-primary"></i>
-                            Return: {{ $plan->expected_return }}%
-                        </li>
-                    </ul>
-
-                    <a href="{{ route('register') }}" class="w-full py-4 text-center rounded-xl bg-[#010522] text-white font-bold group-hover:bg-primary transition-colors">
-                        Choose This Plan
-                    </a>
-                </div>
+                <h4 class="text-xl font-bold text-white mb-3 font-display">{{ $f['title'] }}</h4>
+                <p class="text-[#9aa3b2] leading-relaxed text-sm">{{ $f['desc'] }}</p>
             </div>
             @endforeach
         </div>
     </div>
 </section>
 
-<section class="px-6 py-12">
-    <div class="container mx-auto bg-[#010522] rounded-[3rem] overflow-hidden relative">
-        <div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent"></div>
-        <div class="flex flex-col lg:flex-row items-center px-8 lg:px-20 py-16 relative z-10">
+{{-- ===================== PLANS ===================== --}}
+<section class="py-24 bg-ink">
+    <div class="container mx-auto px-6 max-w-7xl">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <h2 class="text-brand font-semibold mb-4 uppercase tracking-widest text-xs">Investment Options</h2>
+            <h3 class="font-display text-3xl md:text-4xl font-bold text-white">Tailored Plans for Every Strategy</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            @foreach($plans as $plan)
+            <div class="relative rounded-[2rem] border border-line bg-card p-8 flex flex-col transition-all hover:border-brand/40 hover:glow-brand">
+                <h4 class="text-lg font-bold text-[#9aa3b2] mb-2">{{ $plan->name }}</h4>
+                <div class="text-3xl font-bold text-white mb-6 font-display">
+                    ${{ number_format($plan->min_price) }} <span class="text-sm font-medium text-[#9aa3b2]">/min</span>
+                </div>
+
+                <ul class="space-y-4 mb-8 flex-grow">
+                    <li class="flex items-center gap-3 text-sm font-medium text-[#c7cedb]">
+                        <i class="fa-solid fa-circle-check text-accent"></i>
+                        Daily ROI: {{ $plan->increment_amount }}%
+                    </li>
+                    <li class="flex items-center gap-3 text-sm font-medium text-[#c7cedb]">
+                        <i class="fa-solid fa-circle-check text-accent"></i>
+                        Return: {{ $plan->expected_return }}%
+                    </li>
+                </ul>
+
+                <a href="{{ route('register') }}" class="brand-btn w-full py-4 text-center rounded-xl text-white font-bold">
+                    Choose This Plan
+                </a>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+{{-- ===================== CTA ===================== --}}
+<section id="join" class="px-6 py-12 bg-ink">
+    <div class="container mx-auto max-w-7xl rounded-[2.5rem] overflow-hidden relative border border-line bg-panel-2">
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-2/20 via-transparent to-accent/10"></div>
+        <div class="flex flex-col lg:flex-row items-center px-8 lg:px-20 py-16 relative z-10 gap-10">
             <div class="w-full lg:w-1/2 space-y-6 text-center lg:text-left">
-                <h2 class="text-4xl md:text-6xl font-bold text-white leading-tight">
-                    Start earning today <br> <span class="text-primary font-light">with {{ $settings->site_name }}</span>
+                <h2 class="font-display text-3xl md:text-5xl font-bold text-white leading-tight">
+                    Start earning today <br> <span class="brand-gradient font-light">with {{ $settings->site_name }}</span>
                 </h2>
-                <p class="text-gray-400 text-lg">Join thousands of smart investors worldwide.</p>
-                <a href="{{ route('register') }}" class="inline-flex items-center gap-3 text-white text-2xl font-bold hover:text-primary transition-all">
+                <p class="text-[#9aa3b2] text-lg">Join thousands of smart investors worldwide.</p>
+                <a href="{{ route('register') }}" class="inline-flex items-center gap-3 text-white text-xl font-bold hover:text-brand transition-all">
                     Create Free Account <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
-            <div class="w-full lg:w-1/2 mt-12 lg:mt-0 flex justify-center">
+            <div class="w-full lg:w-1/2 flex justify-center">
                  <img src="{{ asset('temp/assets/images/man-shades.webp') }}" class="w-full max-w-md object-contain" alt="Investor">
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-16 bg-white border-y border-gray-100">
-    <div class="container mx-auto px-6">
+{{-- ===================== STATS ===================== --}}
+<section class="py-16 bg-panel border-y border-line">
+    <div class="container mx-auto px-6 max-w-7xl">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-12">
+            @php
+                $stats = [
+                    ['count' => max(9430, $total_users), 'label' => 'Satisfied Investors'],
+                    ['count' => 15, 'label' => 'Years Exp'],
+                    ['count' => 197, 'label' => 'Countries'],
+                    ['count' => 30467, 'label' => 'Transactions'],
+                ];
+            @endphp
+            @foreach($stats as $s)
             <div class="text-center">
-                <div class="text-4xl font-black text-[#010522] mb-1 counter" data-count="9430">0</div>
-                <div class="text-primary font-bold text-xs uppercase tracking-widest">Satisfied Investors</div>
+                <div class="text-4xl font-black text-white mb-1 counter font-display" data-count="{{ $s['count'] }}">0</div>
+                <div class="text-brand font-bold text-xs uppercase tracking-widest">{{ $s['label'] }}</div>
             </div>
-            <div class="text-center">
-                <div class="text-4xl font-black text-[#010522] mb-1 counter" data-count="15">0</div>
-                <div class="text-primary font-bold text-xs uppercase tracking-widest">Years Exp</div>
-            </div>
-            <div class="text-center">
-                <div class="text-4xl font-black text-[#010522] mb-1 counter" data-count="197">0</div>
-                <div class="text-primary font-bold text-xs uppercase tracking-widest">Countries</div>
-            </div>
-            <div class="text-center">
-                <div class="text-4xl font-black text-[#010522] mb-1 counter" data-count="30467">0</div>
-                <div class="text-primary font-bold text-xs uppercase tracking-widest">Transactions</div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
@@ -229,99 +254,57 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    // Crypto Price Fetching
     async function fetchCryptoPrices() {
         try {
             const coinIds = 'bitcoin,ethereum,solana,ripple,avalanche,shiba-inu,tether,aave';
             const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinIds}&vs_currencies=usd`);
             const data = await response.json();
-
-            if (Object.keys(data).length === 0) {
-                console.error("API returned no data. Check coin IDs or API status.");
-                return;
-            }
+            if (Object.keys(data).length === 0) return;
 
             const formatPrice = (price) => {
                 if (price === undefined) return 'N/A';
-                // Handle small numbers like Shiba Inu correctly
-                if (price < 1) {
-                    return price.toFixed(8); // Use more decimal places for very small values
-                }
-                return price.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
+                if (price < 1) return price.toFixed(8);
+                return price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             };
 
-            document.getElementById('bitcoin-price').textContent = formatPrice(data.bitcoin?.usd);
-            document.getElementById('ethereum-price').textContent = formatPrice(data.ethereum?.usd);
-            document.getElementById('solana-price').textContent = formatPrice(data.solana?.usd);
-            document.getElementById('xrp-price').textContent = formatPrice(data.ripple?.usd);
-            document.getElementById('avalanche-price').textContent = formatPrice(data.avalanche?.usd);
-            document.getElementById('shiba-inu-price').textContent = formatPrice(data['shiba-inu']?.usd);
-            document.getElementById('tether-price').textContent = formatPrice(data.tether?.usd);
-            document.getElementById('aave-price').textContent = formatPrice(data.aave?.usd);
-
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            set('bitcoin-price', formatPrice(data.bitcoin?.usd));
+            set('ethereum-price', formatPrice(data.ethereum?.usd));
+            set('solana-price', formatPrice(data.solana?.usd));
+            set('tether-price', formatPrice(data.tether?.usd));
         } catch (error) {
             console.error('Error fetching crypto prices:', error);
         }
     }
-
     fetchCryptoPrices();
     setInterval(fetchCryptoPrices, 60000);
 
-    // Counter Animation
     function animateCounters() {
         $('.counter').each(function() {
             var $this = $(this);
             var countTo = parseInt($this.attr('data-count'));
-
-            $({ countNum: 0 }).animate({
-                countNum: countTo
-            }, {
-                duration: 2000,
-                easing: 'swing',
-                step: function() {
-                    $this.text(Math.floor(this.countNum).toLocaleString());
-                },
-                complete: function() {
-                    $this.text(countTo.toLocaleString());
-                }
+            $({ countNum: 0 }).animate({ countNum: countTo }, {
+                duration: 2000, easing: 'swing',
+                step: function() { $this.text(Math.floor(this.countNum).toLocaleString()); },
+                complete: function() { $this.text(countTo.toLocaleString()); }
             });
         });
     }
-
+    var countersDone = false;
     function checkCounters() {
         const counterSection = $('.counter').first().closest('section');
-        if (counterSection.length) {
+        if (counterSection.length && !countersDone) {
             const sectionTop = counterSection.offset().top;
-            const windowTop = $(window).scrollTop();
-            const windowHeight = $(window).height();
-
-            if (windowTop + windowHeight > sectionTop + 100) {
+            if ($(window).scrollTop() + $(window).height() > sectionTop + 100) {
                 animateCounters();
-                $(window).off('scroll', checkCounters);
+                countersDone = true;
             }
         }
     }
-
     $(window).on('scroll', checkCounters);
+    checkCounters();
 });
-
-
-document.getElementById('menu-toggle').onclick = function() {
-    const menu = document.getElementById('mobile-menu');
-    menu.classList.remove('-translate-y-full', 'opacity-0', 'pointer-events-none');
-};
-
-document.getElementById('close-menu').onclick = function() {
-    const menu = document.getElementById('mobile-menu');
-    menu.classList.add('-translate-y-full', 'opacity-0', 'pointer-events-none');
-};
 </script>
-
-<!-- Alpine.js for potential interactive elements -->
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
 <script src="//code.tidio.co/6jsrtbd0baan9h0fzzbbesslvf1wqrnx.js" async></script>
 @endpush

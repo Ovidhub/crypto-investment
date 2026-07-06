@@ -7,291 +7,140 @@
     <title>{{$settings->site_name}} | @yield('title')</title>
 
     <link rel="icon" href="{{ asset('storage/app/public/'.$settings->favicon)}}" type="image/png"/>
-    
+
     <!-- Core CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
     tailwind.config = {
         darkMode: 'class',
         theme: {
             extend: {
-                screens: {
-                    'xs': '375px',
+                screens: { 'xs': '375px' },
+                fontFamily: {
+                    display: ['"Space Grotesk"', 'sans-serif'],
+                    sans: ['Inter', 'sans-serif'],
                 },
                 colors: {
-                    // Primary: Amber (#F59E0B) - Professional, High-value, Gold-standard
                     primary: {
-                        DEFAULT: '#F59E0B',
-                        '50':  '#fffbeb',
-                        '100': '#fef3c7',
-                        '200': '#fde68a',
-                        '300': '#fcd34d',
-                        '400': '#fbbf24',
-                        '500': '#F59E0B',
-                        '600': '#d97706',
-                        '700': '#b45309',
-                        '800': '#92400e',
-                        '900': '#78350f',
+                        DEFAULT: '#7c3aed',
+                        '50': '#f5f0ff', '100': '#ede4ff', '200': '#d9c4ff', '300': '#c19dff',
+                        '400': '#b57bff', '500': '#9b5cff', '600': '#7c3aed', '700': '#6b28d9',
+                        '800': '#571db0', '900': '#45178c',
                     },
-                    // Secondary: Orange (#FB923C) - Energy, Alerts, Call-to-Actions
-                    secondary: {
-                        DEFAULT: '#FB923C',
-                        '50':  '#fff7ed',
-                        '100': '#ffedd5',
-                        '200': '#fed7aa',
-                        '300': '#fdba74',
-                        '400': '#FB923C',
-                        '500': '#f97316',
-                        '600': '#ea580c',
-                        '700': '#c2410c',
-                        '800': '#9a3412',
-                        '900': '#7c2d12',
-                    },
-                    // Tertiary: Warm Sun - Used for softer highlights and subtle gradients
-                    tertiary: {
-                        DEFAULT: '#FBBF24',
-                        '50':  '#fffdf5',
-                        '100': '#fff8e6',
-                        '200': '#ffecb3',
-                        '300': '#ffe080',
-                        '400': '#ffd44d',
-                        '500': '#FBBF24',
-                        '600': '#e6a800',
-                        '700': '#b38200',
-                        '800': '#805d00',
-                        '900': '#4d3800',
-                    },
-                    // Dark: Keeping the deep Navy/Slate for the "Midnight Quantum" look
-                    dark: {
-                        DEFAULT: '#020617',
-                        '50': '#0F172A',
-                        '100': '#1E293B',
-                        '200': '#334155',
-                        '300': '#475569',
-                    },
-                    light: {
-                        DEFAULT: '#F8FAFC',
-                        '50': '#FFFFFF',
-                        '100': '#F1F5F9',
-                        '200': '#E2E8F0',
-                        '300': '#CBD5E1',
-                    },
+                    brand: '#b57bff',
+                    'brand-2': '#7c3aed',
+                    accent: '#22e58a',
+                    dark: { DEFAULT: '#05060a', '50': '#0b0e15', '100': '#10141d', '200': '#1e2530', '300': '#2a303c' },
+                    light: { DEFAULT: '#F8FAFC', '50': '#FFFFFF', '100': '#F1F5F9', '200': '#E2E8F0', '300': '#CBD5E1' },
                 }
             }
         }
     }
-</script>
-     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Lucide Icons -->
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <!-- Google Recaptcha -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    
-    @section('styles')
-    <!-- Custom Styles -->
-    <style>
-        /* Simple dot pattern background */
-        .bg-dot-pattern {
-            background-image: radial-gradient(circle, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        
-        .light .bg-dot-pattern {
-            background-image: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-        }
 
-        /* Responsive adjustments for split layout */
-        @media (max-width: 1023px) {
-            .split-layout {
-                min-height: 100vh;
-            }
-        }
+    @include('layouts.partials.newtheme')
+
+    @section('styles')
+    <style>
+        body { font-family: "Inter", sans-serif; }
+        h1, h2, h3 { font-family: "Space Grotesk", sans-serif; }
     </style>
     @show
 </head>
-<body class="dark:bg-dark bg-light-100 transition-colors duration-200">
-    <!-- Theme Detection Script - Run Early -->
-    <script>
-        // Check for saved theme preference, default to dark mode
-        const savedTheme = localStorage.getItem('darkMode');
-        
-        // Only switch to light mode if explicitly saved as false
-        if (savedTheme === 'false') {
-            document.documentElement.classList.remove('dark');
-        }
-        // Otherwise stay in dark mode (already set in HTML)
-    </script>
+<body class="bg-dark text-white">
 
-    <!-- Theme Toggle -->
-    <div class="fixed top-4 right-4 z-50">
-        <button id="themeToggle" class="p-2 rounded-full dark:bg-dark-100 bg-light-200 shadow-sm">
-            <i data-lucide="sun" class="h-5 w-5 dark:text-white text-dark hidden dark:block"></i>
-            <i data-lucide="moon" class="h-5 w-5 dark:text-white text-dark block dark:hidden"></i>
-        </button>
-    </div>
-    
     <!-- Main Content - Split Layout -->
     <div class="min-h-screen flex flex-col lg:flex-row">
-        <!-- Left Column - Illustration (Hidden on mobile) -->
-        <div class="hidden lg:flex lg:w-1/2 bg-dot-pattern dark:bg-dark-50 bg-light-200 relative overflow-hidden">
-            <!-- Illustration Container -->
-            <div class="flex flex-col justify-center items-center p-12 w-full max-w-2xl mx-auto">
-                <!-- Logo -->
-                <div class="absolute top-8 left-8">
-                    <a href="/">
-                        <img src="{{ asset('storage/app/public/'.$settings->logo) }}" alt="Logo" class="h-10">
-                    </a>
-                </div>
-                
-                <!-- Illustration from Open Source Library -->
-                <div class="mb-8 w-4/5 max-w-md mx-auto">
-                    <img src="https://raw.githubusercontent.com/cruip/open-react-template/refs/heads/master/public/images/features.png" 
-                         alt="Illustration" class="w-full h-auto" id="illustrationImage">
-                </div>
-                
-                <!-- Text Content -->
-                <div class="text-center">
-                    <h1 class="text-3xl font-bold dark:text-white text-dark mb-4" id="illustrationTitle">Welcome to {{ $settings->site_name }}</h1>
-                    <p class="dark:text-gray-300 text-gray-700 max-w-md mx-auto" id="illustrationDescription">
-                        Our platform offers secure trading, real-time market data, and expert insights to help you achieve your financial goals.
-                    </p>
-                </div>
-                
-                <!-- Optional Feature List -->
-                <div class="mt-8 w-full max-w-md">
-                    <div class="space-y-4">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 mt-1">
-                                <i data-lucide="check-circle" class="h-5 w-5 text-secondary"></i>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium dark:text-white text-dark">Secure Trading</h3>
-                                <p class="text-sm dark:text-gray-400 text-gray-600">State-of-the-art security features to protect your investments</p>
-                            </div>
+        <!-- Left Column - Branded Showcase (Hidden on mobile) -->
+        <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-dark-50">
+            <div class="pointer-events-none absolute inset-0">
+                <div class="absolute inset-0 grid-bg"></div>
+                <div class="absolute -top-32 left-1/3 h-[440px] w-[440px] rounded-full bg-brand-2/30 blur-[120px]"></div>
+                <div class="absolute bottom-0 right-0 h-[320px] w-[320px] rounded-full bg-accent/15 blur-[120px]"></div>
+            </div>
+
+            <div class="relative z-10 flex flex-col justify-center p-12 w-full max-w-2xl mx-auto">
+                <a href="/" class="flex items-center gap-3 mb-12">
+                    <img src="{{ asset('storage/app/public/'.$settings->logo) }}" alt="Logo" class="h-10">
+                </a>
+
+                <span class="inline-flex w-fit items-center gap-2 rounded-full border border-dark-200 bg-white/5 px-4 py-1.5 text-xs font-medium text-[#c7cedb]">
+                    <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+                    Trusted by investors worldwide
+                </span>
+
+                <h1 class="mt-6 font-display text-4xl font-bold leading-tight text-white">
+                    Invest smarter with <span class="brand-gradient">{{ $settings->site_name }}</span>
+                </h1>
+                <p class="mt-4 text-[#9aa3b2] max-w-md">
+                    Secure trading, real-time market data and a portfolio that works for you around the clock.
+                </p>
+
+                <div class="mt-10 space-y-4 w-full max-w-md">
+                    @php
+                        $points = [
+                            ['title' => 'Secure Trading', 'desc' => 'Strong security features to protect your investments'],
+                            ['title' => 'Real-Time Analytics', 'desc' => 'Up-to-the-minute market data to inform your decisions'],
+                            ['title' => 'Expert Support', 'desc' => '24/7 customer support from our team of specialists'],
+                        ];
+                    @endphp
+                    @foreach($points as $p)
+                    <div class="flex items-start gap-3 rounded-2xl border border-dark-200 bg-dark-100/60 p-4">
+                        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand/10 text-accent">
+                            <i class="fa-solid fa-circle-check"></i>
                         </div>
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 mt-1">
-                                <i data-lucide="check-circle" class="h-5 w-5 text-secondary"></i>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium dark:text-white text-dark">Real-Time Analytics</h3>
-                                <p class="text-sm dark:text-gray-400 text-gray-600">Up-to-the-minute market data to inform your decisions</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 mt-1">
-                                <i data-lucide="check-circle" class="h-5 w-5 text-secondary"></i>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium dark:text-white text-dark">Expert Support</h3>
-                                <p class="text-sm dark:text-gray-400 text-gray-600">24/7 customer support from our team of specialists</p>
-                            </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">{{ $p['title'] }}</h3>
+                            <p class="text-sm text-[#9aa3b2]">{{ $p['desc'] }}</p>
                         </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
         </div>
-        
+
         <!-- Right Column - Content Area -->
-        <div class="flex-1 min-h-screen flex flex-col">
-            <!-- Mobile Logo (Visible only on mobile) -->
-            <div class="flex justify-center pt-24 lg:hidden">
+        <div class="flex-1 min-h-screen flex flex-col bg-dark relative">
+            <div class="pointer-events-none absolute inset-0 lg:hidden">
+                <div class="absolute inset-0 grid-bg"></div>
+                <div class="absolute -top-24 right-0 h-[280px] w-[280px] rounded-full bg-brand-2/25 blur-[100px]"></div>
+            </div>
+
+            <!-- Mobile Logo -->
+            <div class="relative z-10 flex justify-center pt-12 lg:hidden">
                 <a href="/">
                     <img src="{{ asset('storage/app/public/'.$settings->logo) }}" alt="Logo" class="h-10">
                 </a>
             </div>
-            
+
             <!-- Content Wrapper -->
-            <div class="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8">
+            <div class="relative z-10 flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8">
                 <div class="w-full max-w-md">
-                    <!-- Content -->
                     @yield('content')
                 </div>
             </div>
-            
+
             <!-- Footer -->
-            <footer class="py-4">
+            <footer class="relative z-10 py-4">
                 <div class="container mx-auto px-4">
-                    <p class="text-center text-sm dark:text-gray-400 text-gray-600">
+                    <p class="text-center text-sm text-[#9aa3b2]">
                         © {{ date('Y') }} {{ $settings->site_name }}. All rights reserved.
                     </p>
                 </div>
             </footer>
         </div>
     </div>
-<script>
-        lucide.createIcons();
-    </script>
-    <!-- Core Scripts -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Lucide icons
-            lucide.createIcons();
-            
-            // Theme toggle functionality
-            const themeToggle = document.getElementById('themeToggle');
-            
-            if (themeToggle) {
-                themeToggle.addEventListener('click', function() {
-                    if (document.documentElement.classList.contains('dark')) {
-                        document.documentElement.classList.remove('dark');
-                        localStorage.setItem('darkMode', 'false');
-                    } else {
-                        document.documentElement.classList.add('dark');
-                        localStorage.setItem('darkMode', 'true');
-                    }
-                });
-            }
-            
-            // Random illustration and text based on page
-            const pageType = document.title.toLowerCase();
-            const illustrations = [
-                {
-                    image: "https://raw.githubusercontent.com/cruip/open-react-template/refs/heads/master/public/images/features.png",
-                    title: "Welcome to {{ $settings->site_name }}",
-                    description: "Our platform offers secure trading, real-time market data, and expert insights to help you achieve your financial goals."
-                },
-                {
-                    image: "https://raw.githubusercontent.com/cruip/open-react-template/refs/heads/master/public/images/features.png",
-                    title: "Invest with Confidence",
-                    description: "Take control of your financial future with our transparent and secure investment platform."
-                },
-                {
-                    image: "https://raw.githubusercontent.com/cruip/open-react-template/refs/heads/master/public/images/features.png",
-                    title: "Simple, Secure, Reliable",
-                    description: "Our advanced platform provides the tools and resources you need to succeed in today's market."
-                }
-            ];
-            
-            // Select random illustration or based on page type
-            let selectedIllustration;
-            if (pageType.includes('login')) {
-                selectedIllustration = illustrations[0];
-            } else if (pageType.includes('register') || pageType.includes('sign up')) {
-                selectedIllustration = illustrations[1];
-            } else {
-                selectedIllustration = illustrations[2];
-            }
-            
-            // Set illustration and text
-            const illustrationImage = document.getElementById('illustrationImage');
-            const illustrationTitle = document.getElementById('illustrationTitle');
-            const illustrationDescription = document.getElementById('illustrationDescription');
-            
-            if (illustrationImage && illustrationTitle && illustrationDescription) {
-                illustrationImage.src = selectedIllustration.image;
-                illustrationTitle.textContent = selectedIllustration.title;
-                illustrationDescription.textContent = selectedIllustration.description;
-            }
-        });
-    </script>
-    
+
+    <script> if (window.lucide) lucide.createIcons(); </script>
+
     @section('scripts')
     @show
-    
+
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.4/dist/livewire-turbolinks.js" data-turbolinks-eval="false" data-turbo-eval="false"></script>
 </body>

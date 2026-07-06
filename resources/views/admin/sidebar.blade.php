@@ -59,6 +59,13 @@
                             <p>Manage Users</p>
                         </a>
                     </li>
+                    <li class="nav-item {{ request()->routeIs('wallet.approvals') ? 'active' : '' }}">
+                        <a href="{{ route('wallet.approvals') }}">
+                            <i class="fa fa-wallet" aria-hidden="true"></i>
+                            <p>Wallet Approvals</p>
+                        </a>
+                    </li>
+
                     <li
                         class="nav-item {{ request()->routeIs('mdeposits') ? 'active' : '' }} {{ request()->routeIs('viewdepositimage') ? 'active' : '' }} {{ request()->routeIs('mdeposits') ? 'active' : '' }}">
                         <a href="{{ url('/admin/dashboard/mdeposits') }}">

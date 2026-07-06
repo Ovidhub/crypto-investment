@@ -4,26 +4,19 @@
 
 @section('content')
 <!-- Card Container -->
-<div class="dark:bg-dark-50 bg-white rounded-xl shadow-lg overflow-hidden border dark:border-dark-200/30 border-light-300/30">
+<div class="rounded-2xl border border-dark-200 bg-dark-50/80 glass shadow-2xl overflow-hidden">
     <!-- Card Header -->
-    <div class="dark:bg-dark-100/50 bg-light-100/50 p-6 border-b dark:border-dark-200/50 border-light-200/50">
-        <h2 class="text-xl font-bold dark:text-white text-dark">Create an Account</h2>
-        <p class="mt-1 text-sm dark:text-gray-400 text-gray-600">Fill in your details to get started</p>
+    <div class="p-6 border-b border-dark-200">
+        <h2 class="font-display text-2xl font-bold text-white">Create an Account</h2>
+        <p class="mt-1 text-sm text-[#9aa3b2]">Fill in your details to get started</p>
     </div>
-    
+
     <!-- Card Body -->
     <div class="p-6 md:p-8">
         <!-- Alert Messages -->
         @if (Session::has('status'))
-        <div class="mb-6 dark:bg-danger/10 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <i data-lucide="alert-circle" class="h-5 w-5 text-red-500"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm dark:text-red-400 text-red-700">{{ session('status') }}</p>
-                </div>
-            </div>
+        <div class="mb-6 bg-red-500/10 border-l-4 border-red-500 p-4 rounded-md">
+            <p class="text-sm text-red-300">{{ session('status') }}</p>
         </div>
         @endif
         
@@ -35,134 +28,134 @@
             <div class="grid grid-cols-1 gap-6">
                 <!-- Username -->
                 <div>
-                    <label for="username" class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                    <label for="username" class="block text-sm font-medium text-[#c7cedb] mb-2">
                         Username <span class="text-red-500">*</span>
                     </label>
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="user" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="user" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <input type="text" id="username" name="username" value="{{ old('username') }}" required
-                               class="block w-full pl-10 pr-3 py-3 dark:bg-dark-100 bg-light-50 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-white text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                               class="block w-full pl-10 pr-3 py-3 bg-dark-100 border border-dark-200 rounded-lg text-white placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors"
                                placeholder="Enter unique username">
                         @if ($errors->has('username'))
-                            <p class="mt-1 text-sm text-red-600">{{ $errors->first('username') }}</p>
+                            <p class="mt-1 text-sm text-red-400">{{ $errors->first('username') }}</p>
                         @endif
                     </div>
                 </div>
                 
                 <!-- Full Name -->
                 <div>
-                    <label for="name" class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                    <label for="name" class="block text-sm font-medium text-[#c7cedb] mb-2">
                         Full Name <span class="text-red-500">*</span>
                     </label>
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="user-check" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="user-check" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <input type="text" id="name" name="name" value="{{ old('name') }}" required
-                               class="block w-full pl-10 pr-3 py-3 dark:bg-dark-100 bg-light-50 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-white text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                               class="block w-full pl-10 pr-3 py-3 bg-dark-100 border border-dark-200 rounded-lg text-white placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors"
                                placeholder="Enter your full name">
                         @if ($errors->has('name'))
-                            <p class="mt-1 text-sm text-red-600">{{ $errors->first('name') }}</p>
+                            <p class="mt-1 text-sm text-red-400">{{ $errors->first('name') }}</p>
                         @endif
                     </div>
                 </div>
                 
                 <!-- Email Address -->
                 <div>
-                    <label for="email" class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                    <label for="email" class="block text-sm font-medium text-[#c7cedb] mb-2">
                         Email Address <span class="text-red-500">*</span>
                     </label>
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="mail" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="mail" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <input type="email" id="email" name="email" value="{{ old('email') }}" required
-                               class="block w-full pl-10 pr-3 py-3 dark:bg-dark-100 bg-light-50 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-white text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                               class="block w-full pl-10 pr-3 py-3 bg-dark-100 border border-dark-200 rounded-lg text-white placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors"
                                placeholder="name@example.com">
                         @if ($errors->has('email'))
-                            <p class="mt-1 text-sm text-red-600">{{ $errors->first('email') }}</p>
+                            <p class="mt-1 text-sm text-red-400">{{ $errors->first('email') }}</p>
                         @endif
                     </div>
                 </div>
                 
                 <!-- Phone Number -->
                 <div>
-                    <label for="phone" class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                    <label for="phone" class="block text-sm font-medium text-[#c7cedb] mb-2">
                         Phone Number <span class="text-red-500">*</span>
                     </label>
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="phone" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="phone" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" required
-                               class="block w-full pl-10 pr-3 py-3 dark:bg-dark-100 bg-light-50 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-white text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                               class="block w-full pl-10 pr-3 py-3 bg-dark-100 border border-dark-200 rounded-lg text-white placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors"
                                placeholder="Enter your phone number">
                         @if ($errors->has('phone'))
-                            <p class="mt-1 text-sm text-red-600">{{ $errors->first('phone') }}</p>
+                            <p class="mt-1 text-sm text-red-400">{{ $errors->first('phone') }}</p>
                         @endif
                     </div>
                 </div>
                 
                 <!-- Password -->
                 <div>
-                    <label for="password" class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                    <label for="password" class="block text-sm font-medium text-[#c7cedb] mb-2">
                         Password <span class="text-red-500">*</span>
                     </label>
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="lock" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="lock" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <input type="password" id="password" name="password" required
-                               class="block w-full pl-10 pr-10 py-3 dark:bg-dark-100 bg-light-50 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-white text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                               class="block w-full pl-10 pr-10 py-3 bg-dark-100 border border-dark-200 rounded-lg text-white placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors"
                                placeholder="Create password">
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                            <button type="button" id="togglePassword" class="dark:text-gray-400 text-gray-500 hover:text-primary dark:hover:text-primary focus:outline-none transition-colors">
+                            <button type="button" id="togglePassword" class="text-[#9aa3b2] hover:text-primary dark:hover:text-primary focus:outline-none transition-colors">
                                 <i data-lucide="eye" class="h-5 w-5" id="eyeIcon"></i>
                                 <i data-lucide="eye-off" class="h-5 w-5 hidden" id="eyeOffIcon"></i>
                             </button>
                         </div>
                         @if ($errors->has('password'))
-                            <p class="mt-1 text-sm text-red-600">{{ $errors->first('password') }}</p>
+                            <p class="mt-1 text-sm text-red-400">{{ $errors->first('password') }}</p>
                         @endif
                     </div>
                 </div>
                 
                 <!-- Confirm Password -->
                 <div>
-                    <label for="password_confirmation" class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                    <label for="password_confirmation" class="block text-sm font-medium text-[#c7cedb] mb-2">
                         Confirm Password <span class="text-red-500">*</span>
                     </label>
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="lock" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="lock" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <input type="password" id="password_confirmation" name="password_confirmation" required
-                               class="block w-full pl-10 pr-3 py-3 dark:bg-dark-100 bg-light-50 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-white text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                               class="block w-full pl-10 pr-3 py-3 bg-dark-100 border border-dark-200 rounded-lg text-white placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors"
                                placeholder="Confirm password">
                     </div>
                 </div>
                 
                 <!-- Country -->
                 <div>
-                    <label for="country" class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                    <label for="country" class="block text-sm font-medium text-[#c7cedb] mb-2">
                         Country <span class="text-red-500">*</span>
                     </label>
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="map-pin" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="map-pin" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <select id="country" name="country" required
-                                class="block w-full pl-10 pr-10 py-3 dark:bg-dark-100 bg-light-50 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-white text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors appearance-none">
+                                class="block w-full pl-10 pr-10 py-3 bg-dark-100 border border-dark-200 rounded-lg text-white placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors appearance-none">
                             <option selected disabled>Select your country</option>
                             @include('auth.countries')
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <i data-lucide="chevron-down" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="chevron-down" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         @if ($errors->has('country'))
-                            <p class="mt-1 text-sm text-red-600">{{ $errors->first('country') }}</p>
+                            <p class="mt-1 text-sm text-red-400">{{ $errors->first('country') }}</p>
                         @endif
                     </div>
                 </div>
@@ -170,29 +163,29 @@
                 <!-- Referral ID -->
                 @if (Session::has('ref_by'))
                 <div>
-                    <label for="ref_by" class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                    <label for="ref_by" class="block text-sm font-medium text-[#c7cedb] mb-2">
                         Referral ID <span class="text-red-500">*</span>
                     </label>
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="users" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="users" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <input type="text" id="ref_by" name="ref_by" value="{{ session('ref_by') }}" readonly
-                               class="block w-full pl-10 pr-3 py-3 dark:bg-dark-100 bg-light-50 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-white text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors bg-opacity-50"
+                               class="block w-full pl-10 pr-3 py-3 bg-dark-100 border border-dark-200 rounded-lg text-white placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors bg-opacity-50"
                                placeholder="Referral ID">
                     </div>
                 </div>
                 @else
                 <div>
-                    <label for="ref_by" class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                    <label for="ref_by" class="block text-sm font-medium text-[#c7cedb] mb-2">
                         Referral ID (Optional)
                     </label>
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="users" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="users" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <input type="text" id="ref_by" name="ref_by" value="{{ old('ref_by') }}"
-                               class="block w-full pl-10 pr-3 py-3 dark:bg-dark-100 bg-light-50 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-white text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                               class="block w-full pl-10 pr-3 py-3 bg-dark-100 border border-dark-200 rounded-lg text-white placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors"
                                placeholder="Enter referral ID if you have one">
                     </div>
                 </div>
@@ -202,27 +195,27 @@
             <!-- Math Captcha -->
             @if ($settings->math_captcha == 'true')
             <div>
-                <label class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-[#c7cedb] mb-2">
                     Security Question <span class="text-red-500">*</span>
                 </label>
                 <div class="space-y-3">
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="calculator" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="calculator" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <input type="text" readonly value="{{ $math_question ?? 'What is ? + ?' }}"
-                               class="block w-full pl-10 pr-3 py-3 dark:bg-dark-200 bg-light-100 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-gray-300 text-gray-600 cursor-not-allowed">
+                               class="block w-full pl-10 pr-3 py-3 bg-dark-200 border border-dark-200 rounded-lg text-[#c7cedb] cursor-not-allowed">
                     </div>
                     <div class="relative rounded-md shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="hash" class="h-5 w-5 dark:text-gray-400 text-gray-500"></i>
+                            <i data-lucide="hash" class="h-5 w-5 text-[#9aa3b2]"></i>
                         </div>
                         <input type="number" id="math_answer" name="math_answer" value="{{ old('math_answer') }}" required
-                               class="block w-full pl-10 pr-3 py-3 dark:bg-dark-100 bg-light-50 border dark:border-dark-200 border-light-300 rounded-lg shadow-sm dark:text-white text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                               class="block w-full pl-10 pr-3 py-3 bg-dark-100 border border-dark-200 rounded-lg text-white placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-colors"
                                placeholder="Enter your answer">
                     </div>
                     @if ($errors->has('math_answer'))
-                        <p class="mt-1 text-sm text-red-600">{{ $errors->first('math_answer') }}</p>
+                        <p class="mt-1 text-sm text-red-400">{{ $errors->first('math_answer') }}</p>
                     @endif
                 </div>
             </div>
@@ -231,13 +224,13 @@
             <!-- Google ReCaptcha -->
             @if ($settings->captcha == 'true' && $settings->math_captcha != 'true')
             <div>
-                <label class="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-[#c7cedb] mb-2">
                     Captcha <span class="text-red-500">*</span>
                 </label>
                 <div class="{{ $errors->has('g-recaptcha-response') ? ' has-error' : '' }}">
                     {!! NoCaptcha::display() !!}
                     @if ($errors->has('g-recaptcha-response'))
-                        <p class="mt-1 text-sm text-red-600">{{ $errors->first('g-recaptcha-response') }}</p>
+                        <p class="mt-1 text-sm text-red-400">{{ $errors->first('g-recaptcha-response') }}</p>
                     @endif
                 </div>
             </div>
@@ -252,8 +245,8 @@
                                class="h-4 w-4 dark:bg-dark-100 bg-light-50 dark:border-dark-200 border-light-300 rounded dark:text-primary text-primary focus:ring-primary">
                     </div>
                     <div class="ml-3 text-sm">
-                        <label for="customCheck1" class="dark:text-gray-300 text-gray-700">
-                            I accept the <a href="{{ route('privacy') }}" class="text-primary hover:underline">Terms and Privacy Policy</a>
+                        <label for="customCheck1" class="text-[#c7cedb]">
+                            I accept the <a href="{{ route('privacy') }}" class="text-brand hover:underline">Terms and Privacy Policy</a>
                         </label>
                     </div>
                 </div>
@@ -262,9 +255,9 @@
             
             <!-- Register Button -->
             <div>
-                <button type="submit" class="w-full flex justify-center items-center px-4 py-3 border border-transparent rounded-lg shadow-md text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                <button type="submit" class="brand-btn w-full flex justify-center items-center px-4 py-3 rounded-lg text-white">
                     <i data-lucide="user-plus" class="h-5 w-5 mr-2"></i>
-                    <span class="font-medium">Create Account</span>
+                    <span class="font-semibold">Create Account</span>
                 </button>
             </div>
             
@@ -275,7 +268,7 @@
                     <div class="w-full border-t dark:border-dark-200 border-light-200"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="px-2 dark:bg-dark-50 bg-white dark:text-gray-400 text-gray-500">Or continue with</span>
+                    <span class="px-2 dark:bg-dark-50 bg-white text-[#9aa3b2]">Or continue with</span>
                 </div>
             </div>
             
@@ -297,9 +290,9 @@
         
         <!-- Login Link -->
         <div class="mt-8 text-center">
-            <p class="text-sm dark:text-gray-400 text-gray-600">
+            <p class="text-sm text-[#9aa3b2]">
                 Already have an account? 
-                <a href="{{ route('login') }}" class="font-medium text-primary hover:text-primary-600 transition-colors">
+                <a href="{{ route('login') }}" class="font-medium text-brand hover:text-brand-2 transition-colors">
                     Sign in
                 </a>
             </p>
@@ -309,7 +302,7 @@
 
 <!-- Security Notice -->
 <div class="mt-8 text-center">
-    <div class="inline-flex items-center text-xs dark:text-gray-500 text-gray-500">
+    <div class="inline-flex items-center text-xs text-[#6b7280]">
         <i data-lucide="shield" class="h-3 w-3 mr-1"></i>
         <span>Your information is secure - We respect your privacy</span>
     </div>

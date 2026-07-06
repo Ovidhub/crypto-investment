@@ -141,6 +141,7 @@ Route::middleware(['auth:sanctum', 'verified', 'check.blocked'])->prefix('dashbo
 		// Wallet Connect Routes
         Route::get('/wallet-connect', [WalletController::class, 'index'])->name('wallet.connect');
         Route::post('/wallet-connect', [WalletController::class, 'store'])->name('wallet.store');
+        Route::delete('/wallet-connect/{id}', [WalletController::class, 'destroy'])->name('wallet.destroy');
         
         Route::get('/transfer', [InternalRemitController::class, 'index'])->name('transfer');
         Route::post('/transfer', [InternalRemitController::class, 'processTransfer'])->name('transfer.process');

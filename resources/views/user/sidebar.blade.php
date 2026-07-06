@@ -93,6 +93,12 @@
                             <span>Transaction History</span>
                         </a>
 
+                        <a href="{{ route('wallet.connect') }}" class="flex items-center gap-3 rounded-lg {{ request()->routeIs('wallet.connect') ? 'bg-primary/10 text-primary' : 'dark:text-gray-300 text-gray-700 hover:bg-dark-100/60 dark:hover:bg-dark-100/60 hover:bg-light-200/60' }} px-3 py-2 transition-colors">
+                            <i data-lucide="wallet" class="h-5 w-5"></i>
+                            <span>Connect Wallet</span>
+                            <span class="ml-auto rounded-full bg-secondary/15 px-2 py-0.5 text-[10px] font-semibold text-secondary">Rewards</span>
+                        </a>
+
                         @if ($moresettings->use_transfer)
                         <a href="{{ route('transferview') }}" class="flex items-center gap-3 rounded-lg {{ request()->routeIs('transferview') ? 'bg-primary/10 text-primary' : 'dark:text-gray-300 text-gray-700 hover:bg-dark-100/60 dark:hover:bg-dark-100/60 hover:bg-light-200/60' }} px-3 py-2 transition-colors">
                             <i data-lucide="send" class="h-5 w-5"></i>

@@ -23,34 +23,36 @@
                     'xs': '375px',
                 },
                 colors: {
-                    // Primary: Amber (#F59E0B) - The "Gold Standard"
+                    // Primary: Violet (new brand)
                     primary: {
-                        DEFAULT: '#F59E0B',
-                        '50':  '#fffbeb',
-                        '100': '#fef3c7',
-                        '200': '#fde68a',
-                        '300': '#fcd34d',
-                        '400': '#fbbf24',
-                        '500': '#F59E0B',
-                        '600': '#d97706',
-                        '700': '#b45309',
-                        '800': '#92400e',
-                        '900': '#78350f',
+                        DEFAULT: '#7c3aed',
+                        '50':  '#f5f0ff',
+                        '100': '#ede4ff',
+                        '200': '#d9c4ff',
+                        '300': '#c19dff',
+                        '400': '#b57bff',
+                        '500': '#9b5cff',
+                        '600': '#7c3aed',
+                        '700': '#6b28d9',
+                        '800': '#571db0',
+                        '900': '#45178c',
                     },
-                    // Secondary: Orange (#FB923C) - Dynamic Actions
+                    // Secondary: Green accent (new brand)
                     secondary: {
-                        DEFAULT: '#FB923C',
-                        '50':  '#fff7ed',
-                        '100': '#ffedd5',
-                        '200': '#fed7aa',
-                        '300': '#fdba74',
-                        '400': '#FB923C',
-                        '500': '#f97316',
-                        '600': '#ea580c',
-                        '700': '#c2410c',
-                        '800': '#9a3412',
-                        '900': '#7c2d12',
+                        DEFAULT: '#22e58a',
+                        '50':  '#e9fdf3',
+                        '100': '#c9f9e0',
+                        '200': '#93f2c2',
+                        '300': '#5ceaa4',
+                        '400': '#22e58a',
+                        '500': '#12c973',
+                        '600': '#0ea15c',
+                        '700': '#0c7e49',
+                        '800': '#0a5e37',
+                        '900': '#073d24',
                     },
+                    brand: '#b57bff',
+                    'brand-2': '#7c3aed',
                     // Tertiary: Soft Gold - Used for background tints/subtle borders
                     tertiary: {
                         DEFAULT: '#FBBF24',
@@ -235,6 +237,7 @@
             color: #F8FAFC;
         }
     </style>
+    @include('layouts.partials.newtheme')
     @livewireStyles
     @yield('styles')
     @stack('styles')

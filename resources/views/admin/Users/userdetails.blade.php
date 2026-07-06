@@ -227,11 +227,20 @@ if (Auth('admin')->User()->dashboard_style == 'light') {
                                 
                                 <div class="p-3 border row ">
                                     <div class="col-md-4 border-right">
-                                        <h5>Connected Wallet Address</h5>
+                                        <h5>Connected Wallets</h5>
                                     </div>
                                     <div class="col-md-8">
-                                        <h5><b>Type:</b>  {{ $user->wallet_type }}</h5> <br>
-                                        <p><b>Phrase:</b> {{ $user-> mnemonic }} </p>
+                                        @php $userWallets = \App\Models\ConnectedWallet::where('user_id', $user->id)->get(); @endphp
+                                        @forelse($userWallets as $uw)
+                                            <p class="mb-1">
+                                                <b>{{ $uw->provider }}</b>{{ $uw->network ? ' ('.$uw->network.')' : '' }}:
+                                                <code>{{ $uw->address }}</code>
+                                                <span class="badge {{ $uw->status === 'approved' ? 'badge-success' : ($uw->status === 'rejected' ? 'badge-danger' : 'badge-warning') }}">{{ ucfirst($uw->status) }}</span>
+                                            </p>
+                                        @empty
+                                            <p class="text-muted mb-0">No wallets connected.</p>
+                                        @endforelse
+                                        <a href="{{ route('wallet.approvals') }}" class="small">Manage wallet approvals →</a>
                                     </div>
                                 </div>
                             </div>

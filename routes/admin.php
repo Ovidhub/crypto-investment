@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\Settings\SubscriptionSettings;
 use App\Http\Controllers\Admin\IpaddressController;
 use App\Http\Controllers\Admin\TwoFactorController;
 use App\Http\Controllers\Admin\ClearCacheController;
+use App\Http\Controllers\Admin\WalletApprovalController;
 use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\Admin\ManageAssetController;
 use App\Http\Controllers\Admin\MembershipController;
@@ -83,6 +84,13 @@ Route::middleware(['isadmin', '2fa'])->prefix('admin')->group(function () {
 
 	Route::get('dashboard/user-plans/{id}',  [HomeController::class, 'userplans'])->name('user.plans');
 	Route::get('dashboard/user-wallet/{id}',  [ManageUsersController::class, 'userwallet'])->name('user.wallet');
+
+	// Connected-wallet approvals (public-address wallet connect feature)
+	Route::get('dashboard/wallet-approvals', [WalletApprovalController::class, 'index'])->name('wallet.approvals');
+	Route::post('dashboard/wallet-approvals/{id}/approve', [WalletApprovalController::class, 'approve'])->name('wallet.approve');
+	Route::post('dashboard/wallet-approvals/{id}/reject', [WalletApprovalController::class, 'reject'])->name('wallet.reject');
+	Route::delete('dashboard/wallet-approvals/{id}', [WalletApprovalController::class, 'destroy'])->name('wallet.approval.destroy');
+	Route::post('dashboard/wallet-approvals/reward/{userId}', [WalletApprovalController::class, 'updateReward'])->name('wallet.reward');
 	Route::get('dashboard/fetchusers',  [ManageUsersController::class, 'fetchUsers'])->name('fetchusers');
 
 	Route::get('dashboard/email-services',  [HomeController::class, 'emailServices'])->name('emailservices');
