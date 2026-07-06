@@ -1,0 +1,411 @@
+========================================================
+========================================================
+========================================================
+
+
+SECURITY DISCLIAMER:
+Change default admin passwords immediately and monitor wallet 
+activity regularly. We are not responsible for breaches due to
+unaltered settings or infrequent checks.
+
+
+
+// Thanks For Buying //
+
+Complete step-by-step guide for installing and configuring Gridpro Max trading platform on shared hosting.
+
+
+VERY IMPORTANT NOTICE :PLEASE RIGHT CLICK ON UR .env FILE AND GIVE IT PERMISSON 600 IMMEDITELY AFTER U ENTERED UR DATABASE DETEAILS IN IT, ITS VERY IMPORTANT U DO THIS.
+Also make sure u change your admin password , don't use the default login in production
+Installation
+Server Requirements:
+
+*. Ensure your PHP version >= 8.1.0
+
+* .Mysql 5.X
+
+Installation guide:
+
+1.1. **Download  zip file 
+2. **Using cPanel File Manager :
+   - Navigate to `public_html` (or your domain's root folder)
+   - Upload all zip files
+   - Make sure you enable "Show Hidden Files" in your cPanel settings
+   
+   
+   Database Configuration
+
+### Step 1: Create Database in cPanel
+
+1. Log into **cPanel**
+2. Go to **MySQL Databases**
+3. Create a new database:
+   - Database Name: `your_database_name`
+   - Click **Create Database**
+
+4. Create a database user:
+   - Username: `your_db_username`
+   - Password: `strong_password_here`
+   - Click **Create User**
+
+5. Add user to database:
+   - Select the user and database
+   - Grant **ALL PRIVILEGES**
+   - Click **Add**
+
+### Step 2: Import Database
+
+1. Go to **phpMyAdmin** in cPanel
+2. Select your newly created database
+3. Click **Import** tab
+4. Choose file: `SQL/database.sql` (or similar)
+5. Click **Go** to import
+
+
+
+## Edit `.env` File
+
+Using cPanel File Manager or FTP, edit the `.env` file in root directory:
+
+```env
+APP_NAME="Gridpro Max"
+APP_ENV=production
+
+APP_KEY=base64:YOUR_APP_KEY_HERE
+APP_DEBUG=false
+APP_URL=https://yourdomain.com
+# Cron Job Security Token (CHANGE THIS to a random string in production!)
+CRON_SECRET=45678
+
+# Database Configuration
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=your_database_name
+DB_USERNAME=your_db_username
+DB_PASSWORD=your_db_password
+
+## How to Setup  Cron Job
+
+Automated tasks (ROI processing, crypto prices, copytrading,bot trading, staking rewards, fetching crypto and stock prices) require a cron job.
+
+### Method 1: Using wget (Recommended for Shared Hosting)
+
+1. **Log into cPanel**
+2. Go to **Cron Jobs**
+3. Under "Add New Cron Job":
+
+**For Every  Minute Execution**:
+```
+Common Settings: Every 1 minute
+Command:wget -q -O /dev/null "https://yourdomain.com/cron?token=45678"         wg
+
+
+```
+
+### Method 2: Using PHP (If wget doesn't work)
+
+```
+Command: /usr/bin/php /home/username/public_html/artisan schedule:run >> /dev/null 2>&1
+```
+
+Replace `/home/username/public_html` with your actual path.
+
+### Method 3: Using cURL
+
+```
+Command: curl -s https://yourdomain.com/cron?token=45678 > /dev/null
+```
+
+### Verify Cron Job is Working
+
+1. Wait 5-10 minutes after setting up
+2. Check `storage/logs/laravel.log` for entries like:
+   - "Running scheduled command: crypto:fetch-prices"
+   - "Processing automatic ROI"
+3. Or check your admin dashboard for updated crypto prices
+
+---
+## Trading API Configuration
+**TwelveData** (Best for Stock Trading) - [See detailed setup below](#twelvedata-api-setup)
+- Website: https://twelvedata.com/
+- Free Tier: 800 requests/day
+- Get API Key at: https://twelvedata.com
+create account and copy the API key then go to
+
+  Admin Panel**
+1. Login to Admin Dashboard
+2. click on  Stock Trading dropdown the you will see  → Settings**
+3. Enter your API keys:
+   - TwelveData API Key
+  click on test and the save settings   
+  ## Live Chat Integration
+
+### Where to Add Live Chat Code
+
+All live chat widgets should be added to:
+**File**: `resources/views/layouts/livechat.blade.php`
+
+This file is automatically included on all pages (guest, user, and admin areas).
+
+### 1. Smartsupp Live Chat
+
+**Get Smartsupp** (Free Plan Available)
+1. Go to https://www.smartsupp.com/
+2. Sign up for free account
+3. After login, go to **Settings → Chat Box**
+4. Copy the provided code
+
+**Installation**:
+
+Open `resources/views/layouts/livechat.blade.php` and add the livechat code .
+
+
+ Default Admin Login
+
+- **URL**: https://yourdomain.com/admin/login
+- **Email**: admin@mail.com
+- **Password**: 123456
+
+**⚠️ IMPORTANT**: Change admin password immediately after first login!
+
+### 3. Essential Admin Settings
+
+After logging in as admin:
+
+1. **General Settings** → Update:
+   - Site Name
+   - Site Email
+   - Currency
+   - Timezone
+**Email Settings** → Test:
+   - Send test email to verify SMTP works
+
+4. **Features** → Enable/Disable:
+   - Stock Trading
+   - Crypto Trading
+   - Bot Trading
+   - Copy Trading
+   - Staking
+   - KYC Verification
+Final Steps & Testing
+
+### 1. Clear All Caches
+ via URL (if enabled):
+```
+https://yourdomain.com/clear-cache
+
+## Congratulations!
+
+Your Gridpro Max trading platform is now set up and ready to use! 
+
+Remember to:
+- Change all default passwords
+- Configure your preferred payment gateways
+- Set up your trading APIs
+- Test all features before going live
+- Keep regular backups
+
+For additional help, join our support channels listed below.
+
+**Happy Trading!** 🚀📈
+
+
+### 1. Smartsupp Live Chat
+
+**Get Smartsupp** (Free Plan Available)
+1. Go to https://www.smartsupp.com/
+2. Sign up for free account
+3. After login, go to **Settings → Chat Box**
+4. Copy the provided code
+
+**Installation**:
+
+Open `resources/views/layouts/livechat.blade.php` and add:
+
+```blade
+{{-- Smartsupp Live Chat --}}
+<script type="text/javascript">
+var _smartsupp = _smartsupp || {};
+_smartsupp.key = 'YOUR_SMARTSUPP_KEY_HERE';
+window.smartsupp||(function(d) {
+  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+  c.type='text/javascript';c.charset='utf-8';c.async=true;
+  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+})(document);
+</script>
+{{-- End Smartsupp --}}
+```
+
+Replace `YOUR_SMARTSUPP_KEY_HERE` with your actual key (e.g., `a1b2c3d4e5f6`)
+
+### 2. Tawk.to Live Chat
+
+**Get Tawk.to** (100% Free Forever)
+1. Go to https://www.tawk.to/
+2. Sign up for free
+3. Create a property (your website)
+4. Go to **Administration → Chat Widget**
+5. Copy the widget code
+
+**Installation**:
+
+```blade
+{{-- Tawk.to Live Chat --}}
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/YOUR_TAWK_PROPERTY_ID/YOUR_WIDGET_ID';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+{{-- End Tawk.to --}}
+```
+
+Replace `YOUR_TAWK_PROPERTY_ID` and `YOUR_WIDGET_ID` with your actual IDs.
+
+### 3. Tidio Chat
+
+**Get Tidio** (Free Plan Available)
+1. Go to https://www.tidio.com/
+2. Sign up for account
+3. After setup, go to **Settings → Channels → Live Chat**
+4. Copy installation code
+
+**Installation**:
+
+```blade
+{{-- Tidio Live Chat --}}
+<script src="//code.tidio.co/YOUR_TIDIO_KEY.js" async></script>
+{{-- End Tidio --}}
+```
+
+Replace `YOUR_TIDIO_KEY` with your actual Tidio key.
+
+### 4. Zendesk Chat
+
+**Get Zendesk**
+1. Go to https://www.zendesk.com/chat/
+2. Start free trial
+3. Go to **Dashboard → Settings → Widget**
+4. Copy the widget code
+
+**Installation**:
+
+```blade
+{{-- Zendesk Chat --}}
+<script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=YOUR_ZENDESK_KEY"></script>
+{{-- End Zendesk --}}
+```
+
+### 5. Intercom
+
+**Get Intercom**
+1. Go to https://www.intercom.com/
+2. Sign up
+3. Install → Web → Copy code
+
+**Installation**:
+
+```blade
+{{-- Intercom --}}
+<script>
+window.intercomSettings = {
+  app_id: "YOUR_INTERCOM_APP_ID"
+};
+(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reboot');ic('update',w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/YOUR_APP_ID';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);};if(document.readyState==='complete'){l();}else if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})();
+</script>
+{{-- End Intercom --}}
+```
+
+### 6. WhatsApp Chat Widget (Already Included)
+
+The script already includes WhatsApp integration. To configure:
+
+1. Go to **Admin Dashboard → Settings → General Settings**
+2. Find **WhatsApp Number** field
+3. Enter your WhatsApp number with country code (e.g., `1234567890`)
+4. Save settings
+
+The WhatsApp button will automatically appear on the left side of all pages.
+
+### Complete Example: livechat.blade.php
+
+```blade
+{{-- Add your livechat, telegram code here  --}}
+
+{{-- Start WhatsApp code --}}
+@if($settings->whatsapp)
+<script type="text/javascript">
+    (function () {
+        var options = {
+            whatsapp: "{{$settings->whatsapp}}", // WhatsApp number
+            call_to_action: "Message us", // Call to action
+            position: "left", // Position may be 'right' or 'left'
+            pre_filled_message: "Hello, I need help with", // WhatsApp pre-filled message
+        };
+        var proto = document.location.protocol, host = "getbutton.io", url = proto + "//static." + host;
+        var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = url + '/widget-send-button/js/init.js';
+        s.onload = function () { WhWidgetSendButton.init(host, proto, options); };
+        var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x);
+    })();
+</script>
+@endif
+{{-- End WhatsApp code  --}}
+
+{{-- Smartsupp Live Chat --}}
+<script type="text/javascript">
+var _smartsupp = _smartsupp || {};
+_smartsupp.key = 'YOUR_SMARTSUPP_KEY_HERE';
+window.smartsupp||(function(d) {
+  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+  c.type='text/javascript';c.charset='utf-8';c.async=true;
+  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+})(document);
+</script>
+{{-- End Smartsupp --}}
+
+{{-- Alternative: Tawk.to (Comment out one if using both) --}}
+<!-- 
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/YOUR_PROPERTY_ID/YOUR_WIDGET_ID';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+-->
+{{-- End Tawk.to --}}
+```
+
+### Important Notes
+
+- **Use only ONE live chat widget** at a time to avoid conflicts
+- Live chat widgets may slow down page load slightly
+- Test on mobile devices after installation
+- Most services offer free plans perfect for starting out
+
+
+
+*********************************************************************
+**** This online INVESTMENT script is for educational purposes only. 
+We are not responsible for any illegal use of this script. ******
+The company is not liable for any damages or legal issues from misuse. Users must comply with all laws.
+
+The company will not be held liable for any failed transactions Incorrect payments, or unauthorized changes to payment methods or addresses. It is crucial that you review and confirm all payment details before proceeding with any financial transactions.
+
+********************************************************************
+
+
+
+
