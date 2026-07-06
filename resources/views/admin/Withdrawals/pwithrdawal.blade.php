@@ -29,11 +29,20 @@ if (Auth('admin')->User()->dashboard_style == 'light') {
                 <div class="mb-5 row">
                     <div class="col-lg-8 offset-lg-2 card p-md-4 p-2  shadow">
                         <div class="mb-3">
-                            @if ($withdrawal->status != 'Processed')
-                                <h4 class="">Send Funds to {{ $user->name }} through his payment details below</h4>
+                            @if ($withdrawal->status == 'Processed')
+                                <h4 class="text-success">Completed — funds received into {{ $user->name }}'s address</h4>
+                            @elseif ($withdrawal->status == 'Declined')
+                                <h4 class="text-danger">This withdrawal request was declined</h4>
                             @else
-                                <h4 class="text-success">Payment Completed</h4>
+                                <h4 class="">Send funds to {{ $user->name }}'s receiving address below, then set the status</h4>
                             @endif
+                            <p class="text-muted mb-0">
+                                Amount: <b>{{ $settings->currency ?? '' }}{{ $withdrawal->amount }}</b>
+                                &nbsp;|&nbsp; Current status:
+                                <span class="badge {{ $withdrawal->status == 'Processed' ? 'badge-success' : ($withdrawal->status == 'Declined' ? 'badge-danger' : 'badge-warning') }}">
+                                    {{ $withdrawal->status == 'Processed' ? 'Received' : $withdrawal->status }}
+                                </span>
+                            </p>
                         </div>
                         <div class="">
                             @if ($method->defaultpay == 'yes')
@@ -104,54 +113,53 @@ if (Auth('admin')->User()->dashboard_style == 'light') {
                             @endif
                         </div>
 
-                        @if ($withdrawal->status != 'Processed')
-                            <div class="mt-1">
-                                <form action="{{ route('pwithdrawal') }}" method="POST">
-                                    @csrf
-                                    <div class="form-row">
-                                        <div class="form-group col-md-12">
-                                            <h6 class="">Action</h6>
-                                            <select name="action" id="action" class="  mb-2 form-control">
-                                                {{-- <option selected disabled>Select processing action</option> --}}
-                                                <option value="Paid">Paid</option>
-                                                <option value="Reject">Reject</option>
-                                            </select>
+                        <div class="mt-1">
+                            <form action="{{ route('pwithdrawal') }}" method="POST">
+                                @csrf
+                                <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                        <h6 class="">Set Withdrawal Status</h6>
+                                        <select name="action" id="action" class="  mb-2 form-control">
+                                            <option value="Complete">Complete — mark as Received</option>
+                                            <option value="Pending" {{ $withdrawal->status == 'Pending' ? 'selected' : '' }}>Pending — awaiting processing</option>
+                                            <option value="Decline">Decline — reject &amp; refund balance</option>
+                                        </select>
+                                        <small class="text-muted">Declining refunds the held amount back to the user's balance.</small>
+                                    </div>
+                                </div>
+                                <div class="form-row d-none" id="emailcheck">
+                                    <div class="col-md-12 form-group">
+                                        <div class="selectgroup">
+                                            <label class="selectgroup-item">
+                                                <input type="radio" name="emailsend" id="dontsend" value="false"
+                                                    class="selectgroup-input" checked="">
+                                                <span class="selectgroup-button">Don't Send Email</span>
+                                            </label>
+                                            <label class="selectgroup-item">
+                                                <input type="radio" name="emailsend" id="sendemail" value="true"
+                                                    class="selectgroup-input">
+                                                <span class="selectgroup-button">Send Email</span>
+                                            </label>
                                         </div>
                                     </div>
-                                    <div class="form-row d-none" id="emailcheck">
-                                        <div class="col-md-12 form-group">
-                                            <div class="selectgroup">
-                                                <label class="selectgroup-item">
-                                                    <input type="radio" name="emailsend" id="dontsend" value="false"
-                                                        class="selectgroup-input" checked="">
-                                                    <span class="selectgroup-button">Don't Send Email</span>
-                                                </label>
-                                                <label class="selectgroup-item">
-                                                    <input type="radio" name="emailsend" id="sendemail" value="true"
-                                                        class="selectgroup-input">
-                                                    <span class="selectgroup-button">Send Email</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                </div>
+                                <div class="form-row d-none" id="emailtext">
+                                    <div class="form-group col-md-12">
+                                        <h6 class="">Subject</h6>
+                                        <input type="text" name="subject" id="subject" class="  form-control">
                                     </div>
-                                    <div class="form-row d-none" id="emailtext">
-                                        <div class="form-group col-md-12">
-                                            <h6 class="">Subject</h6>
-                                            <input type="text" name="subject" id="subject" class="  form-control">
-                                        </div>
-                                        <div class="form-group col-md-12">
-                                            <h6 class="">Enter Reasons for rejecting this withdrawal request</h6>
-                                            <textarea class="  form-control" row="3" placeholder="Type in here" name="reason" id="message"></textarea>
-                                        </div>
+                                    <div class="form-group col-md-12">
+                                        <h6 class="">Reason for declining this withdrawal request</h6>
+                                        <textarea class="  form-control" row="3" placeholder="Type in here" name="reason" id="message"></textarea>
                                     </div>
+                                </div>
 
-                                    <div class="form-group">
-                                        <input type="hidden" name="id" value="{{ $withdrawal->id }}">
-                                        <input type="submit" class="px-3 btn btn-primary" value="Proccess">
-                                    </div>
-                                </form>
-                            </div>
-                        @endif
+                                <div class="form-group">
+                                    <input type="hidden" name="id" value="{{ $withdrawal->id }}">
+                                    <input type="submit" class="px-3 btn btn-primary" value="Update Status">
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -161,7 +169,7 @@ if (Auth('admin')->User()->dashboard_style == 'light') {
             let action = document.getElementById('action');
 
             $('#action').change(function() {
-                if (action.value === "Reject") {
+                if (action.value === "Decline") {
                     document.getElementById('emailcheck').classList.remove('d-none');
                 } else {
                     document.getElementById('emailcheck').classList.add('d-none');

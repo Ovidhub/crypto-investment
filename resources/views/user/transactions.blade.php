@@ -156,18 +156,20 @@
                 <div class="sm:hidden">
                     <ul class="divide-y dark:divide-dark-100 divide-light-200">
                         @forelse ($withdrawals as $withdrawal)
+                            @php
+                                $wLabel = $withdrawal->status == 'Processed' ? 'Received' : $withdrawal->status;
+                                $wBadge = $withdrawal->status == 'Processed'
+                                    ? 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400'
+                                    : ($withdrawal->status == 'Pending'
+                                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-800/20 dark:text-amber-400'
+                                        : 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400');
+                            @endphp
                             <li class="p-4">
                                 <div class="mb-2 flex justify-between items-center">
                                     <span class="text-base font-medium dark:text-white text-dark">{{ $settings->currency }}{{ $withdrawal->amount }}</span>
-                                    @if ($withdrawal->status == 'Processed')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400">
-                                            {{ $withdrawal->status }}
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400">
-                                            {{ $withdrawal->status }}
-                                        </span>
-                                    @endif
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $wBadge }}">
+                                        {{ $wLabel }}
+                                    </span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-xs dark:text-gray-400 text-gray-600">Total (incl. charges)</span>
@@ -177,6 +179,12 @@
                                     <span class="text-xs dark:text-gray-400 text-gray-600">Payment Method</span>
                                     <span class="text-sm dark:text-gray-300 text-gray-700">{{ $withdrawal->payment_mode }}</span>
                                 </div>
+                                @if(!empty($withdrawal->paydetails))
+                                <div class="flex justify-between gap-3 mt-1">
+                                    <span class="text-xs dark:text-gray-400 text-gray-600 shrink-0">Receiving into</span>
+                                    <span class="text-xs dark:text-gray-300 text-gray-700 text-right break-all font-mono">{{ $withdrawal->paydetails }}</span>
+                                </div>
+                                @endif
                                 <div class="flex justify-between mt-1">
                                     <span class="text-xs dark:text-gray-400 text-gray-600">Date</span>
                                     <span class="text-sm dark:text-gray-300 text-gray-700">{{ \Carbon\Carbon::parse($withdrawal->created_at)->format('M d, Y H:i') }}</span>
@@ -205,32 +213,36 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium dark:text-gray-400 text-gray-500 uppercase tracking-wider">Amount</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium dark:text-gray-400 text-gray-500 uppercase tracking-wider">Amount + Charges</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium dark:text-gray-400 text-gray-500 uppercase tracking-wider">Payment Mode</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium dark:text-gray-400 text-gray-500 uppercase tracking-wider">Receiving Into</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium dark:text-gray-400 text-gray-500 uppercase tracking-wider">Status</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium dark:text-gray-400 text-gray-500 uppercase tracking-wider">Date</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y dark:divide-dark-100 divide-light-200">
                                 @forelse ($withdrawals as $withdrawal)
+                                    @php
+                                        $wLabel = $withdrawal->status == 'Processed' ? 'Received' : $withdrawal->status;
+                                        $wBadge = $withdrawal->status == 'Processed'
+                                            ? 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400'
+                                            : ($withdrawal->status == 'Pending'
+                                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-800/20 dark:text-amber-400'
+                                                : 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400');
+                                    @endphp
                                     <tr class="hover:dark:bg-dark-100/50 hover:bg-light-100/50 transition-colors">
                                         <td class="px-6 py-4 text-sm dark:text-white text-dark">{{ $settings->currency }}{{ $withdrawal->amount }}</td>
                                         <td class="px-6 py-4 text-sm dark:text-white text-dark">{{ $settings->currency }}{{ $withdrawal->to_deduct }}</td>
                                         <td class="px-6 py-4 text-sm dark:text-gray-300 text-gray-700">{{ $withdrawal->payment_mode }}</td>
+                                        <td class="px-6 py-4 text-xs dark:text-gray-300 text-gray-700 font-mono break-all max-w-[200px]">{{ $withdrawal->paydetails ?: '—' }}</td>
                                         <td class="px-6 py-4 text-sm">
-                                            @if ($withdrawal->status == 'Processed')
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400">
-                                                    {{ $withdrawal->status }}
-                                                </span>
-                                            @else
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400">
-                                                    {{ $withdrawal->status }}
-                                                </span>
-                                            @endif
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $wBadge }}">
+                                                {{ $wLabel }}
+                                            </span>
                                         </td>
                                         <td class="px-6 py-4 text-sm dark:text-gray-300 text-gray-700">{{ \Carbon\Carbon::parse($withdrawal->created_at)->toDayDateTimeString() }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-6 py-8 text-sm text-center dark:text-gray-400 text-gray-500">
+                                        <td colspan="6" class="px-6 py-8 text-sm text-center dark:text-gray-400 text-gray-500">
                                             <div class="flex flex-col items-center justify-center">
                                                 <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                                                     <i data-lucide="inbox" class="h-6 w-6 text-primary"></i>

@@ -155,6 +155,12 @@
                             <span class="text-dark-300 dark:text-light-300">You will receive:</span>
                             <span class="font-medium text-dark dark:text-white">{{ $settings->currency }}<span id="receive-amount">0.00</span></span>
                         </div>
+
+                        <!-- Receiving Into (destination address) -->
+                        <div class="flex justify-between gap-3 text-xs pt-2 mt-2 border-t border-light-200 dark:border-dark-200">
+                            <span class="text-dark-300 dark:text-light-300 shrink-0">Receiving into:</span>
+                            <span class="font-medium text-dark dark:text-white text-right break-all font-mono" id="receiving-address">your {{ $payment_mode }} address</span>
+                        </div>
                     </div>
 
                     <input value="{{$payment_mode}}" type="hidden" name="method">
@@ -436,6 +442,21 @@
 
 <!-- JavaScript for functionality - Final Fixed version -->
 <script>
+    // Live-update the "Receiving into" destination address as the user types.
+    document.addEventListener('DOMContentLoaded', function () {
+        const detailsField = document.querySelector('[name="details"]');
+        const receivingAddress = document.getElementById('receiving-address');
+        const placeholder = 'your {{ $payment_mode }} address';
+        if (detailsField && receivingAddress) {
+            const sync = function () {
+                const val = (detailsField.value || '').trim();
+                receivingAddress.textContent = val.length ? val : placeholder;
+            };
+            detailsField.addEventListener('input', sync);
+            sync();
+        }
+    });
+
     // Define updateAmountDisplay in the global scope
     function updateAmountDisplay(value) {
         const amountDisplay = document.getElementById('amount-display');
