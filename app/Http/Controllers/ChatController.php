@@ -44,13 +44,18 @@ class ChatController extends Controller
         }
 
         if (!$conversation) {
+            $ip = $this->clientIp($request);
+            $geo = $this->lookupCountry($ip);
             $conversation = ChatConversation::create([
-                'token'    => Str::random(40),
-                'name'     => $data['name'] ?? null,
-                'email'    => $data['email'] ?? null,
-                'user_id'  => Auth::check() ? Auth::id() : null,
-                'page_url' => $data['page'] ?? null,
-                'status'   => 'open',
+                'token'        => Str::random(40),
+                'name'         => $data['name'] ?? null,
+                'email'        => $data['email'] ?? null,
+                'user_id'      => Auth::check() ? Auth::id() : null,
+                'ip_address'   => $ip,
+                'country'      => $geo['country'] ?? null,
+                'country_code' => $geo['country_code'] ?? null,
+                'page_url'     => $data['page'] ?? null,
+                'status'       => 'open',
             ]);
         } else {
             // keep name/email/status fresh
@@ -115,6 +120,41 @@ class ChatController extends Controller
     public function status()
     {
         return response()->json(['agent_online' => self::agentOnline()]);
+    }
+
+    // Best-effort real client IP (handles Cloudflare / reverse proxies on shared hosting).
+    private function clientIp(Request $request): ?string
+    {
+        foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP'] as $h) {
+            if (!empty($_SERVER[$h])) {
+                $ip = trim(explode(',', $_SERVER[$h])[0]);
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
+        }
+        return $request->ip();
+    }
+
+    // Resolve country from IP via a free geo service. Fails quietly (returns nulls).
+    private function lookupCountry(?string $ip): array
+    {
+        if (!$ip || !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            return ['country' => null, 'country_code' => null];
+        }
+        try {
+            $ctx = stream_context_create(['http' => ['timeout' => 3, 'ignore_errors' => true]]);
+            $raw = @file_get_contents("http://ip-api.com/json/{$ip}?fields=status,country,countryCode", false, $ctx);
+            if ($raw) {
+                $j = json_decode($raw, true);
+                if (($j['status'] ?? '') === 'success') {
+                    return ['country' => $j['country'] ?? null, 'country_code' => $j['countryCode'] ?? null];
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Chat geo lookup failed: ' . $e->getMessage());
+        }
+        return ['country' => null, 'country_code' => null];
     }
 
     private function formatMessage(ChatMessage $m): array

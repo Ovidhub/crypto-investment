@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class ChatConversation extends Model
 {
     protected $fillable = [
-        'token', 'name', 'email', 'user_id', 'page_url', 'status', 'last_message_at',
+        'token', 'name', 'email', 'user_id', 'ip_address', 'country', 'country_code',
+        'page_url', 'status', 'last_message_at',
     ];
 
     protected $casts = [

@@ -77,11 +77,23 @@
             close:function(id){return "{{ url('admin/dashboard/live-chat') }}/"+id+"/close";},
             heartbeat:"{{ route('livechat.heartbeat') }}"
         };
-        var active=null, lastId=0;
+        var active=null, lastId=0, seen={}, sending=false;
         var list=document.getElementById('lc-conv-list'), thread=document.getElementById('lc-thread'),
-            replyBox=document.getElementById('lc-reply-box'), replyText=document.getElementById('lc-reply-text');
+            replyBox=document.getElementById('lc-reply-box'), replyText=document.getElementById('lc-reply-text'),
+            sendBtn=document.getElementById('lc-reply-send');
 
         function esc(s){return(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+        function flag(cc){ if(!cc||cc.length!==2) return ''; return cc.toUpperCase().replace(/./g,function(c){return String.fromCodePoint(127397+c.charCodeAt(0));}); }
+
+        // Render a message once (deduped by id, so the reply POST + the poll can't double it).
+        function renderMsg(m){
+            if(m.id && seen[m.id]) return;
+            if(m.id) seen[m.id]=1;
+            var el=document.createElement('div'); el.className=(m.sender==='admin'?'lc-a-msg':'lc-v-msg');
+            el.innerHTML=esc(m.body)+'<span class="lc-m-time">'+esc(m.time)+'</span>';
+            thread.appendChild(el);
+            if(m.id) lastId=Math.max(lastId,m.id);
+        }
 
         function loadConvs(){
             fetch(URLS.convs,{headers:{'X-Requested-With':'XMLHttpRequest'}}).then(r=>r.json()).then(function(d){
@@ -89,10 +101,12 @@
                 if(d.total_unread>0){tu.textContent=d.total_unread;tu.style.display='inline-block';}else{tu.style.display='none';}
                 if(!d.conversations.length){list.innerHTML='<div class="text-muted text-center p-4">No conversations yet.</div>';return;}
                 list.innerHTML=d.conversations.map(function(c){
+                    var loc=[]; if(c.country) loc.push(flag(c.country_code)+' '+esc(c.country)); if(c.ip) loc.push(esc(c.ip));
                     return '<div class="lc-c-item '+(active===c.id?'active':'')+'" data-id="'+c.id+'">'+
                         '<div class="d-flex justify-content-between"><b class="text-dark">'+esc(c.name)+'</b>'+
                         (c.unread>0?'<span class="badge badge-danger">'+c.unread+'</span>':'')+'</div>'+
                         '<div class="text-muted small text-truncate">'+esc(c.snippet)+'</div>'+
+                        (loc.length?'<div class="text-muted" style="font-size:11px">'+loc.join(' · ')+'</div>':'')+
                         '<div class="text-muted" style="font-size:11px">'+esc(c.email||'')+' · '+esc(c.time||'')+'</div></div>';
                 }).join('');
                 Array.prototype.forEach.call(list.querySelectorAll('.lc-c-item'),function(el){
@@ -102,7 +116,7 @@
         }
 
         function selectConv(id){
-            if(active!==id){active=id;lastId=0;thread.innerHTML='';}
+            if(active!==id){active=id;lastId=0;seen={};thread.innerHTML='';}
             document.getElementById('lc-close-conv').style.display='inline-block';
             replyBox.style.display='block';
             loadMsgs(true);
@@ -111,27 +125,26 @@
         function loadMsgs(scroll){
             if(!active) return;
             fetch(URLS.msgs(active)+'?after='+lastId,{headers:{'X-Requested-With':'XMLHttpRequest'}}).then(r=>r.json()).then(function(d){
-                document.getElementById('lc-thread-name').textContent=d.conversation.name;
-                document.getElementById('lc-thread-email').textContent=(d.conversation.email||'')+(d.conversation.page?(' · '+d.conversation.page):'');
+                var c=d.conversation||{};
+                document.getElementById('lc-thread-name').textContent=(c.country?flag(c.country_code)+' ':'')+(c.name||'Guest');
+                var meta=[]; if(c.email) meta.push(c.email);
+                if(c.country) meta.push(c.country); if(c.ip) meta.push('IP '+c.ip);
+                if(c.page) meta.push(c.page);
+                document.getElementById('lc-thread-email').textContent=meta.join(' · ');
                 if(lastId===0 && !d.messages.length){thread.innerHTML='<div class="text-muted text-center p-4">No messages yet.</div>';}
-                d.messages.forEach(function(m){
-                    if(lastId===0 && thread.querySelector('.text-muted')){thread.innerHTML='';}
-                    var el=document.createElement('div');el.className=(m.sender==='admin'?'lc-a-msg':'lc-v-msg');
-                    el.innerHTML=esc(m.body)+'<span class="lc-m-time">'+esc(m.time)+'</span>';
-                    thread.appendChild(el); lastId=Math.max(lastId,m.id);
-                });
+                if(d.messages.length && lastId===0 && thread.querySelector('.text-muted')){thread.innerHTML='';}
+                d.messages.forEach(renderMsg);
                 if(scroll||d.messages.length) thread.scrollTop=thread.scrollHeight;
             }).catch(function(){});
         }
 
         function sendReply(){
-            var v=replyText.value.trim(); if(!v||!active) return; replyText.value='';
+            var v=replyText.value.trim(); if(!v||!active||sending) return;
+            sending=true; sendBtn.disabled=true; replyText.value='';
             fetch(URLS.reply(active),{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF,'X-Requested-With':'XMLHttpRequest'},
                 body:JSON.stringify({body:v})}).then(r=>r.json()).then(function(d){
-                if(d&&d.message){var el=document.createElement('div');el.className='lc-a-msg';
-                    el.innerHTML=esc(d.message.body)+'<span class="lc-m-time">'+esc(d.message.time)+'</span>';
-                    thread.appendChild(el);lastId=Math.max(lastId,d.message.id);thread.scrollTop=thread.scrollHeight;}
-            }).catch(function(){});
+                if(d&&d.message){ renderMsg(d.message); thread.scrollTop=thread.scrollHeight; }
+            }).catch(function(){}).finally(function(){ sending=false; sendBtn.disabled=false; });
         }
 
         document.getElementById('lc-reply-send').addEventListener('click',sendReply);

@@ -37,13 +37,16 @@ class LiveChatController extends Controller
                     ->where('sender', 'visitor')->where('read_by_admin', false)->count();
 
                 return [
-                    'id'      => $c->id,
-                    'name'    => $c->name ?: 'Guest',
-                    'email'   => $c->email,
-                    'status'  => $c->status,
-                    'unread'  => $unread,
-                    'snippet' => $last ? mb_strimwidth($last->body, 0, 40, '…') : '',
-                    'time'    => optional($c->last_message_at ?: $c->created_at)->format('M d, H:i'),
+                    'id'           => $c->id,
+                    'name'         => $c->name ?: 'Guest',
+                    'email'        => $c->email,
+                    'country'      => $c->country,
+                    'country_code' => $c->country_code,
+                    'ip'           => $c->ip_address,
+                    'status'       => $c->status,
+                    'unread'       => $unread,
+                    'snippet'      => $last ? mb_strimwidth($last->body, 0, 40, '…') : '',
+                    'time'         => optional($c->last_message_at ?: $c->created_at)->format('M d, H:i'),
                 ];
             });
 
@@ -76,11 +79,14 @@ class LiveChatController extends Controller
 
         return response()->json([
             'conversation' => [
-                'id'    => $conversation->id,
-                'name'  => $conversation->name ?: 'Guest',
-                'email' => $conversation->email,
-                'page'  => $conversation->page_url,
-                'status' => $conversation->status,
+                'id'           => $conversation->id,
+                'name'         => $conversation->name ?: 'Guest',
+                'email'        => $conversation->email,
+                'country'      => $conversation->country,
+                'country_code' => $conversation->country_code,
+                'ip'           => $conversation->ip_address,
+                'page'         => $conversation->page_url,
+                'status'       => $conversation->status,
             ],
             'messages' => $messages,
         ]);
