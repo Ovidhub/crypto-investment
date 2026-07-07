@@ -14,6 +14,13 @@ if (version_compare(PHP_VERSION, '7.1.0', '>=')) {
 //cron url
 Route::get('/cron', [AutoTaskController::class, 'autotopup'])->name('cron');
 
+// Public live chat (visitor widget) — rate limited
+Route::middleware('throttle:60,1')->group(function () {
+    Route::post('/chat/message', [\App\Http\Controllers\ChatController::class, 'message'])->name('chat.message');
+    Route::get('/chat/poll', [\App\Http\Controllers\ChatController::class, 'poll'])->name('chat.poll');
+    Route::get('/chat/status', [\App\Http\Controllers\ChatController::class, 'status'])->name('chat.status');
+});
+
 
 Route::get('/cronwallet', function () {
 

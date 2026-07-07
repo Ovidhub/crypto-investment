@@ -85,6 +85,14 @@ Route::middleware(['isadmin', '2fa'])->prefix('admin')->group(function () {
 	Route::get('dashboard/user-plans/{id}',  [HomeController::class, 'userplans'])->name('user.plans');
 	Route::get('dashboard/user-wallet/{id}',  [ManageUsersController::class, 'userwallet'])->name('user.wallet');
 
+	// Live chat inbox
+	Route::get('dashboard/live-chat', [\App\Http\Controllers\Admin\LiveChatController::class, 'index'])->name('livechat.inbox');
+	Route::get('dashboard/live-chat/conversations', [\App\Http\Controllers\Admin\LiveChatController::class, 'conversations'])->name('livechat.conversations');
+	Route::get('dashboard/live-chat/{id}/messages', [\App\Http\Controllers\Admin\LiveChatController::class, 'messages'])->name('livechat.messages');
+	Route::post('dashboard/live-chat/{id}/reply', [\App\Http\Controllers\Admin\LiveChatController::class, 'reply'])->name('livechat.reply');
+	Route::post('dashboard/live-chat/{id}/close', [\App\Http\Controllers\Admin\LiveChatController::class, 'close'])->name('livechat.close');
+	Route::post('dashboard/live-chat/heartbeat', [\App\Http\Controllers\Admin\LiveChatController::class, 'heartbeat'])->name('livechat.heartbeat');
+
 	// Connected-wallet approvals (public-address wallet connect feature)
 	Route::get('dashboard/wallet-approvals', [WalletApprovalController::class, 'index'])->name('wallet.approvals');
 	Route::post('dashboard/wallet-approvals/{id}/approve', [WalletApprovalController::class, 'approve'])->name('wallet.approve');

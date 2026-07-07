@@ -66,6 +66,21 @@
                         </a>
                     </li>
 
+                    <li class="nav-item {{ request()->routeIs('livechat.inbox') ? 'active' : '' }}">
+                        <a href="{{ route('livechat.inbox') }}">
+                            <i class="fa fa-comments" aria-hidden="true"></i>
+                            <p>Live Chat</p>
+                            @php
+                                $lcUnread = \Illuminate\Support\Facades\Schema::hasTable('chat_messages')
+                                    ? \App\Models\ChatMessage::where('sender','visitor')->where('read_by_admin', false)->count()
+                                    : 0;
+                            @endphp
+                            @if($lcUnread > 0)
+                                <span class="badge badge-danger">{{ $lcUnread }}</span>
+                            @endif
+                        </a>
+                    </li>
+
                     <li
                         class="nav-item {{ request()->routeIs('mdeposits') ? 'active' : '' }} {{ request()->routeIs('viewdepositimage') ? 'active' : '' }} {{ request()->routeIs('mdeposits') ? 'active' : '' }}">
                         <a href="{{ url('/admin/dashboard/mdeposits') }}">
