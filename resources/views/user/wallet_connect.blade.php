@@ -48,6 +48,27 @@
         </div>
     </div>
 
+    {{-- ===================== VIDEO: HOW TO SEND & RECEIVE ===================== --}}
+    <div class="rounded-2xl border border-dark-200 dark:border-dark-200 border-light-300 bg-dark-50 dark:bg-dark-50 bg-white overflow-hidden">
+        <div class="flex items-center justify-between gap-4 p-5 border-b border-dark-200 dark:border-dark-200 border-light-300">
+            <div class="flex items-center gap-3">
+                <div class="grid h-10 w-10 place-items-center rounded-lg bg-primary/15 text-primary">
+                    <i data-lucide="play-circle" class="h-5 w-5"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold dark:text-white text-dark font-display">How to Send &amp; Receive Coins</h2>
+                    <p class="text-xs dark:text-gray-400 text-gray-500">Quick video walkthrough</p>
+                </div>
+            </div>
+            <a href="{{ route('send.receive.guide') }}" class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-400">
+                Full guide <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </a>
+        </div>
+        <div class="p-5">
+            @include('partials.video-embed')
+        </div>
+    </div>
+
     {{-- ===================== ADD WALLET FORM ===================== --}}
     <div class="rounded-2xl border border-dark-200 dark:border-dark-200 border-light-300 bg-dark-50 dark:bg-dark-50 bg-white overflow-hidden">
         <div class="flex items-center justify-between gap-4 p-6 border-b border-dark-200 dark:border-dark-200 border-light-300">

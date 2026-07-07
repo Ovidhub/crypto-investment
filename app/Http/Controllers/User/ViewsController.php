@@ -380,4 +380,12 @@ class ViewsController extends Controller
     {
         return redirect()->route('deposits')->with('message', 'Something went wrong please try again. Contact our support center if problem persist');
     }
+
+    // "How to Send & Receive Crypto" guide page (with the admin-configured video)
+    public function sendReceiveGuide()
+    {
+        return view('user.send-receive-guide', [
+            'title' => 'How to Send & Receive Crypto',
+        ]);
+    }
 }

@@ -51,6 +51,13 @@
                     <input name="tido" class="form-control " type="text"
                         value="{{ $settings->tido }}">
                 </div>
+                 <div class="form-group col-md-6">
+                    <h5 class="text-{{ $text }}">How to Send &amp; Receive Coins — Video URL</h5>
+                    <input name="send_receive_video" class="form-control " type="text"
+                        placeholder="YouTube, Vimeo or direct .mp4 link"
+                        value="{{ $settings->send_receive_video }}">
+                    <small class="text-{{ $text }}">Paste a YouTube/Vimeo link (or a direct .mp4 URL). Shown on the Connect Wallet page and the "How to Send &amp; Receive Crypto" guide. Leave blank to hide the video.</small>
+                </div>
                 <!--<div class="form-group col-md-6">-->
                 <!--    <h5 class="text-{{ $text }}">Purchase/License Code</h5>-->
                 <!--    <input name="purchase_code" class="form-control " type="text"-->

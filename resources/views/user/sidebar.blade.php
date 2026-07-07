@@ -99,6 +99,11 @@
                             <span class="ml-auto rounded-full bg-secondary/15 px-2 py-0.5 text-[10px] font-semibold text-secondary">Rewards</span>
                         </a>
 
+                        <a href="{{ route('send.receive.guide') }}" class="flex items-center gap-3 rounded-lg {{ request()->routeIs('send.receive.guide') ? 'bg-primary/10 text-primary' : 'dark:text-gray-300 text-gray-700 hover:bg-dark-100/60 dark:hover:bg-dark-100/60 hover:bg-light-200/60' }} px-3 py-2 transition-colors">
+                            <i data-lucide="play-circle" class="h-5 w-5"></i>
+                            <span>Send &amp; Receive Guide</span>
+                        </a>
+
                         @if ($moresettings->use_transfer)
                         <a href="{{ route('transferview') }}" class="flex items-center gap-3 rounded-lg {{ request()->routeIs('transferview') ? 'bg-primary/10 text-primary' : 'dark:text-gray-300 text-gray-700 hover:bg-dark-100/60 dark:hover:bg-dark-100/60 hover:bg-light-200/60' }} px-3 py-2 transition-colors">
                             <i data-lucide="send" class="h-5 w-5"></i>

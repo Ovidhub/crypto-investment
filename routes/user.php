@@ -138,6 +138,9 @@ Route::middleware(['auth:sanctum', 'verified', 'check.blocked'])->prefix('dashbo
 
 		Route::get('referuser', [ViewsController::class, 'referuser'])->name('referuser');
 		
+		// How to Send & Receive Crypto guide
+        Route::get('/send-receive-guide', [ViewsController::class, 'sendReceiveGuide'])->name('send.receive.guide');
+
 		// Wallet Connect Routes
         Route::get('/wallet-connect', [WalletController::class, 'index'])->name('wallet.connect');
         Route::post('/wallet-connect', [WalletController::class, 'store'])->name('wallet.store');

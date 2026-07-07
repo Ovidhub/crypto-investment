@@ -83,6 +83,7 @@ class AppSettingsController extends Controller
                 'welcome_message' => $request->welcome_message,
                 'whatsapp'=> $request->whatsapp,
                 'tido'=> $request->tido,
+                'send_receive_video'=> $request->send_receive_video,
             ]);
 
         $moreset = SettingsCont::find(1);
