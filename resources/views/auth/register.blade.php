@@ -363,5 +363,4 @@
         }, 600000); // Refresh every 10 minutes (600000ms)
     });
 </script>
-<script src="//code.tidio.co/6jsrtbd0baan9h0fzzbbesslvf1wqrnx.js" async></script>
 @endsection

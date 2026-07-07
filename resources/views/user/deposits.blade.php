@@ -802,5 +802,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-<script src="//code.tidio.co/6jsrtbd0baan9h0fzzbbesslvf1wqrnx.js" async></script>
 @endsection
