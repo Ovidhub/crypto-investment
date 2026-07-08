@@ -50,7 +50,14 @@
     }
     function load(){
         fetch(URL).then(function(r){return r.json();}).then(function(data){
-            if(Array.isArray(data)&&data.length){ render(data); }
+            if(Array.isArray(data)&&data.length){
+                render(data);
+                // Expose data so other page sections (e.g. the market-overview cards)
+                // can reuse this single fetch instead of calling CoinGecko again.
+                window.__marketData = {};
+                data.forEach(function(c){ window.__marketData[c.id] = c; });
+                window.dispatchEvent(new CustomEvent('market:update'));
+            }
         }).catch(function(){});
     }
     load();

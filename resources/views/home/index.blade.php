@@ -9,6 +9,12 @@
 
 @section('content')
 
+@php
+    // Satisfied investors: starts at 9,430 and grows by 1 every hour (time-based, deterministic).
+    $investorAnchorTs = strtotime('2026-07-08 21:00:00 UTC');
+    $satisfiedInvestors = 9430 + max(0, intval((time() - $investorAnchorTs) / 3600));
+@endphp
+
 {{-- ===================== LIVE MARKET TICKER ===================== --}}
 @include('partials.market-ticker')
 
@@ -57,7 +63,7 @@
                     @endforeach
                 </div>
                 <div class="text-left">
-                    <p class="font-display text-lg font-bold text-white counter" data-count="{{ max(9430, $total_users) }}">0</p>
+                    <p class="font-display text-lg font-bold text-white counter" data-count="{{ $satisfiedInvestors }}">0</p>
                     <p class="text-xs text-[#9aa3b2]">investors already onboard</p>
                 </div>
             </div>
@@ -128,9 +134,9 @@
                 </div>
                 <div class="space-y-1">
                     <div class="text-2xl font-bold text-white font-display">$<span id="{{ $asset['id'] }}-price">---</span></div>
-                    <div class="flex items-center gap-2 text-accent text-sm font-bold">
+                    <div class="flex items-center gap-2 text-accent text-sm font-bold" id="{{ $asset['id'] }}-change">
                         <i class="fa-solid fa-caret-up"></i>
-                        <span>Live Data</span>
+                        <span>Live</span>
                     </div>
                 </div>
             </div>
@@ -237,7 +243,7 @@
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-12">
             @php
                 $stats = [
-                    ['count' => max(9430, $total_users), 'label' => 'Satisfied Investors'],
+                    ['count' => $satisfiedInvestors, 'label' => 'Satisfied Investors'],
                     ['count' => 15, 'label' => 'Years Exp'],
                     ['count' => 197, 'label' => 'Countries'],
                     ['count' => 30467, 'label' => 'Transactions'],
@@ -258,30 +264,32 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    async function fetchCryptoPrices() {
-        try {
-            const coinIds = 'bitcoin,ethereum,solana,ripple,avalanche,shiba-inu,tether,aave';
-            const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinIds}&vs_currencies=usd`);
-            const data = await response.json();
-            if (Object.keys(data).length === 0) return;
-
-            const formatPrice = (price) => {
-                if (price === undefined) return 'N/A';
-                if (price < 1) return price.toFixed(8);
-                return price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            };
-
-            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-            set('bitcoin-price', formatPrice(data.bitcoin?.usd));
-            set('ethereum-price', formatPrice(data.ethereum?.usd));
-            set('solana-price', formatPrice(data.solana?.usd));
-            set('tether-price', formatPrice(data.tether?.usd));
-        } catch (error) {
-            console.error('Error fetching crypto prices:', error);
-        }
+    // Market-overview cards reuse the ticker's single live fetch (window.__marketData).
+    function formatPrice(price){
+        if (price === undefined || price === null) return null;
+        if (price < 1) return price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+        return price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
-    fetchCryptoPrices();
-    setInterval(fetchCryptoPrices, 60000);
+    function updateCards(){
+        var d = window.__marketData; if (!d) return;
+        ['bitcoin','ethereum','solana','tether'].forEach(function(id){
+            var c = d[id]; if (!c) return;
+            var priceEl = document.getElementById(id + '-price');
+            var p = formatPrice(c.current_price);
+            if (priceEl && p !== null) priceEl.textContent = p;
+
+            var chgEl = document.getElementById(id + '-change');
+            if (chgEl) {
+                var chg = c.price_change_percentage_24h || 0;
+                var up = chg >= 0;
+                chgEl.className = 'flex items-center gap-2 text-sm font-bold ' + (up ? 'text-accent' : 'text-red-400');
+                chgEl.innerHTML = '<i class="fa-solid ' + (up ? 'fa-caret-up' : 'fa-caret-down') + '"></i>' +
+                    '<span>' + (up ? '+' : '') + chg.toFixed(2) + '%</span>';
+            }
+        });
+    }
+    window.addEventListener('market:update', updateCards);
+    updateCards(); // in case data already arrived
 
     function animateCounters() {
         $('.counter').each(function() {
