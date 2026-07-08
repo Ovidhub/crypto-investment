@@ -9,6 +9,9 @@
 
 @section('content')
 
+{{-- ===================== LIVE MARKET TICKER ===================== --}}
+@include('partials.market-ticker')
+
 {{-- ===================== HERO ===================== --}}
 <section id="top" class="relative overflow-hidden pt-16 pb-16 sm:pt-24 bg-ink">
     <div class="pointer-events-none absolute inset-0 -z-0">

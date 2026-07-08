@@ -1,6 +1,11 @@
 @extends('layouts.dash')
 @section('title', $title)
 @section('content')
+<!-- Live market price ticker -->
+<div class="-mx-4 md:-mx-6 -mt-4 md:-mt-6 mb-6 rounded-none overflow-hidden">
+    @include('partials.market-ticker')
+</div>
+
 <!-- Alert Messages -->
 <x-danger-alert />
 <x-success-alert />
