@@ -83,7 +83,7 @@
 
             <div class="absolute left-0 top-10 hidden rounded-2xl border border-line glass px-4 py-3 sm:block">
                 <p class="text-[10px] text-[#9aa3b2]">BTC / USD</p>
-                <p class="font-display text-lg font-bold text-white">$<span id="bitcoin-price">---</span></p>
+                <p class="font-display text-lg font-bold text-white">$<span id="hero-btc-price">---</span></p>
                 <p class="text-xs font-semibold text-accent">Live</p>
             </div>
             <div class="absolute bottom-6 right-0 hidden rounded-2xl border border-line glass px-4 py-3 sm:block">
@@ -274,6 +274,12 @@ $(document).ready(function() {
     }
     function updateCards(){
         var d = window.__marketData; if (!d) return;
+        // hero floating BTC chip (separate id so it doesn't collide with the card)
+        if (d.bitcoin) {
+            var hb = document.getElementById('hero-btc-price');
+            var hp = formatPrice(d.bitcoin.current_price);
+            if (hb && hp !== null) hb.textContent = hp;
+        }
         ['bitcoin','ethereum','solana','tether'].forEach(function(id){
             var c = d[id]; if (!c) return;
             var priceEl = document.getElementById(id + '-price');
