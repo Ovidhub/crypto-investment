@@ -10,9 +10,11 @@
 @section('content')
 
 @php
-    // Satisfied investors: starts at 9,430 and grows by 1 every hour (time-based, deterministic).
-    $investorAnchorTs = strtotime('2026-07-08 21:00:00 UTC');
-    $satisfiedInvestors = 9430 + max(0, intval((time() - $investorAnchorTs) / 3600));
+    // Time-based, deterministic auto-growing counters.
+    $counterAnchorTs = strtotime('2026-07-08 21:00:00 UTC');
+    $elapsed = max(0, time() - $counterAnchorTs);
+    $satisfiedInvestors = 9430 + intval($elapsed / 3600);   // +1 every hour
+    $transactionsCount  = 30467 + intval($elapsed / 1200);  // +1 every 20 minutes
 @endphp
 
 {{-- ===================== LIVE MARKET TICKER ===================== --}}
@@ -246,7 +248,7 @@
                     ['count' => $satisfiedInvestors, 'label' => 'Satisfied Investors'],
                     ['count' => 15, 'label' => 'Years Exp'],
                     ['count' => 197, 'label' => 'Countries'],
-                    ['count' => 30467, 'label' => 'Transactions'],
+                    ['count' => $transactionsCount, 'label' => 'Transactions'],
                 ];
             @endphp
             @foreach($stats as $s)
@@ -290,6 +292,25 @@ $(document).ready(function() {
     }
     window.addEventListener('market:update', updateCards);
     updateCards(); // in case data already arrived
+
+    // Robustness: keep syncing cards from shared ticker data; if it never arrives
+    // (ticker fetch blocked/failed), fall back to one direct fetch so cards still fill.
+    var cardTries = 0;
+    setInterval(function(){
+        cardTries++;
+        if (window.__marketData) { updateCards(); return; }
+        if (cardTries === 3) {
+            fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,tether&price_change_percentage=24h')
+                .then(function(r){return r.json();})
+                .then(function(data){
+                    if (Array.isArray(data)) {
+                        window.__marketData = window.__marketData || {};
+                        data.forEach(function(c){ window.__marketData[c.id] = c; });
+                        updateCards();
+                    }
+                }).catch(function(){});
+        }
+    }, 4000);
 
     function animateCounters() {
         $('.counter').each(function() {
