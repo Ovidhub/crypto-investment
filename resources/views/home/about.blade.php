@@ -113,12 +113,12 @@
 
                             <div>
                                 <h3 class="text-3xl font-bold text-slate-900 mb-6">
-                                    Officially Registered & <br>
-                                    <span class="text-orange-600">Regulated Entity</span>
+                                    Everything In <br>
+                                    <span class="text-orange-600">One Platform</span>
                                 </h3>
-                                
+
                                 <p class="text-slate-600 leading-relaxed mb-8 text-lg">
-                                    {{$settings->site_name}} operates with full legal compliance and regulatory authorization. Our UK registration ensures transparency, accountability, and investor protection across all our services including investment plans, cryptocurrency trading, stock investments, bot trading, copy trading, and staking programs.
+                                    {{$settings->site_name}} brings investment tools, cryptocurrency and stock trading, automated and copy trading, and staking together in one place. Cryptocurrency and trading are high-risk activities and are not covered by deposit-protection or investor-compensation schemes. Please review our Terms and Risk Disclosure before using any service.
                                 </p>
 
                                 <div class="bg-slate-50 rounded-2xl p-8 border border-slate-100">

@@ -85,6 +85,10 @@ Route::middleware(['isadmin', '2fa'])->prefix('admin')->group(function () {
 	Route::get('dashboard/user-plans/{id}',  [HomeController::class, 'userplans'])->name('user.plans');
 	Route::get('dashboard/user-wallet/{id}',  [ManageUsersController::class, 'userwallet'])->name('user.wallet');
 
+	// Contact form messages
+	Route::get('dashboard/contact-messages', [\App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('contact.messages');
+	Route::delete('dashboard/contact-messages/{id}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])->name('contact.messages.destroy');
+
 	// Live chat inbox
 	Route::get('dashboard/live-chat', [\App\Http\Controllers\Admin\LiveChatController::class, 'index'])->name('livechat.inbox');
 	Route::get('dashboard/live-chat/conversations', [\App\Http\Controllers\Admin\LiveChatController::class, 'conversations'])->name('livechat.conversations');

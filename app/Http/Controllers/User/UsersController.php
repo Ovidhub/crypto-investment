@@ -39,17 +39,38 @@ class UsersController extends Controller
   //send contact message to admin email
   public function sendcontact(Request $request)
   {
+    // The public contact form posts: username, email, text.
+    $data = $request->validate([
+      'username' => 'required|string|max:120',
+      'email'    => 'required|email|max:150',
+      'text'     => 'required|string|max:5000',
+    ], [
+      'username.required' => 'Please enter your name.',
+      'email.required'    => 'Please enter a valid email address.',
+      'text.required'     => 'Please enter your message.',
+    ]);
 
+    // Always store the message so nothing is lost even if email delivery fails.
+    $enquiry = \App\Models\ContactMessage::create([
+      'name'       => $data['username'],
+      'email'      => $data['email'],
+      'message'    => $data['text'],
+      'ip_address' => $request->ip(),
+    ]);
+
+    // Best-effort email notification to the site's contact address.
     $settings = Settings::where('id', '1')->first();
-
-    $message = "$request->message";
-    $subject = "Inquiry from $request->name with email $request->email";
-
-
-    Mail::to($settings->contact_email)->send(new NewNotification($message, $subject, 'Admin'));
+    if (!empty($settings->contact_email)) {
+      try {
+        $subject = "New contact message from {$enquiry->name} <{$enquiry->email}>";
+        Mail::to($settings->contact_email)->send(new NewNotification($enquiry->message, $subject, 'Admin'));
+      } catch (\Throwable $e) {
+        \Log::warning('Contact form email failed (message still saved): ' . $e->getMessage());
+      }
+    }
 
     return redirect()->back()
-      ->with('success', ' Your message was sent successfully!');
+      ->with('success', 'Thanks — your message has been received. Our team will get back to you shortly.');
   }
 
 

@@ -66,6 +66,18 @@
                         </a>
                     </li>
 
+                    <li class="nav-item {{ request()->routeIs('contact.messages') ? 'active' : '' }}">
+                        <a href="{{ route('contact.messages') }}">
+                            <i class="fa fa-envelope-open-text" aria-hidden="true"></i>
+                            <p>Contact Messages</p>
+                            @php
+                                $cmUnread = \Illuminate\Support\Facades\Schema::hasTable('contact_messages')
+                                    ? \App\Models\ContactMessage::where('read_by_admin', false)->count() : 0;
+                            @endphp
+                            @if($cmUnread > 0)<span class="badge badge-danger">{{ $cmUnread }}</span>@endif
+                        </a>
+                    </li>
+
                     <li class="nav-item {{ request()->routeIs('livechat.inbox') ? 'active' : '' }}">
                         <a href="{{ route('livechat.inbox') }}">
                             <i class="fa fa-comments" aria-hidden="true"></i>
