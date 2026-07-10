@@ -21,10 +21,10 @@
     <div class="rounded-2xl border border-dark-200 dark:border-dark-200 border-light-300 bg-gradient-to-br from-primary/10 via-dark-50 to-dark-50 dark:from-primary/10 p-6 relative overflow-hidden">
         <div class="absolute -top-16 -right-10 h-48 w-48 rounded-full bg-primary/20 blur-3xl"></div>
         <div class="relative">
-            <p class="text-xs font-semibold uppercase tracking-widest text-primary">Daily Rewards</p>
-            <h2 class="mt-2 text-2xl font-bold dark:text-white text-dark font-display">Connect your wallet to unlock rewards</h2>
+            <p class="text-xs font-semibold uppercase tracking-widest text-primary">Wallet</p>
+            <h2 class="mt-2 text-2xl font-bold dark:text-white text-dark font-display">Connect your wallet</h2>
             <p class="mt-2 max-w-xl text-sm dark:text-gray-400 text-gray-600">
-                Submit a verified public crypto wallet address. Once approved by admin, you will start receiving daily rewards directly to your account.
+                Add a public crypto wallet address so we can identify your account. We only store public addresses &mdash; never your recovery phrase or private key. Any promotions are optional, set by the team, and are not guaranteed.
             </p>
 
             <div class="mt-5 flex flex-wrap items-center gap-6">
@@ -38,12 +38,14 @@
                 </span>
                 @endif
 
+                @if((float) (Auth::user()->wallet_daily_reward ?? 0) > 0)
                 <div>
-                    <p class="text-xs dark:text-gray-400 text-gray-500">Current daily reward</p>
+                    <p class="text-xs dark:text-gray-400 text-gray-500">Current promotion (set by team)</p>
                     <p class="text-2xl font-bold dark:text-white text-dark font-display">
-                        ${{ number_format((float) (Auth::user()->wallet_daily_reward ?? 0), 2) }} <span class="text-sm font-medium dark:text-gray-400 text-gray-500">/ day</span>
+                        ${{ number_format((float) Auth::user()->wallet_daily_reward, 2) }} <span class="text-sm font-medium dark:text-gray-400 text-gray-500">/ day</span>
                     </p>
                 </div>
+                @endif
             </div>
         </div>
     </div>

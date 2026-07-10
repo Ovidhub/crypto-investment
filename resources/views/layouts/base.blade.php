@@ -235,6 +235,12 @@
                 </div>
             </div>
 
+            <div class="mb-6 rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <p class="text-[11px] leading-relaxed text-slate-500">
+                    <strong class="text-slate-400">Risk disclaimer:</strong> {{$settings->site_name}} provides access to cryptocurrency markets and related services. Trading and investing in digital assets involves substantial risk, including the possible loss of your entire capital. Any rates or targets shown are not guaranteed and past performance does not indicate future results. Nothing on this site is financial advice. Only invest funds you can afford to lose, and comply with the laws of your jurisdiction.
+                </p>
+            </div>
+
             <div class="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div class="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
                     <p class="text-xs text-slate-500">
@@ -335,23 +341,7 @@
                 }, duration);
             };
 
-            // Random Transaction Notifications
-            const amounts = [30000, 45000, 11500, 16000, 8000, 10000, 13000, 17000, 29000, 30000, 16000, 28000, 21000, 51000, 12000, 17000, 25000, 9000, 50000, 4000];
-            const countries = ["United States", "United Kingdom", "Canada", "Australia", "Germany", "France", "Japan", "China", "Brazil", "India", "Russia", "South Africa", "Mexico", "Spain", "Italy", "Netherlands", "Sweden", "Singapore", "United Arab Emirates", "Switzerland"];
-
-            function showRandomTransaction() {
-                const isInvestment = Math.random() < 0.5;
-                const randomCountry = countries[Math.floor(Math.random() * countries.length)];
-                const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
-                
-                let message = isInvestment 
-                    ? `Someone from ${randomCountry} just invested $${randomAmount} in {{$settings->site_name}}`
-                    : `Someone from ${randomCountry} just withdrew $${randomAmount} from {{$settings->site_name}}`;
-                
-                window.showToast(message, 3000);
-            }
-
-            setInterval(showRandomTransaction, 10000);
+            // (Removed: fabricated "someone just invested/withdrew $X" popups.)
         });
     </script>
 

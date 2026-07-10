@@ -9,14 +9,6 @@
 
 @section('content')
 
-@php
-    // Time-based, deterministic auto-growing counters.
-    $counterAnchorTs = strtotime('2026-07-08 21:00:00 UTC');
-    $elapsed = max(0, time() - $counterAnchorTs);
-    $satisfiedInvestors = 9430 + intval($elapsed / 3600);   // +1 every hour
-    $transactionsCount  = 30467 + intval($elapsed / 1200);  // +1 every 20 minutes
-@endphp
-
 {{-- ===================== LIVE MARKET TICKER ===================== --}}
 @include('partials.market-ticker')
 
@@ -65,8 +57,8 @@
                     @endforeach
                 </div>
                 <div class="text-left">
-                    <p class="font-display text-lg font-bold text-white counter" data-count="{{ $satisfiedInvestors }}">0</p>
-                    <p class="text-xs text-[#9aa3b2]">investors already onboard</p>
+                    <p class="font-display text-lg font-bold text-white">{{ number_format($total_users) }}</p>
+                    <p class="text-xs text-[#9aa3b2]">registered members</p>
                 </div>
             </div>
         </div>
@@ -165,7 +157,7 @@
                     ['icon' => 'fa-shield-halved', 'title' => 'Bank-Grade Security', 'desc' => 'Protected with strong encryption, two-factor authentication, and cold storage for digital assets.'],
                     ['icon' => 'fa-copy', 'title' => 'Copy Trading', 'desc' => 'Mirror the moves of expert traders automatically and grow your portfolio while you learn.'],
                     ['icon' => 'fa-coins', 'title' => 'Crypto Staking', 'desc' => 'Put idle assets to work and earn steady staking rewards on supported coins.'],
-                    ['icon' => 'fa-wallet', 'title' => 'Connect Your Wallet', 'desc' => 'Link your public wallet address (MetaMask, Trust Wallet & more) and unlock daily rewards.'],
+                    ['icon' => 'fa-wallet', 'title' => 'Connect Your Wallet', 'desc' => 'Link a public wallet address (MetaMask, Trust Wallet & more) to identify your account. Public addresses only — never your recovery phrase.'],
                 ];
             @endphp
 
@@ -201,11 +193,11 @@
                 <ul class="space-y-4 mb-8 flex-grow">
                     <li class="flex items-center gap-3 text-sm font-medium text-[#c7cedb]">
                         <i class="fa-solid fa-circle-check text-accent"></i>
-                        Daily ROI: {{ $plan->increment_amount }}%
+                        Target daily rate: {{ $plan->increment_amount }}%
                     </li>
                     <li class="flex items-center gap-3 text-sm font-medium text-[#c7cedb]">
                         <i class="fa-solid fa-circle-check text-accent"></i>
-                        Return: {{ $plan->expected_return }}%
+                        Target return: {{ $plan->expected_return }}%
                     </li>
                 </ul>
 
@@ -215,6 +207,10 @@
             </div>
             @endforeach
         </div>
+
+        <p class="mt-10 text-center text-xs text-[#9aa3b2] max-w-3xl mx-auto">
+            Rates shown are targets, not guarantees. Cryptocurrency investing carries significant risk, including the possible loss of your capital. Past performance does not guarantee future results. Only invest what you can afford to lose.
+        </p>
     </div>
 </section>
 
@@ -245,15 +241,15 @@
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-12">
             @php
                 $stats = [
-                    ['count' => $satisfiedInvestors, 'label' => 'Satisfied Investors'],
-                    ['count' => 15, 'label' => 'Years Exp'],
-                    ['count' => 197, 'label' => 'Countries'],
-                    ['count' => $transactionsCount, 'label' => 'Transactions'],
+                    ['value' => number_format($total_users), 'label' => 'Registered Members'],
+                    ['value' => '100+', 'label' => 'Crypto Assets'],
+                    ['value' => '24/7', 'label' => 'Support'],
+                    ['value' => '2FA', 'label' => 'Account Security'],
                 ];
             @endphp
             @foreach($stats as $s)
             <div class="text-center">
-                <div class="text-4xl font-black text-white mb-1 counter font-display" data-count="{{ $s['count'] }}">0</div>
+                <div class="text-4xl font-black text-white mb-1 font-display">{{ $s['value'] }}</div>
                 <div class="text-brand font-bold text-xs uppercase tracking-widest">{{ $s['label'] }}</div>
             </div>
             @endforeach
