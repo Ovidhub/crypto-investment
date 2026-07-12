@@ -57,8 +57,8 @@
                     @endforeach
                 </div>
                 <div class="text-left">
-                    <p class="font-display text-lg font-bold text-white">{{ number_format($total_users) }}</p>
-                    <p class="text-xs text-[#9aa3b2]">registered members</p>
+                    <p class="font-display text-lg font-bold text-white">100+</p>
+                    <p class="text-xs text-[#9aa3b2]">digital assets supported</p>
                 </div>
             </div>
         </div>
@@ -241,7 +241,7 @@
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-12">
             @php
                 $stats = [
-                    ['value' => number_format($total_users), 'label' => 'Registered Members'],
+                    ['value' => 'Live', 'label' => 'Market Data'],
                     ['value' => '100+', 'label' => 'Crypto Assets'],
                     ['value' => '24/7', 'label' => 'Support'],
                     ['value' => '2FA', 'label' => 'Account Security'],
