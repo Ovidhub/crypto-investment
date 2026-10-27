@@ -4,6 +4,7 @@ import {
   getRecentUsers,
 } from "@/lib/admin";
 import { formatUsd } from "@/lib/format";
+import { isDemoMode } from "@/db";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,15 @@ export default async function AdminOverview() {
           Platform-wide metrics and recent activity.
         </p>
       </div>
+
+      {isDemoMode && (
+        <div className="rounded-2xl border border-brand/40 bg-brand/10 px-5 py-4 text-sm text-[#d8c8ff]">
+          <strong className="font-semibold text-white">Demo mode.</strong> This
+          deployment uses in-memory sample data, so new accounts and changes
+          are not permanently stored. Add a <code>DATABASE_URL</code> project
+          variable to switch to a real Postgres database.
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {cards.map((c) => (

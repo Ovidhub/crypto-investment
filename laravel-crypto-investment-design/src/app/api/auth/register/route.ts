@@ -52,7 +52,7 @@ export async function POST(req: Request) {
         passwordHash: hashPassword(password),
         balanceUsd: "10000",
       })
-      .returning({ id: users.id });
+      .returning();
 
     // Give a small starter portfolio so the dashboard has data.
     await db.insert(holdings).values([
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
       usdValue: "10000",
     });
 
-    await setSession(user.id);
+    await setSession(user);
     return Response.json({ ok: true });
   } catch {
     return Response.json({ error: "Registration failed." }, { status: 500 });

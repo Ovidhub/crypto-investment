@@ -1,63 +1,80 @@
-import {
-  randomBytes,
-  scryptSync,
-  timingSafeEqual,
-  createHmac,
-} from "node:crypto";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
-import { db } from "@/db";
+import { db, ensureDemoUser, isDemoMode } from "@/db";
 import { users } from "@/db/schema";
+import { hashPassword, verifyPassword } from "@/lib/password";
 import { eq } from "drizzle-orm";
 
-const SECRET =
-  process.env.AUTH_SECRET ?? "enethi-dev-secret-change-me-in-production-2026";
+export { hashPassword, verifyPassword };
+
+const SECRET = process.env.AUTH_SECRET ?? randomBytes(32).toString("hex");
 const COOKIE = "enethi_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
-// ── Password hashing (scrypt) ───────────────────────────────────────
-export function hashPassword(password: string): string {
-  const salt = randomBytes(16).toString("hex");
-  const derived = scryptSync(password, salt, 64).toString("hex");
-  return `${salt}:${derived}`;
-}
+export type SessionUser = {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  balanceUsd: string;
+};
 
-export function verifyPassword(password: string, stored: string): boolean {
-  const [salt, hash] = stored.split(":");
-  if (!salt || !hash) return false;
-  const derived = scryptSync(password, salt, 64);
-  const hashBuf = Buffer.from(hash, "hex");
-  if (hashBuf.length !== derived.length) return false;
-  return timingSafeEqual(hashBuf, derived);
-}
+type SessionPayload = {
+  id: number;
+  ts: number;
+  user?: SessionUser;
+};
 
-// ── Session token (signed cookie) ───────────────────────────────────
 function sign(payload: string): string {
   return createHmac("sha256", SECRET).update(payload).digest("base64url");
 }
 
-function createToken(userId: number): string {
-  const payload = `${userId}.${Date.now()}`;
-  const b64 = Buffer.from(payload).toString("base64url");
+function createToken(user: number | SessionUser): string {
+  const payload: SessionPayload =
+    typeof user === "number"
+      ? { id: user, ts: Date.now() }
+      : {
+          id: user.id,
+          ts: Date.now(),
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            status: user.status,
+            balanceUsd: user.balanceUsd,
+          },
+        };
+  const b64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
   return `${b64}.${sign(b64)}`;
 }
 
-function readToken(token: string): number | null {
+function readToken(token: string): SessionPayload | null {
   const [b64, sig] = token.split(".");
   if (!b64 || !sig) return null;
   const expected = sign(b64);
   const a = Buffer.from(sig);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
-  const payload = Buffer.from(b64, "base64url").toString();
-  const [id, ts] = payload.split(".");
-  if (!id || !ts) return null;
-  if (Date.now() - Number(ts) > MAX_AGE * 1000) return null;
-  return Number(id);
+
+  try {
+    const payload = JSON.parse(
+      Buffer.from(b64, "base64url").toString("utf8"),
+    ) as SessionPayload;
+    if (!Number.isInteger(payload.id) || !Number.isFinite(payload.ts)) {
+      return null;
+    }
+    if (Date.now() - payload.ts > MAX_AGE * 1000) return null;
+    return payload;
+  } catch {
+    return null;
+  }
 }
 
-export async function setSession(userId: number): Promise<void> {
+export async function setSession(user: number | SessionUser): Promise<void> {
   const store = await cookies();
-  store.set(COOKIE, createToken(userId), {
+  store.set(COOKIE, createToken(user), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -71,22 +88,23 @@ export async function clearSession(): Promise<void> {
   store.delete(COOKIE);
 }
 
-export type SessionUser = {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-  balanceUsd: string;
-};
-
 export async function getCurrentUser(): Promise<SessionUser | null> {
   try {
     const store = await cookies();
     const token = store.get(COOKIE)?.value;
     if (!token) return null;
-    const userId = readToken(token);
-    if (!userId) return null;
+    const session = readToken(token);
+    if (!session) return null;
+
+    // Demo mode keeps its data in process memory. Re-seed this user in the
+    // current function instance before reading from it. Because each instance
+    // assigns its own serial ids, resolve demo users by email rather than by
+    // the id embedded in the cookie.
+    const useDemoIdentity = isDemoMode && !!session.user;
+    if (useDemoIdentity && session.user) {
+      await ensureDemoUser(session.user);
+    }
+
     const [u] = await db
       .select({
         id: users.id,
@@ -97,7 +115,11 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
         balanceUsd: users.balanceUsd,
       })
       .from(users)
-      .where(eq(users.id, userId))
+      .where(
+        useDemoIdentity && session.user
+          ? eq(users.email, session.user.email)
+          : eq(users.id, session.id),
+      )
       .limit(1);
     return u ?? null;
   } catch {

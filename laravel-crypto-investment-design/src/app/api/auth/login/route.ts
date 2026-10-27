@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       );
     }
 
-    await setSession(user.id);
+    await setSession(user);
     return Response.json({ ok: true, role: user.role });
   } catch {
     return Response.json({ error: "Login failed." }, { status: 500 });
