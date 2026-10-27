@@ -14,20 +14,29 @@ export default async function AdminRequestsPage() {
   ]);
   const canApprove = me.role === "admin";
 
-  const serialise = (
-    rows: Awaited<ReturnType<typeof pendingDepositRows>>,
-  ) =>
-    rows.map((r) => ({
-      id: r.id,
-      userId: r.userId,
-      userEmail: r.userEmail,
-      userName: r.userName,
-      amountUsd: r.amountUsd,
-      status: r.status,
-      createdAt: new Date(r.createdAt).toISOString(),
-      reference: r.reference,
-      destination: r.destination,
-    }));
+  const depositRows = deposits.map((d) => ({
+    id: d.id,
+    userId: d.userId,
+    userEmail: d.userEmail,
+    userName: d.userName,
+    amountUsd: d.amountUsd,
+    status: d.status,
+    createdAt: new Date(d.createdAt).toISOString(),
+    reference: d.reference,
+    destination: null,
+  }));
+
+  const withdrawalRows = withdrawals.map((w) => ({
+    id: w.id,
+    userId: w.userId,
+    userEmail: w.userEmail,
+    userName: w.userName,
+    amountUsd: w.amountUsd,
+    status: w.status,
+    createdAt: new Date(w.createdAt).toISOString(),
+    reference: null,
+    destination: w.destination,
+  }));
 
   return (
     <div className="space-y-8">
@@ -54,7 +63,7 @@ export default async function AdminRequestsPage() {
           <AdminRequestsTable
             kind="deposit"
             canApprove={canApprove}
-            rows={serialise(deposits)}
+            rows={depositRows}
           />
         </div>
 
@@ -68,7 +77,7 @@ export default async function AdminRequestsPage() {
           <AdminRequestsTable
             kind="withdrawal"
             canApprove={canApprove}
-            rows={serialise(withdrawals)}
+            rows={withdrawalRows}
           />
         </div>
       </div>

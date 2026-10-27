@@ -325,29 +325,45 @@ export type PlanSummaryRow = {
 };
 
 export async function plansWithStats(): Promise<PlanSummaryRow[]> {
-  const rows = await db
-    .select({
-      id: plans.id,
-      slug: plans.slug,
-      name: plans.name,
-      tagline: plans.tagline,
-      riskLevel: plans.riskLevel,
-      minUsd: plans.minAmountUsd,
-      maxUsd: plans.maxAmountUsd,
-      annualRateBp: plans.annualRateBp,
-      durationDays: plans.durationDays,
-      subscribers: sql<number>`(select count(*) from investments i where i.plan_id = ${plans.id})`,
-      simulatedPrincipal: sql<string>`coalesce((select sum(i.principal_usd) from investments i where i.plan_id = ${plans.id}), 0)::text`,
-    })
-    .from(plans)
-    .where(eq(plans.status, "active"))
-    .orderBy(asc(plans.sortOrder), asc(plans.id));
+  // Two plain queries merged in memory rather than correlated sub-selects: the
+  // in-memory demo database does not evaluate those reliably, and this version
+  // is just as cheap for a catalogue of a few plans.
+  const [catalogue, stats] = await Promise.all([
+    db
+      .select({
+        id: plans.id,
+        slug: plans.slug,
+        name: plans.name,
+        tagline: plans.tagline,
+        riskLevel: plans.riskLevel,
+        minUsd: plans.minAmountUsd,
+        maxUsd: plans.maxAmountUsd,
+        annualRateBp: plans.annualRateBp,
+        durationDays: plans.durationDays,
+      })
+      .from(plans)
+      .where(eq(plans.status, "active"))
+      .orderBy(asc(plans.sortOrder), asc(plans.id)),
+    db
+      .select({
+        planId: investments.planId,
+        subscribers: sql<string>`count(*)`,
+        principal: sql<string>`coalesce(sum(${investments.principalUsd}), 0)::text`,
+      })
+      .from(investments)
+      .groupBy(investments.planId),
+  ]);
 
-  return rows.map((r) => ({
-    ...r,
-    subscribers: Number(r.subscribers),
-    simulatedPrincipal: centsToUsd(toCents(r.simulatedPrincipal)),
-  }));
+  const byPlan = new Map(stats.map((s) => [s.planId, s]));
+
+  return catalogue.map((plan) => {
+    const stat = byPlan.get(plan.id);
+    return {
+      ...plan,
+      subscribers: Number(stat?.subscribers ?? 0),
+      simulatedPrincipal: centsToUsd(toCents(stat?.principal ?? "0")),
+    };
+  });
 }
 
 export async function planStats() {

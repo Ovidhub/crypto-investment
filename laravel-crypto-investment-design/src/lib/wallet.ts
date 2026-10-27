@@ -421,30 +421,6 @@ export async function myRequests(userId: number) {
   return { deposits, withdrawals };
 }
 
-export async function pendingQueue() {
-  const [deposits, withdrawals, counts] = await Promise.all([
-    db
-      .select()
-      .from(depositRequests)
-      .where(eq(depositRequests.status, "pending"))
-      .orderBy(desc(depositRequests.createdAt)),
-    db
-      .select()
-      .from(withdrawalRequests)
-      .where(eq(withdrawalRequests.status, "pending"))
-      .orderBy(desc(withdrawalRequests.createdAt)),
-    db
-      .select({
-        deposits: sql<number>`(select count(*) from deposit_requests where status = 'pending')`,
-        withdrawals: sql<number>`(select count(*) from withdrawal_requests where status = 'pending')`,
-        custody: sql<string>`coalesce((select sum(delta_usd) from ledger_entries e join ledger_accounts a on a.id = e.account_id where a.code = 'asset:cash'), 0)::text`,
-      })
-      .from(featureFlags)
-      .limit(1),
-  ]);
-  return { deposits, withdrawals, counts: counts[0] };
-}
-
 export async function ledgerCash() {
   return accountBalance(ACCOUNTS.cashAsset);
 }

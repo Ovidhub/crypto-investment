@@ -137,7 +137,6 @@ export async function pendingDepositRows() {
       status: depositRequests.status,
       reference: depositRequests.reference,
       createdAt: depositRequests.createdAt,
-      destination: sql<string | null>`null`,
       userName: users.name,
       userEmail: users.email,
     })
@@ -154,7 +153,6 @@ export async function pendingWithdrawalRows() {
       userId: withdrawalRequests.userId,
       amountUsd: withdrawalRequests.amountUsd,
       status: withdrawalRequests.status,
-      reference: sql<string | null>`null`,
       createdAt: withdrawalRequests.createdAt,
       destination: withdrawalRequests.destination,
       userName: users.name,
