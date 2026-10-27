@@ -1,5 +1,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { db, ensureDemoUser, isDemoMode } from "@/db";
 import { users } from "@/db/schema";
 import { hashPassword, verifyPassword } from "@/lib/password";
@@ -7,9 +8,16 @@ import { eq } from "drizzle-orm";
 
 export { hashPassword, verifyPassword };
 
-const SECRET = process.env.AUTH_SECRET ?? randomBytes(32).toString("hex");
+const SECRET =
+  process.env.AUTH_SECRET ??
+  // A random per-process secret keeps forged cookies impossible, at the cost of
+  // signing everyone out on restart. Set AUTH_SECRET in production.
+  randomBytes(32).toString("hex");
 const COOKIE = "enethi_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+
+export const ROLES = ["user", "support", "admin"] as const;
+export type Role = (typeof ROLES)[number];
 
 export type SessionUser = {
   id: number;
@@ -18,6 +26,8 @@ export type SessionUser = {
   role: string;
   status: string;
   balanceUsd: string;
+  referralCode: string;
+  kycStatus: string;
 };
 
 type SessionPayload = {
@@ -44,6 +54,8 @@ function createToken(user: number | SessionUser): string {
             role: user.role,
             status: user.status,
             balanceUsd: user.balanceUsd,
+            referralCode: user.referralCode,
+            kycStatus: user.kycStatus,
           },
         };
   const b64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
@@ -113,6 +125,8 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
         role: users.role,
         status: users.status,
         balanceUsd: users.balanceUsd,
+        referralCode: users.referralCode,
+        kycStatus: users.kycStatus,
       })
       .from(users)
       .where(
@@ -125,4 +139,77 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   } catch {
     return null;
   }
+}
+
+/** Signed-in and not suspended. */
+export async function requireUser(): Promise<SessionUser> {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  if (user.status === "suspended") redirect("/suspended");
+  return user;
+}
+
+export function isStaff(role: string): boolean {
+  return role === "admin" || role === "support";
+}
+
+/** Admin or support. */
+export async function requireStaff(): Promise<SessionUser> {
+  const user = await requireUser();
+  if (!isStaff(user.role)) redirect("/dashboard");
+  return user;
+}
+
+/** Full admin only — approvals, settings, ledger adjustments. */
+export async function requireAdmin(): Promise<SessionUser> {
+  const user = await requireUser();
+  if (user.role !== "admin") redirect("/dashboard");
+  return user;
+}
+
+/** API-side guard: returns the user or a 401/403 response. */
+export async function apiUser(): Promise<
+  { user: SessionUser; response?: never } | { user?: never; response: Response }
+> {
+  const user = await getCurrentUser();
+  if (!user) {
+    return {
+      response: Response.json({ error: "Please sign in." }, { status: 401 }),
+    };
+  }
+  if (user.status === "suspended") {
+    return {
+      response: Response.json(
+        { error: "This account is suspended." },
+        { status: 403 },
+      ),
+    };
+  }
+  return { user };
+}
+
+export async function apiStaff(): Promise<
+  { user: SessionUser; response?: never } | { user?: never; response: Response }
+> {
+  const result = await apiUser();
+  if (!result.user) return result;
+  if (!isStaff(result.user.role)) {
+    return {
+      response: Response.json({ error: "Not allowed." }, { status: 403 }),
+    };
+  }
+  return result;
+}
+
+export async function apiAdmin(): Promise<
+  { user: SessionUser; response?: never } | { user?: never; response: Response }
+> {
+  const result = await apiUser();
+  if (!result.user) return result;
+  if (result.user.role !== "admin") {
+    return {
+      response: Response.json({ error: "Not allowed." }, { status: 403 }),
+    };
+  }
+  return result;
 }

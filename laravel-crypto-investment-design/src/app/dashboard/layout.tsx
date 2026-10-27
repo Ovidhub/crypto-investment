@@ -1,23 +1,22 @@
-import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import DashboardShell from "@/components/DashboardShell";
-import type { ReactNode } from "react";
+import { unreadCount } from "@/lib/notifications";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
-  const me = await getCurrentUser();
-  if (!me) redirect("/login");
-  if (me.role === "admin") redirect("/admin");
+  const me = await requireUser();
+  const unread = await unreadCount(me.id);
 
   return (
     <DashboardShell
       user={{ name: me.name, email: me.email, role: me.role }}
       variant="user"
+      unread={unread}
     >
       {children}
     </DashboardShell>

@@ -118,7 +118,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
         </div>
 
         <p className="mt-6 text-center text-xs text-[#6b7488]">
-          Protected by bank-grade encryption. Demo platform — no real funds.
+          Simulation only — no real funds, no card details, nothing leaves the sandbox.
         </p>
       </div>
     </div>

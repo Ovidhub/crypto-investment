@@ -4,24 +4,28 @@ import { useState } from "react";
 
 const FAQS = [
   {
-    q: "Is Enethi safe to use?",
-    a: "Absolutely. We use cold-storage custody, mandatory 2FA, biometric login and carry full insurance on custodial assets. Your funds and data are always protected.",
+    q: "Is this a real investment platform?",
+    a: "No. Enethi is a product demonstration. Every balance, deposit, withdrawal and yield credit is simulated in a database. There is no payment processor, no custody of real assets and no blockchain transaction anywhere in the app.",
   },
   {
-    q: "How do I earn passive income?",
-    a: "You can stake supported assets or deposit into our yield vaults to earn up to 12% APY. Rewards compound automatically and can be withdrawn anytime.",
+    q: "How do the plan returns work?",
+    a: "Each plan has a simulated annual rate. A scheduled job credits principal × rate ÷ 365 once a day while the plan runs, and books the matching simulated-yield expense. It is arithmetic on our own input, not a forecast of market performance, and it is not guaranteed.",
   },
   {
-    q: "What are the trading fees?",
-    a: "Enethi charges a flat 0.1% maker/taker fee with no hidden charges. Deposits via crypto are always free, and card deposits carry a small processor fee.",
+    q: "What fees does it charge?",
+    a: "A 0.50% simulated execution fee on buys and sells, recorded as revenue in the ledger. Deposits and withdrawals are reviewed manually and carry no fee in this demo.",
   },
   {
-    q: "Which cryptocurrencies are supported?",
-    a: "We support 99+ assets including Bitcoin, Ethereum, Solana, and all major DeFi and Layer-1 tokens. New coins are added every month.",
+    q: "Which assets are supported?",
+    a: "The 12 largest coins by market cap, priced live from CoinGecko. If that API is unreachable the app falls back to clearly-labelled sample prices so the interface still works.",
   },
   {
-    q: "Can I use Enethi in my country?",
-    a: "Enethi is available in 160+ countries. During sign-up we automatically check availability and applicable compliance requirements for your region.",
+    q: "What happens to the data I enter?",
+    a: "By default the demo runs on an in-process database that resets when the server restarts. If an operator sets DATABASE_URL it persists in Postgres. Do not enter real identity documents: the verification screen is a simulated workflow that stores only the last four digits.",
+  },
+  {
+    q: "Can I export or delete my data?",
+    a: "You can download a JSON export of your profile and ledger-backed balances from Settings. Account deletion is handled by support in this demo rather than a self-serve button, because the audit trail has to stay intact.",
   },
 ];
 
