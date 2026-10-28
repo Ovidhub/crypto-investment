@@ -60,6 +60,12 @@ three coin positions, one settled win, one settled loss and one live trade.
 
 `vercel.json` schedules the accrual job daily at 00:15 UTC.
 
+With `DATABASE_URL` set, create the tables once with
+`npx drizzle-kit push` (schema lives in `src/db/schema.ts`). Demo mode builds
+its schema from the DDL in `src/db/demo.ts`, so nothing else is needed there.
+Note that the shared demo login and its one-click endpoint are disabled as soon
+as `DATABASE_URL` is present.
+
 ---
 
 ## What's implemented
