@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   }
 
   const result = await settleSimTrade({
-    admin: { id: auth.user.id, email: auth.user.email },
+    actor: { id: auth.user.id, email: auth.user.email },
     tradeId: id,
     outcome: outcome as "won" | "lost" | "void" | "market",
     reason: typeof reason === "string" ? reason : "",

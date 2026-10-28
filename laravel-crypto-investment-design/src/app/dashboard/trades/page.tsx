@@ -9,6 +9,7 @@ import {
   SIM_MAX_OPEN_TRADES,
   SIM_PAYOUT_BP,
   listUserTrades,
+  settleDueTrades,
 } from "@/lib/sim-trades";
 import SimTradeTicket from "@/components/SimTradeTicket";
 import StatCard from "@/components/StatCard";
@@ -29,6 +30,11 @@ function timeLeft(iso: string): string {
 
 export default async function TradesPage() {
   const me = await requireUser();
+
+  // A trade whose window has closed settles under any standing policy on this
+  // account, so the customer sees a final result instead of a stale open row.
+  await settleDueTrades({ userId: me.id });
+
   const [balances, trades, coins] = await Promise.all([
     userBalances(me.id),
     listUserTrades(me.id, 50),

@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, lte } from "drizzle-orm";
 import { db } from "@/db";
 import { simTrades, transactions, users } from "@/db/schema";
 import { logAudit, notify } from "@/lib/audit";
@@ -53,6 +53,32 @@ export type TradeDirection = "long" | "short";
 export type TradeStatus = "open" | "won" | "lost" | "void";
 export type SettleOutcome = "won" | "lost" | "void" | "market";
 
+/**
+ * Operator control over how an account's trades resolve.
+ *
+ * `manual` leaves every trade for the desk to decide. The other three are a
+ * standing instruction: any trade this account opens settles that way once it
+ * reaches its expiry, without the operator having to click each time.
+ */
+export type OutcomePolicy = "manual" | "win" | "loss" | "market";
+export const OUTCOME_POLICIES = ["manual", "win", "loss", "market"] as const;
+
+export const POLICY_LABELS: Record<OutcomePolicy, string> = {
+  manual: "Manual — decide each trade",
+  win: "Always win",
+  loss: "Always lose",
+  market: "Follow the market",
+};
+
+export const POLICY_DESCRIPTIONS: Record<OutcomePolicy, string> = {
+  manual: "Every trade waits on the settlement desk for a decision.",
+  win: "Each trade is paid out as a win: stake returned plus the 85% profit.",
+  loss: "Each trade forfeits its stake to the house.",
+  market: "Each trade is judged on the live price versus its entry, and a tie voids.",
+};
+
+export type SettleSource = "operator" | "market" | "policy";
+
 export type OpenTradeResult =
   | {
       ok: true;
@@ -69,7 +95,7 @@ export type SettleResult =
   | {
       ok: true;
       outcome: Exclude<TradeStatus, "open">;
-      source: "operator" | "market";
+      source: SettleSource;
       message: string;
       payout: string;
       cashAfter: string;
@@ -268,6 +294,20 @@ export async function openSimTrade(input: {
   };
 }
 
+/** How a settlement reads on a receipt, keyed by who decided it. */
+export const SOURCE_PHRASE: Record<SettleSource, string> = {
+  operator: "operator decision",
+  market: "settled at market",
+  policy: "house outcome policy",
+};
+
+/** The same, phrased for a notification sentence. */
+export const SOURCE_SENTENCE: Record<SettleSource, string> = {
+  operator: "Settled by an operator",
+  market: "Settled at market",
+  policy: "Settled under the account's house outcome policy",
+};
+
 /**
  * Decide an open trade. `outcome: "market"` compares the live price with the
  * entry price (long wins when price rose, short wins when it fell, a tie
@@ -276,10 +316,13 @@ export async function openSimTrade(input: {
  * is stored with the operator's id and reason.
  */
 export async function settleSimTrade(input: {
-  admin: { id: number; email: string };
+  /** Null actor = settled by the account's standing policy, not a person. */
+  actor: { id: number | null; email: string | null };
   tradeId: number;
   outcome: SettleOutcome;
   reason: string;
+  /** Overrides the derived source; used for policy settlements. */
+  source?: Exclude<SettleSource, "market">;
 }): Promise<SettleResult> {
   if (
     input.outcome !== "won" &&
@@ -291,10 +334,15 @@ export async function settleSimTrade(input: {
   }
 
   const typed = input.reason.trim().replace(/\s+/g, " ");
-  // A market settlement needs no operator prose: the outcome speaks for
-  // itself, so fall back to the standard note the UI advertises.
+  // Market and policy settlements need no operator prose: the outcome speaks
+  // for itself, so fall back to the standard note the UI advertises.
   const reason =
-    typed || (input.outcome === "market" ? "Settled at the live market price." : "");
+    typed ||
+    (input.outcome === "market"
+      ? "Settled at the live market price."
+      : input.source === "policy"
+        ? "Settled automatically under this account's outcome policy."
+        : "");
   if (reason.length < SIM_REASON_MIN) {
     return {
       ok: false,
@@ -352,7 +400,8 @@ export async function settleSimTrade(input: {
   }
 
   const payout = outcome === "won" ? applyBasisPoints(stake, row.payoutBp) : BigInt(0);
-  const source = input.outcome === "market" ? "market" : "operator";
+  const source: SettleSource =
+    input.source ?? (input.outcome === "market" ? "market" : "operator");
   const exitPrice = mark !== null ? mark.toFixed(6) : row.entryPrice;
 
   if (outcome === "won") {
@@ -361,7 +410,7 @@ export async function settleSimTrade(input: {
       memo: `Won ${row.symbol} ${row.direction} — stake $${centsToUsd(stake)} + payout $${centsToUsd(payout)}`,
       refType: "sim_trade",
       refId: row.id,
-      actorId: input.admin.id,
+      actorId: input.actor.id ?? undefined,
       postings: [
         debit(ACCOUNTS.userStake(row.userId), stake),
         debit(ACCOUNTS.payoutExpense, payout),
@@ -374,7 +423,7 @@ export async function settleSimTrade(input: {
       memo: `Lost ${row.symbol} ${row.direction} — stake $${centsToUsd(stake)} forfeited`,
       refType: "sim_trade",
       refId: row.id,
-      actorId: input.admin.id,
+      actorId: input.actor.id ?? undefined,
       postings: [
         debit(ACCOUNTS.userStake(row.userId), stake),
         credit(ACCOUNTS.settlementRevenue, stake),
@@ -386,7 +435,7 @@ export async function settleSimTrade(input: {
       memo: `Voided ${row.symbol} ${row.direction} — stake $${centsToUsd(stake)} returned`,
       refType: "sim_trade",
       refId: row.id,
-      actorId: input.admin.id,
+      actorId: input.actor.id ?? undefined,
       postings: [
         debit(ACCOUNTS.userStake(row.userId), stake),
         credit(ACCOUNTS.userCash(row.userId), stake),
@@ -402,7 +451,7 @@ export async function settleSimTrade(input: {
       exitPrice,
       payoutUsd: centsToUsd(payout),
       outcomeSource: source,
-      settledBy: input.admin.id,
+      settledBy: input.actor.id,
       settleNote: reason,
       settledAt,
     })
@@ -425,7 +474,7 @@ export async function settleSimTrade(input: {
     amount: "0",
     price: exitPrice,
     usdValue: centsToUsd(usd),
-    note: `${label} · ${source === "market" ? "settled at market" : "operator decision"}: ${reason}`,
+    note: `${label} · ${SOURCE_PHRASE[source]}: ${reason}`,
   });
 
   const cash = await syncCachedCash(row.userId);
@@ -435,15 +484,15 @@ export async function settleSimTrade(input: {
     title: outcome === "won" ? "Trade won" : outcome === "lost" ? "Trade closed at a loss" : "Trade voided",
     body:
       outcome === "won"
-        ? `Your ${row.symbol} ${row.direction} won $${centsToUsd(payout)} (stake returned). Settled ${source === "market" ? "at market" : "by an operator"}: ${reason}`
+        ? `Your ${row.symbol} ${row.direction} won $${centsToUsd(payout)} (stake returned). ${SOURCE_SENTENCE[source]}: ${reason}`
         : outcome === "lost"
-          ? `Your ${row.symbol} ${row.direction} lost its $${centsToUsd(stake)} stake. Settled ${source === "market" ? "at market" : "by an operator"}: ${reason}`
+          ? `Your ${row.symbol} ${row.direction} lost its $${centsToUsd(stake)} stake. ${SOURCE_SENTENCE[source]}: ${reason}`
           : `Your ${row.symbol} ${row.direction} was voided and the $${centsToUsd(stake)} stake returned. ${reason}`,
   });
 
   await logAudit({
-    actorId: input.admin.id,
-    actorEmail: input.admin.email,
+    actorId: input.actor.id ?? undefined,
+    actorEmail: input.actor.email,
     action: `simtrade.settle.${outcome}`,
     targetType: "sim_trade",
     targetId: row.id,
@@ -569,4 +618,277 @@ export async function simDeskStats() {
     takenIn: centsToNumber(taken),
     houseNet: centsToNumber(taken - paid),
   };
+}
+
+// ── Standing outcome policy per account ─────────────────────────────
+
+export function isOutcomePolicy(value: unknown): value is OutcomePolicy {
+  return (
+    value === "manual" || value === "win" || value === "loss" || value === "market"
+  );
+}
+
+export async function getOutcomePolicy(userId: number): Promise<OutcomePolicy> {
+  const [row] = await db
+    .select({ policy: users.tradeOutcome })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  return isOutcomePolicy(row?.policy) ? row.policy : "manual";
+}
+
+export type PolicyResult =
+  | {
+      ok: true;
+      policy: OutcomePolicy;
+      message: string;
+      settledNow: number;
+    }
+  | { ok: false; error: string; status: number };
+
+/**
+ * Set how an account's trades resolve from now on.
+ *
+ * `policy: "manual"` clears any standing instruction. The others are applied
+ * to every trade the account opens from that point on, and — when the operator
+ * asks for it — to trades already open (see `settleOpenTradesForUser`).
+ */
+export async function setOutcomePolicy(input: {
+  admin: { id: number; email: string };
+  userId: number;
+  policy: unknown;
+  reason?: string;
+}): Promise<PolicyResult> {
+  if (!isOutcomePolicy(input.policy)) {
+    return { ok: false, error: "Choose a valid outcome policy.", status: 400 };
+  }
+  if (input.userId === input.admin.id) {
+    return {
+      ok: false,
+      error: "You cannot set an outcome policy on your own account. Ask another admin.",
+      status: 400,
+    };
+  }
+
+  const [target] = await db
+    .select({ id: users.id, name: users.name, email: users.email })
+    .from(users)
+    .where(eq(users.id, input.userId))
+    .limit(1);
+  if (!target) return { ok: false, error: "User not found.", status: 404 };
+
+  const typed = (input.reason ?? "").trim().replace(/\s+/g, " ").slice(0, 300);
+
+  await db
+    .update(users)
+    .set({ tradeOutcome: input.policy })
+    .where(eq(users.id, input.userId));
+
+  await logAudit({
+    actorId: input.admin.id,
+    actorEmail: input.admin.email,
+    action: "simtrade.policy",
+    targetType: "user",
+    targetId: input.userId,
+    meta: {
+      policy: input.policy,
+      note: typed || null,
+      targetEmail: target.email,
+    },
+  });
+
+  if (input.policy !== "manual") {
+    await notify({
+      userId: input.userId,
+      title: "Trade settlement terms updated",
+      body: `How your simulated trades settle has been changed to: ${POLICY_LABELS[input.policy]}. ${POLICY_DESCRIPTIONS[input.policy]}${typed ? ` Note: ${typed}` : ""}`,
+    });
+  }
+
+  return {
+    ok: true,
+    policy: input.policy,
+    settledNow: 0,
+    message: `${target.name}: ${POLICY_LABELS[input.policy].toLowerCase()}.`,
+  };
+}
+
+/**
+ * Settle a whole batch of open trades. Used by "apply to open trades" on the
+ * account page and by the automatic policy runner.
+ */
+export async function settleOpenTradesForUser(input: {
+  actor: { id: number | null; email: string | null };
+  userId: number;
+  outcome: Exclude<SettleOutcome, "market">;
+  reason: string;
+  source?: Exclude<SettleSource, "market">;
+}): Promise<{ settled: number; failures: string[] }> {
+  const open = await db
+    .select({ id: simTrades.id })
+    .from(simTrades)
+    .where(and(eq(simTrades.userId, input.userId), eq(simTrades.status, "open")));
+
+  let settled = 0;
+  const failures: string[] = [];
+  for (const row of open) {
+    const result = await settleSimTrade({
+      actor: input.actor,
+      tradeId: row.id,
+      outcome: input.outcome,
+      reason: input.reason,
+      source: input.source,
+    });
+    if (result.ok) settled += 1;
+    else failures.push(`#${row.id}: ${result.error}`);
+  }
+  return { settled, failures };
+}
+
+/**
+ * Apply standing policies to trades that have reached their expiry.
+ *
+ * Runs whenever the user's trade page or the admin desk is loaded, so a policy
+ * takes effect without waiting for a scheduler. Trades on `manual` accounts are
+ * deliberately left open for a human decision.
+ */
+export async function settleDueTrades(
+  options: { userId?: number; now?: Date } = {},
+): Promise<{
+  settled: number;
+  skipped: number;
+  failures: number;
+}> {
+  const now = options.now ?? new Date();
+  const due = await db
+    .select({
+      id: simTrades.id,
+      policy: users.tradeOutcome,
+    })
+    .from(simTrades)
+    .innerJoin(users, eq(users.id, simTrades.userId))
+    .where(
+      options.userId === undefined
+        ? and(eq(simTrades.status, "open"), lte(simTrades.expiresAt, now))
+        : and(
+            eq(simTrades.status, "open"),
+            eq(simTrades.userId, options.userId),
+            lte(simTrades.expiresAt, now),
+          ),
+    )
+    .limit(50);
+
+  let settled = 0;
+  let skipped = 0;
+  let failures = 0;
+
+  for (const row of due) {
+    const policy = isOutcomePolicy(row.policy) ? row.policy : "manual";
+    if (policy === "manual") {
+      skipped += 1;
+      continue;
+    }
+    const outcome: Exclude<SettleOutcome, "market"> | "market" =
+      policy === "win" ? "won" : policy === "loss" ? "lost" : "market";
+
+    const result = await settleSimTrade({
+      actor: { id: null, email: null },
+      tradeId: row.id,
+      outcome,
+      reason: "Settled automatically under this account's outcome policy.",
+      source: "policy",
+    });
+    if (result.ok) settled += 1;
+    else failures += 1;
+  }
+
+  return { settled, skipped, failures };
+}
+
+export type PolicyRow = {
+  userId: number;
+  name: string;
+  email: string;
+  policy: OutcomePolicy;
+  openTrades: number;
+};
+
+/** Accounts whose trades no longer wait on a manual decision. */
+export async function listPolicyAccounts(): Promise<PolicyRow[]> {
+  const rows = await db
+    .select({
+      userId: users.id,
+      name: users.name,
+      email: users.email,
+      policy: users.tradeOutcome,
+    })
+    .from(users)
+    .where(eq(users.tradeOutcome, "win"));
+
+  const losses = await db
+    .select({
+      userId: users.id,
+      name: users.name,
+      email: users.email,
+      policy: users.tradeOutcome,
+    })
+    .from(users)
+    .where(eq(users.tradeOutcome, "loss"));
+
+  const markets = await db
+    .select({
+      userId: users.id,
+      name: users.name,
+      email: users.email,
+      policy: users.tradeOutcome,
+    })
+    .from(users)
+    .where(eq(users.tradeOutcome, "market"));
+
+  return [...rows, ...losses, ...markets]
+    .filter((row) => isOutcomePolicy(row.policy) && row.policy !== "manual")
+    .map((row) => ({
+      userId: row.userId,
+      name: row.name,
+      email: row.email,
+      policy: row.policy as OutcomePolicy,
+      openTrades: 0,
+    }));
+}
+
+/**
+ * Apply a policy to trades that are already open. Separate from setting the
+ * policy because an operator may want the new rule to start with the next
+ * trade rather than re-deciding live positions.
+ */
+export async function applyPolicyNow(input: {
+  actor: { id: number | null; email: string | null };
+  userId: number;
+  policy: OutcomePolicy;
+  reason: string;
+}): Promise<{ settled: number; failures: string[] }> {
+  if (input.policy === "manual") return { settled: 0, failures: [] };
+
+  const open = await db
+    .select({ id: simTrades.id })
+    .from(simTrades)
+    .where(and(eq(simTrades.userId, input.userId), eq(simTrades.status, "open")));
+
+  const outcome: SettleOutcome =
+    input.policy === "win" ? "won" : input.policy === "loss" ? "lost" : "market";
+
+  let settled = 0;
+  const failures: string[] = [];
+  for (const row of open) {
+    const result = await settleSimTrade({
+      actor: input.actor,
+      tradeId: row.id,
+      outcome,
+      reason: input.reason,
+      source: "policy",
+    });
+    if (result.ok) settled += 1;
+    else failures.push(`#${row.id}: ${result.error}`);
+  }
+  return { settled, failures };
 }

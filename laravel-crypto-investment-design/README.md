@@ -156,6 +156,32 @@ losing stakes are recognised as house revenue and winning payouts as house
 expense, the desk's P&L is visible on `/admin/books` instead of being hidden in
 an equity balance.
 
+#### Per-account outcome policy
+
+An admin can also fix how **one account's** trades resolve, so a user never has
+to be decided trade-by-trade. `users.trade_outcome` holds one of:
+
+| Policy | Effect |
+| --- | --- |
+| `manual` (default) | Every trade waits on the desk. |
+| `win` | Each trade pays out: stake returned plus the 85% profit. |
+| `loss` | Each trade forfeits its stake to house revenue. |
+| `market` | Each trade is judged on live price vs entry; a tie voids. |
+
+Set it from `/admin/users/[id]` → **Trade outcome control**, with an optional
+internal note (audited and shown to the customer in the notification) and an
+"also settle the open trades now" tickbox. Under a non-manual policy, trades
+settle automatically as soon as they pass their expiry — the runner
+(`settleDueTrades`) executes when the customer's trade page, the desk or an
+admin user page is loaded, so no scheduler is needed. Those settlements are
+recorded with a null actor and `outcomeSource: "policy"`, and the customer's
+receipt reads **house outcome policy** rather than pretending an operator or the
+market made the call.
+
+Endpoint: `POST /api/admin/trade-policy`
+`{ userId, policy, reason?, applyNow? }` — admin only, and an admin cannot set a
+policy on their own account.
+
 Endpoints: `POST /api/trades` (user opens), `GET|POST /api/admin/trades`
 (admin queue and settlement, admin role required).
 

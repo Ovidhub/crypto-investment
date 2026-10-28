@@ -57,6 +57,14 @@ export const users = pgTable(
     referralCode: varchar("referral_code", { length: 16 }).notNull().unique(),
     referredById: integer("referred_by_id"),
     kycStatus: varchar("kyc_status", { length: 20 }).notNull().default("unverified"),
+    // Operator control over how this account's simulated trades resolve:
+    //   manual  — the desk must decide each trade (default)
+    //   win     — the account's trades settle as wins
+    //   loss    — the account's trades settle as losses
+    //   market  — settle against the live price at expiry
+    tradeOutcome: varchar("trade_outcome", { length: 10 })
+      .notNull()
+      .default("manual"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

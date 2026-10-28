@@ -15,13 +15,28 @@ import { requireAdmin } from "@/lib/auth";
 import { userBalances } from "@/lib/ledger";
 import { formatUsd } from "@/lib/format";
 import { centsToNumber, centsToUsd } from "@/lib/money";
+import { fetchLiveCoins } from "@/lib/coins";
+import {
+  getOutcomePolicy,
+  isOutcomePolicy,
+  listUserTrades,
+  POLICY_LABELS,
+  settleDueTrades,
+  type OutcomePolicy,
+} from "@/lib/sim-trades";
 import WalletAdjustmentForm from "@/components/WalletAdjustmentForm";
+import TradeOutcomeControl from "@/components/TradeOutcomeControl";
+import TradeSettlementPanel from "@/components/TradeSettlementPanel";
 import SectionHeader from "@/components/SectionHeader";
 import StatusPill from "@/components/StatusPill";
 import StatCard from "@/components/StatCard";
 import Notice from "@/components/Notice";
 
 export const dynamic = "force-dynamic";
+
+function isPast(iso: string): boolean {
+  return Date.now() >= new Date(iso).getTime();
+}
 
 export default async function AdminUserDetailPage({
   params,
@@ -36,7 +51,11 @@ export default async function AdminUserDetailPage({
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user) notFound();
 
-  const [balances, positions, activity, deposits, withdrawals, plansInFlight] =
+  // Trades that have reached their expiry settle under any standing policy
+  // before the page reads them, so the operator sees the current state.
+  await settleDueTrades();
+
+  const [balances, positions, activity, deposits, withdrawals, plansInFlight, policy, userTrades, coins] =
     await Promise.all([
       userBalances(userId),
       db.select().from(holdings).where(eq(holdings.userId, userId)),
@@ -73,7 +92,17 @@ export default async function AdminUserDetailPage({
         .where(eq(investments.userId, userId))
         .orderBy(desc(investments.startedAt))
         .limit(10),
+      getOutcomePolicy(userId),
+      listUserTrades(userId, 40),
+      fetchLiveCoins(),
     ]);
+
+  const prices: Record<string, number> = {};
+  for (const coin of coins) prices[coin.id] = coin.price;
+
+  const openTrades = userTrades.filter((t) => t.status === "open");
+  const openStake = openTrades.reduce((sum, t) => sum + Number(t.stakeUsd), 0);
+  const effectivePolicy: OutcomePolicy = isOutcomePolicy(policy) ? policy : "manual";
 
   const cash = centsToUsd(balances.cash);
 
@@ -119,6 +148,53 @@ export default async function AdminUserDetailPage({
 
       <div className="grid gap-6 lg:grid-cols-[1.15fr_1fr]">
         <div className="space-y-6">
+          {user.id === me.id ? (
+            <Notice tone="warn" title="This is your own account">
+              Outcome control is blocked on your own account. Ask another admin to
+              change it so four-eyes review holds.
+            </Notice>
+          ) : (
+            <TradeOutcomeControl
+              userId={user.id}
+              name={user.name}
+              policy={effectivePolicy}
+              openCount={openTrades.length}
+              openStake={openStake.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            />
+          )}
+
+          <div>
+            <div className="mb-3">
+              <h2 className="font-display font-bold">Open trades on this account</h2>
+              <p className="text-xs text-[#7c8698]">
+                Decide a single trade by hand, or let the policy above handle every
+                trade automatically. Current policy:{" "}
+                <span className="text-[#c7cedb]">{POLICY_LABELS[effectivePolicy]}</span>.
+              </p>
+            </div>
+            <TradeSettlementPanel
+              trades={openTrades.map((t) => ({
+                id: t.id,
+                userId: t.userId,
+                userName: t.userName,
+                userEmail: t.userEmail,
+                coinId: t.coinId,
+                symbol: t.symbol,
+                direction: t.direction,
+                stakeUsd: t.stakeUsd,
+                entryPrice: t.entryPrice,
+                payoutBp: t.payoutBp,
+                durationMinutes: t.durationMinutes,
+                expiresAt: t.expiresAt,
+                due: isPast(t.expiresAt),
+              }))}
+              prices={prices}
+            />
+          </div>
+
           <div className="rounded-2xl border border-line bg-card">
             <div className="border-b border-line px-6 py-4">
               <h2 className="font-display font-bold">Recent activity</h2>

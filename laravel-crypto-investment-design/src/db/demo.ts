@@ -57,6 +57,7 @@ CREATE TABLE users (
   referral_code varchar(16) NOT NULL UNIQUE,
   referred_by_id integer,
   kyc_status varchar(20) NOT NULL DEFAULT 'unverified',
+  trade_outcome varchar(10) NOT NULL DEFAULT 'manual',
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX users_email_idx ON users (email);
