@@ -26,6 +26,8 @@ export type PortfolioSummary = {
   coins: Coin[];
   cash: number;
   locked: number;
+  /** Committed to open simulated trades; still the user's money. */
+  stake: number;
   investedValue: number;
   totalValue: number;
   cryptoAtCost: number;
@@ -75,6 +77,7 @@ export async function getPortfolio(userId: number): Promise<PortfolioSummary> {
   const locked = centsToNumber(balances.locked);
   const investedValue = centsToNumber(balances.locked);
   const cryptoAtCost = centsToNumber(balances.crypto);
+  const stake = centsToNumber(balances.stake);
 
   // Allocate the user's recorded cost basis across positions pro rata so the
   // unrealised P/L column is meaningful without per-lot bookkeeping.
@@ -92,8 +95,9 @@ export async function getPortfolio(userId: number): Promise<PortfolioSummary> {
     coins,
     cash,
     locked,
+    stake,
     investedValue,
-    totalValue: holdingsValue + cash + locked,
+    totalValue: holdingsValue + cash + locked + stake,
     cryptoAtCost,
   };
 }
@@ -130,6 +134,10 @@ const LABELS: Record<string, string> = {
   referral_bonus: "Referral bonus",
   adjustment_credit: "Operator credit",
   adjustment_debit: "Operator debit",
+  trade_open: "Stake escrowed",
+  trade_win: "Trade won",
+  trade_loss: "Trade lost",
+  trade_void: "Trade voided",
 };
 
 export async function getActivity(userId: number, limit = 50): Promise<ActivityItem[]> {
@@ -142,12 +150,15 @@ export async function getActivity(userId: number, limit = 50): Promise<ActivityI
       t.type === "demo_credit" ||
       t.type === "sell" ||
       t.type === "referral_bonus" ||
-      t.type === "adjustment_credit"
+      t.type === "adjustment_credit" ||
+      t.type === "trade_win" ||
+      t.type === "trade_void"
         ? "in"
         : t.type === "buy" ||
             t.type === "withdraw" ||
             t.type === "plan_deposit" ||
-            t.type === "adjustment_debit"
+            t.type === "adjustment_debit" ||
+            t.type === "trade_loss"
           ? "out"
           : "neutral";
     return {
@@ -155,10 +166,12 @@ export async function getActivity(userId: number, limit = 50): Promise<ActivityI
       type: t.type,
       label: LABELS[t.type] ?? t.type,
       detail:
-        t.symbol && t.amount
+        t.symbol && t.amount && Number(t.amount) > 0
           ? `${Number(t.amount).toFixed(6)} ${t.symbol} @ $${Number(t.price ?? 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}`
           : t.note
-            ? `Reason: ${t.note}`
+            ? t.type.startsWith("adjustment_")
+              ? `Reason: ${t.note}`
+              : t.note
             : t.type === "demo_credit"
               ? "Simulated funds — not real money"
               : "",

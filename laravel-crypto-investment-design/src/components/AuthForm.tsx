@@ -4,7 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function AuthForm({ mode }: { mode: "login" | "register" }) {
+export default function AuthForm({
+  mode,
+  demo,
+}: {
+  mode: "login" | "register";
+  /** Demo credentials to advertise in demo mode; omitted otherwise. */
+  demo?: { email: string; password: string };
+}) {
   const router = useRouter();
   const isLogin = mode === "login";
   const [name, setName] = useState("");
@@ -12,6 +19,26 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [demoBusy, setDemoBusy] = useState(false);
+
+  async function signInAsDemo() {
+    setDemoBusy(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth/demo", { method: "POST" });
+      const data = (await res.json()) as { error?: string; role?: string };
+      if (!res.ok) {
+        setError(data.error ?? "Could not open the demo account.");
+        setDemoBusy(false);
+        return;
+      }
+      router.push(data.role === "admin" ? "/admin" : "/dashboard");
+      router.refresh();
+    } catch {
+      setError("Network error. Please try again.");
+      setDemoBusy(false);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -105,6 +132,40 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
                   : "Create Account"}
             </button>
           </form>
+
+          {isLogin && demo && (
+            <div className="mt-6 rounded-2xl border border-brand/25 bg-brand/5 p-4">
+              <p className="text-xs font-semibold text-white">User demo account</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-[#9aa3b2]">
+                A funded, non-admin customer account so you can see the user side —
+                wallet, spot trading, the simulated trade desk and statements.
+              </p>
+              <div className="mt-2 space-y-1 font-mono text-[11px] text-[#c7cedb]">
+                <p>{demo.email}</p>
+                <p>{demo.password}</p>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={signInAsDemo}
+                  disabled={demoBusy}
+                  className="rounded-lg bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-white/15 disabled:opacity-50"
+                >
+                  {demoBusy ? "Opening…" : "Sign in as demo user"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail(demo.email);
+                    setPassword(demo.password);
+                  }}
+                  className="rounded-lg border border-line px-3 py-1.5 text-[11px] font-semibold text-[#c7cedb] hover:border-brand hover:text-white"
+                >
+                  Fill the form instead
+                </button>
+              </div>
+            </div>
+          )}
 
           <p className="mt-5 text-center text-sm text-[#9aa3b2]">
             {isLogin ? "New to Enethi? " : "Already have an account? "}

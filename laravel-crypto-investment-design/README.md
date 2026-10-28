@@ -28,6 +28,21 @@ No database is required to try it: without `DATABASE_URL` the app boots an
 in-process Postgres (pg-mem) with a full seed. That data lives in the server
 process and resets on restart.
 
+### Demo sign-in
+
+The seed includes a funded, non-admin customer so the user side can be reviewed
+without registering (shown on `/login` in demo mode, one click):
+
+```
+demo@enethi.app
+Enethi-Demo-2026!42
+```
+
+Override with `DEMO_LOGIN_EMAIL` / `DEMO_LOGIN_PASSWORD`. The one-click
+`POST /api/auth/demo` door is **disabled** whenever `DATABASE_URL` is set — it
+only exists in the in-memory demo. The demo account starts with $24,562.50 cash,
+three coin positions, one settled win, one settled loss and one live trade.
+
 ## Deploy
 
 - Root directory: `laravel-crypto-investment-design`
@@ -41,6 +56,7 @@ process and resets on restart.
 | `ADMIN_PASSWORD_HASH` | scrypt hash of the admin password (`npm run env:generate`). |
 | `DATABASE_URL` | Optional Postgres URL. Without it the demo DB is in-memory. |
 | `CRON_SECRET` | Optional. When set, `/api/cron/accrue` requires `Authorization: Bearer <secret>`. |
+| `DEMO_LOGIN_EMAIL` / `DEMO_LOGIN_PASSWORD` | Optional. Credentials of the seeded demo customer (demo mode only). |
 
 `vercel.json` schedules the accrual job daily at 00:15 UTC.
 
@@ -79,7 +95,9 @@ Conventions:
 - On a real Postgres connection each journal runs inside a transaction.
 
 Chart of accounts: custody cash, crypto held, per-user cash / crypto-at-cost /
-locked accounts, fee revenue, simulated-yield expense, referral-bonus expense.
+locked / trade-stake accounts, fee revenue, forfeited-stake revenue,
+simulated-yield expense, winning-payout expense, referral-bonus expense,
+operator-adjustment equity.
 The admin **Ledger** screen shows the trial balance and the debits/credits
 difference live.
 
@@ -90,11 +108,12 @@ difference live.
 | Marketing | `/`, `/pricing`, `/about`, `/contact`, `/legal/{risk,terms,privacy}` | Honest copy; pricing reads the live plan catalogue. |
 | Account | `/login`, `/register` (+ `?ref=CODE`), `/suspended` | scrypt hashes, HMAC-signed HTTP-only cookie, login rate limiting. |
 | Portfolio | `/dashboard`, `/dashboard/portfolio`, `/dashboard/markets` | Live CoinGecko prices, cost-basis estimate, 0.50% fee quoted up front. |
+| Trades | `/dashboard/trades` | Stake simulated cash on a direction (5 min – 4 h). Stake is escrowed, then the desk settles it. |
 | Wallet | `/dashboard/wallet` | Deposit/withdrawal **requests**; withdrawals reserve funds before review. |
 | Plans | `/dashboard/plans`, `/dashboard/plans/[slug]`, `/dashboard/investments` | Locked principal, daily simulated accrual, early close. |
 | Growth | `/dashboard/referrals`, `/dashboard/notifications`, `/dashboard/support` | $25 simulated referral bonus per signup, in-app notifications. |
 | Account mgmt | `/dashboard/settings`, `/dashboard/kyc` | Password change, JSON data export, simulated verification. |
-| Admin | `/admin`, `/admin/requests`, `/admin/kyc`, `/admin/books`, `/admin/users`, `/admin/plans`, `/admin/settings`, `/admin/audit`, `/admin/waitlist`, `/admin/messages` | KPIs, approvals, plan catalogue, feature flags, append-only audit trail. |
+| Admin | `/admin`, `/admin/requests`, `/admin/kyc`, `/admin/books`, `/admin/users`, `/admin/users/[id]`, `/admin/trades`, `/admin/adjustments`, `/admin/plans`, `/admin/settings`, `/admin/audit`, `/admin/waitlist`, `/admin/messages` | KPIs, approvals, settlement desk, wallet adjustments, plan catalogue, feature flags, append-only audit trail. |
 
 ### Simulated yield
 
@@ -107,6 +126,32 @@ daily = principal × annualRateBp ÷ 10 000 ÷ 365   (rounded down to the cent)
 The credit is booked as `debit expense:simulated-yield / credit user cash`.
 Re-running the job the same day is a no-op. At the end of the term the principal
 moves back to available cash.
+
+### Simulated trade desk
+
+A user stakes their **own** simulated cash on a direction (long or short) for a
+fixed window. Opening a trade moves the stake from
+`liability:user:X:cash` to `liability:user:X:stake` — escrow, not a loss.
+
+Settlement is in the customer's hands only in the sense that they chose the
+direction; the desk decides the outcome. Three honest paths, all journaled:
+
+| Outcome | Journal | Customer sees |
+| --- | --- | --- |
+| won | debit stake, debit `expense:trade-payout`, credit cash | stake returned + 85% profit |
+| lost | debit stake, credit `revenue:trade-settlement` | stake forfeited |
+| void | debit stake, credit cash | stake returned untouched |
+
+`settleSimTrade` takes `outcome: "won" | "lost" | "void" | "market"`. The last
+one compares the live price with the entry price instead of asking an operator,
+and is labelled on the trade as `settled at market` — an operator decision is
+labelled `operator decision` with the actor id and a mandatory note. Because
+losing stakes are recognised as house revenue and winning payouts as house
+expense, the desk's P&L is visible on `/admin/books` instead of being hidden in
+an equity balance.
+
+Endpoints: `POST /api/trades` (user opens), `GET|POST /api/admin/trades`
+(admin queue and settlement, admin role required).
 
 ### Roles
 
@@ -142,9 +187,10 @@ npm run typecheck
 npm run build
 ```
 
-The flows are exercised end to end against a running server: register → trade →
-fund a plan → request a withdrawal → run accrual → approve as admin → confirm
-`/admin/books` still reports **Books are balanced**.
+The flows are exercised end to end against a running server: sign in as the demo
+user → open a simulated trade → settle it as an operator (won / lost / void /
+market) → confirm the customer's activity feed, notification and CSV statement
+match → confirm `/admin/books` still reports **Books are balanced**.
 
 ## Layout
 

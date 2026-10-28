@@ -43,7 +43,29 @@ export const ACCOUNTS = {
     normal: "credit",
     ownerUserId: id,
   })) as UserAccount,
+  userStake: ((id: number) => ({
+    code: `liability:user:${id}:stake`,
+    name: `User ${id} stake in open trades`,
+    kind: "liability",
+    normal: "credit",
+    ownerUserId: id,
+  })) as UserAccount,
   feeRevenue: { code: "revenue:fees", name: "Trading fees (simulated)", kind: "revenue", normal: "credit" },
+  // Losing stakes are recognised as house income; winning payouts are a house
+  // expense. Together they make the settlement desk's P&L legible instead of
+  // hiding it inside an operator equity balance.
+  settlementRevenue: {
+    code: "revenue:trade-settlement",
+    name: "Forfeited stakes (simulated)",
+    kind: "revenue",
+    normal: "credit",
+  },
+  payoutExpense: {
+    code: "expense:trade-payout",
+    name: "Winning payouts (simulated)",
+    kind: "expense",
+    normal: "debit",
+  },
   yieldExpense: { code: "expense:simulated-yield", name: "Simulated plan yield", kind: "expense", normal: "debit" },
   referralExpense: { code: "expense:referral-bonus", name: "Referral bonuses (simulated)", kind: "expense", normal: "debit" },
   roundingEquity: { code: "equity:rounding", name: "Rounding", kind: "equity", normal: "credit" },
@@ -234,6 +256,9 @@ export async function userBalances(userId: number) {
     cash: byCode.get(ACCOUNTS.userCash(userId).code) ?? BigInt(0),
     crypto: byCode.get(ACCOUNTS.userCrypto(userId).code) ?? BigInt(0),
     locked: byCode.get(ACCOUNTS.userLocked(userId).code) ?? BigInt(0),
+    // Money committed to open simulated trades. Still the user's, but not
+    // spendable until the trade settles.
+    stake: byCode.get(ACCOUNTS.userStake(userId).code) ?? BigInt(0),
   };
 }
 

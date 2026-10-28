@@ -27,7 +27,8 @@ export default function DashboardShell({
       items: [
         { href: "/dashboard", label: "Overview", icon: "▚" },
         { href: "/dashboard/portfolio", label: "Holdings", icon: "◈" },
-        { href: "/dashboard/markets", label: "Trade", icon: "⇅" },
+        { href: "/dashboard/markets", label: "Spot", icon: "⇅" },
+        { href: "/dashboard/trades", label: "Trades", icon: "◎" },
         { href: "/dashboard/wallet", label: "Wallet", icon: "▦" },
         { href: "/dashboard/transactions", label: "Activity", icon: "≡" },
       ],
@@ -57,6 +58,7 @@ export default function DashboardShell({
       items: [
         { href: "/admin", label: "Overview", icon: "▚" },
         { href: "/admin/requests", label: "Approvals", icon: "⇄" },
+        { href: "/admin/trades", label: "Settlement desk", icon: "◎" },
         { href: "/admin/adjustments", label: "Adjustments", icon: "±" },
         { href: "/admin/kyc", label: "Verification", icon: "✓" },
         { href: "/admin/books", label: "Ledger", icon: "▤" },

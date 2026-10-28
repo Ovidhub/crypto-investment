@@ -30,7 +30,8 @@ export default async function DashboardOverview() {
   const locked = centsToNumber(balances.locked);
   const activePlans = investments.filter((i) => i.status === "active");
   const earned = investments.reduce((sum, i) => sum + Number(i.earnedUsd), 0);
-  const totalValue = portfolio.holdingsValue + cash + locked;
+  const stake = centsToNumber(balances.stake);
+  const totalValue = portfolio.holdingsValue + cash + locked + stake;
 
   return (
     <div className="space-y-8">
@@ -40,7 +41,8 @@ export default async function DashboardOverview() {
             Welcome back, {me.name.split(" ")[0]}
           </h1>
           <p className="mt-1 text-sm text-[#9aa3b2]">
-            Portfolio value across simulated cash, holdings and locked plans.
+            Portfolio value across simulated cash, holdings, locked plans and open
+            trades.
           </p>
         </div>
         <Link

@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { newDb, replaceQueryArgs$ } from "pg-mem";
 import type { Pool } from "pg";
 import { hashPassword } from "@/lib/password";
+import { DEMO_ACCOUNT } from "@/lib/demo-access";
 
 /**
  * A tiny in-process Postgres used when no DATABASE_URL is configured.
@@ -84,6 +85,29 @@ CREATE TABLE transactions (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX transactions_user_idx ON transactions (user_id);
+
+CREATE TABLE sim_trades (
+  id serial PRIMARY KEY,
+  user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  coin_id varchar(60) NOT NULL,
+  symbol varchar(20) NOT NULL,
+  direction varchar(6) NOT NULL,
+  stake_usd numeric(18,2) NOT NULL,
+  entry_price numeric(18,6) NOT NULL,
+  exit_price numeric(18,6),
+  payout_bp integer NOT NULL DEFAULT 8500,
+  duration_minutes integer NOT NULL,
+  status varchar(12) NOT NULL DEFAULT 'open',
+  outcome_source varchar(12),
+  payout_usd numeric(18,2),
+  settled_by integer,
+  settle_note text,
+  opened_at timestamptz NOT NULL DEFAULT now(),
+  expires_at timestamptz NOT NULL,
+  settled_at timestamptz
+);
+CREATE INDEX sim_trades_user_idx ON sim_trades (user_id);
+CREATE INDEX sim_trades_status_idx ON sim_trades (status);
 
 CREATE TABLE plans (
   id serial PRIMARY KEY,
@@ -289,6 +313,14 @@ function isoDaysAgo(days: number): string {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 }
 
+function isoMinutesAgo(minutes: number): string {
+  return new Date(Date.now() - minutes * 60 * 1000).toISOString();
+}
+
+function isoMinutesAhead(minutes: number): string {
+  return new Date(Date.now() + minutes * 60 * 1000).toISOString();
+}
+
 function isoDaysAhead(days: number): string {
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
 }
@@ -313,6 +345,8 @@ export function createDemoDatabase(): DemoDatabase {
   const adminPasswordHash =
     process.env.ADMIN_PASSWORD_HASH ?? hashPassword(randomBytes(32).toString("hex"));
   const lockedHash = hashPassword(randomBytes(32).toString("hex"));
+  // The shared demo sign-in. Public on purpose: it is a simulated account.
+  const demoPasswordHash = hashPassword(DEMO_ACCOUNT.password);
 
   // ── Admin ────────────────────────────────────────────────────────
   // Let the serial column assign id 1; seeding explicit ids does not advance
@@ -331,6 +365,8 @@ export function createDemoDatabase(): DemoDatabase {
     [4, "Demo Holder", "demo.holder@enethi.app", "active", "26200.75", "pending"],
     [5, "Demo Reviewer", "demo.reviewer@enethi.app", "suspended", "1500.00", "unverified"],
     [6, "Demo Newbie", "demo.newbie@enethi.app", "active", "10000.00", "unverified"],
+    // Public demo login seeded with the exact password in src/lib/demo-access.
+    [7, DEMO_ACCOUNT.name, DEMO_ACCOUNT.email, "active", "24562.50", "verified"],
   ];
 
   for (const [id, name, email, status, balance, kyc] of demoUsers) {
@@ -338,7 +374,17 @@ export function createDemoDatabase(): DemoDatabase {
       `INSERT INTO users
         (name, email, password_hash, role, status, balance_usd, referral_code, kyc_status, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [name, email, lockedHash, "user", status, balance, seedCode(id), kyc, isoDaysAgo(90 - id * 7)],
+      [
+        name,
+        email,
+        email === DEMO_ACCOUNT.email ? demoPasswordHash : lockedHash,
+        "user",
+        status,
+        balance,
+        seedCode(id),
+        kyc,
+        isoDaysAgo(90 - id * 7),
+      ],
     );
   }
 
@@ -354,6 +400,10 @@ export function createDemoDatabase(): DemoDatabase {
     [seedCode(3), "solana", "SOL", "42.5000000000", "4250.00"],
     [seedCode(4), "bitcoin", "BTC", "0.3120000000", "19344.00"],
     [seedCode(6), "ethereum", "ETH", "0.4500000000", "1080.00"],
+    // Public demo account portfolio (cost basis only; live value comes from prices).
+    [seedCode(7), "bitcoin", "BTC", "0.1200000000", "10009.35"],
+    [seedCode(7), "ethereum", "ETH", "1.4000000000", "3648.33"],
+    [seedCode(7), "solana", "SOL", "20.0000000000", "2329.00"],
   ];
   for (const [code, coinId, symbol, amount] of holdings) {
     run(
@@ -381,6 +431,72 @@ export function createDemoDatabase(): DemoDatabase {
       [code, type, coinId, symbol, usdValue, isoDaysAgo(daysAgo)],
     );
   }
+
+  // ── Public demo account: activity and simulated trades ───────────
+  // One settled win, one settled loss and one live trade so the trade desk
+  // screen has something real to look at on first load.
+  // Notes go in as bound parameters: the demo driver's argument replacer treats
+  // a literal "$150.00" in SQL text as placeholder number 150 and blows up.
+  run(
+    `INSERT INTO transactions (user_id, type, coin_id, symbol, usd_value, note, created_at)
+     VALUES ((SELECT id FROM users WHERE referral_code = $1), 'deposit', NULL, NULL, '25000.00', $2, $3)`,
+    [
+      seedCode(7),
+      "Demo account funding — simulated, not real money",
+      isoDaysAgo(40),
+    ],
+  );
+  run(
+    `INSERT INTO transactions (user_id, type, coin_id, symbol, usd_value, note, created_at)
+     VALUES ((SELECT id FROM users WHERE referral_code = $1), 'trade_loss', 'solana', 'SOL', '150.00', $2, $3)`,
+    [
+      seedCode(7),
+      "Lost SOL long · stake $150.00 · operator decision: Closed below the entry price at expiry.",
+      isoDaysAgo(4),
+    ],
+  );
+  run(
+    `INSERT INTO transactions (user_id, type, coin_id, symbol, usd_value, note, created_at)
+     VALUES ((SELECT id FROM users WHERE referral_code = $1), 'trade_win', 'ethereum', 'ETH', '212.50', $2, $3)`,
+    [
+      seedCode(7),
+      "Won ETH short · payout $212.50 · settled at market: Settled at the live market price at expiry.",
+      isoDaysAgo(2),
+    ],
+  );
+  run(
+    `INSERT INTO transactions (user_id, type, coin_id, symbol, usd_value, note, created_at)
+     VALUES ((SELECT id FROM users WHERE referral_code = $1), 'trade_open', 'bitcoin', 'BTC', '500.00', $2, $3)`,
+    [seedCode(7), "Long BTC · stake $500.00 · entry $83411.24", isoMinutesAgo(20)],
+  );
+
+  // won (2 days ago) → lost (4 days ago) → open (20 minutes ago)
+  run(
+    `INSERT INTO sim_trades
+      (user_id, coin_id, symbol, direction, stake_usd, entry_price, exit_price, payout_bp,
+       duration_minutes, status, outcome_source, payout_usd, settle_note, opened_at, expires_at, settled_at)
+     VALUES ((SELECT id FROM users WHERE referral_code = $1), 'ethereum', 'ETH', 'short', '250.00',
+             '2650.100000', '2612.400000', 8500, 60, 'won', 'market', '212.50',
+             'Settled at the live market price at expiry.', $2, $3, $4)`,
+    [seedCode(7), isoDaysAgo(2), isoDaysAgo(2), isoDaysAgo(2)],
+  );
+  run(
+    `INSERT INTO sim_trades
+      (user_id, coin_id, symbol, direction, stake_usd, entry_price, exit_price, payout_bp,
+       duration_minutes, status, outcome_source, payout_usd, settle_note, opened_at, expires_at, settled_at)
+     VALUES ((SELECT id FROM users WHERE referral_code = $1), 'solana', 'SOL', 'long', '150.00',
+             '118.000000', '114.200000', 8500, 15, 'lost', 'operator', '0.00',
+             'Closed below the entry price at expiry.', $2, $3, $4)`,
+    [seedCode(7), isoDaysAgo(4), isoDaysAgo(4), isoDaysAgo(4)],
+  );
+  run(
+    `INSERT INTO sim_trades
+      (user_id, coin_id, symbol, direction, stake_usd, entry_price, exit_price, payout_bp,
+       duration_minutes, status, opened_at, expires_at)
+     VALUES ((SELECT id FROM users WHERE referral_code = $1), 'bitcoin', 'BTC', 'long', '500.00',
+             '83411.240000', NULL, 8500, 60, 'open', $2, $3)`,
+    [seedCode(7), isoMinutesAgo(20), isoMinutesAhead(40)],
+  );
 
   // ── Plans (explicitly simulated yields) ──────────────────────────
   const plans: Array<[string, string, string, string, string, string, number, number, number]> = [
@@ -448,6 +564,8 @@ export function createDemoDatabase(): DemoDatabase {
     ["revenue:fees", "Trading fees (simulated)", "revenue", "credit", null],
     ["expense:simulated-yield", "Simulated plan yield", "expense", "debit", null],
     ["expense:referral-bonus", "Referral bonuses (simulated)", "expense", "debit", null],
+    ["revenue:trade-settlement", "Forfeited stakes (simulated)", "revenue", "credit", null],
+    ["expense:trade-payout", "Winning payouts (simulated)", "expense", "debit", null],
     ["equity:rounding", "Rounding", "equity", "credit", null],
   ];
   for (const [code, name, kind, normal, owner] of accounts) {
@@ -479,6 +597,7 @@ export function createDemoDatabase(): DemoDatabase {
     [seedCode(4)]: 4,
     [seedCode(5)]: 5,
     [seedCode(6)]: 6,
+    [seedCode(7)]: 7,
   };
 
   for (const [code, userId] of Object.entries(seedUserIds)) {
@@ -486,6 +605,7 @@ export function createDemoDatabase(): DemoDatabase {
       ["cash", "available cash"],
       ["crypto", "crypto at cost"],
       ["locked", "principal in plans"],
+      ["stake", "stake in open trades"],
     ] as const) {
       run(
         `INSERT INTO ledger_accounts (code, name, kind, normal, owner_user_id)
@@ -544,6 +664,61 @@ export function createDemoDatabase(): DemoDatabase {
     );
   }
 
+  // ── Demo account journals ────────────────────────────────────────
+  // Built leg-by-leg so the numbers on the public demo account are exact:
+  // open with $25,000, lose a $150 SOL stake, win $212.50 on an ETH short and
+  // leave $500 escrowed in a live BTC trade → $24,562.50 available cash.
+  const demoUserId = seedUserIds[seedCode(7)];
+  const seedJournal = (kind: string, memo: string, legs: Array<[string, string]>) => {
+    const inserted = run(
+      `INSERT INTO ledger_transactions (kind, memo) VALUES ($1, $2) RETURNING id`,
+      [kind, memo],
+    ) as { rows: Array<{ id: number }> };
+    const txnId = Number(inserted.rows[0]?.id);
+    for (const [code, delta] of legs) {
+      run(
+        `INSERT INTO ledger_entries (txn_id, account_id, delta_usd)
+         VALUES ($1, (SELECT id FROM ledger_accounts WHERE code = $2), $3)`,
+        [txnId, code, delta],
+      );
+    }
+  };
+
+  const demoCash = `liability:user:${demoUserId}:cash`;
+  const demoStake = `liability:user:${demoUserId}:stake`;
+
+  seedJournal("seed:demo-opening", "Demo account funding (simulated)", [
+    ["asset:cash", "25000.00"],
+    [demoCash, "-25000.00"],
+  ]);
+
+  // Lost SOL long: stake escrowed, then forfeited to house revenue.
+  seedJournal("seed:demo-trade-lost.open", "Demo trade: long SOL stake", [
+    [demoCash, "150.00"],
+    [demoStake, "-150.00"],
+  ]);
+  seedJournal("seed:demo-trade-lost.settle", "Demo trade: SOL long lost", [
+    [demoStake, "150.00"],
+    ["revenue:trade-settlement", "-150.00"],
+  ]);
+
+  // Won ETH short: stake escrowed, then returned with $212.50 of house payout.
+  seedJournal("seed:demo-trade-won.open", "Demo trade: short ETH stake", [
+    [demoCash, "250.00"],
+    [demoStake, "-250.00"],
+  ]);
+  seedJournal("seed:demo-trade-won.settle", "Demo trade: ETH short won", [
+    [demoStake, "250.00"],
+    ["expense:trade-payout", "212.50"],
+    [demoCash, "-462.50"],
+  ]);
+
+  // Live BTC long: $500 still in escrow.
+  seedJournal("seed:demo-trade-open", "Demo trade: long BTC stake", [
+    [demoCash, "500.00"],
+    [demoStake, "-500.00"],
+  ]);
+
   // Feature flags
   const flags: Array<[string, boolean]> = [
     ["plans", true],
@@ -575,7 +750,7 @@ export function createDemoDatabase(): DemoDatabase {
       [
         user.name.slice(0, 120),
         email,
-        lockedHash,
+        email === DEMO_ACCOUNT.email ? demoPasswordHash : lockedHash,
         user.role,
         user.status,
         user.balanceUsd,

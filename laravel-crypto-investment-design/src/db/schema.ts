@@ -114,6 +114,49 @@ export const transactions = pgTable(
   }),
 );
 
+// ── Simulated fixed-odds trades ─────────────────────────────────────
+// A user stakes their own simulated cash on a direction. The stake leaves
+// available cash and sits in escrow (`liability:user:<id>:stake`) as a user
+// liability — it is still their money, it is just committed. An operator, or
+// an explicit "settle at market" action, then decides the outcome. Nothing
+// here mints money: a win is paid out of the house settlement expense account
+// and a loss is recognised as house revenue, so both sides are journaled.
+export const simTrades = pgTable(
+  "sim_trades",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    coinId: varchar("coin_id", { length: 60 }).notNull(),
+    symbol: varchar("symbol", { length: 20 }).notNull(),
+    // long = price up wins, short = price down wins.
+    direction: varchar("direction", { length: 6 }).notNull(),
+    stakeUsd: numeric("stake_usd", { precision: 18, scale: 2 }).notNull(),
+    entryPrice: numeric("entry_price", { precision: 18, scale: 6 }).notNull(),
+    exitPrice: numeric("exit_price", { precision: 18, scale: 6 }),
+    // Profit paid on a win, in basis points of the stake (8500 = 85%).
+    payoutBp: integer("payout_bp").notNull().default(8500),
+    durationMinutes: integer("duration_minutes").notNull(),
+    // open | won | lost | void
+    status: varchar("status", { length: 12 }).notNull().default("open"),
+    // Who decided the outcome: operator | market.
+    outcomeSource: varchar("outcome_source", { length: 12 }),
+    payoutUsd: numeric("payout_usd", { precision: 18, scale: 2 }),
+    settledBy: integer("settled_by"),
+    settleNote: text("settle_note"),
+    openedAt: timestamp("opened_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    settledAt: timestamp("settled_at", { withTimezone: true }),
+  },
+  (t) => ({
+    userIdx: index("sim_trades_user_idx").on(t.userId),
+    statusIdx: index("sim_trades_status_idx").on(t.status),
+  }),
+);
+
 // ── Investment plans (simulated yields) ─────────────────────────────
 export const plans = pgTable(
   "plans",
@@ -348,6 +391,8 @@ export type Message = typeof messages.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type Holding = typeof holdings.$inferSelect;
 export type Transaction = typeof transactions.$inferSelect;
+export type SimTrade = typeof simTrades.$inferSelect;
+export type NewSimTrade = typeof simTrades.$inferInsert;
 export type Plan = typeof plans.$inferSelect;
 export type Investment = typeof investments.$inferSelect;
 export type DepositRequest = typeof depositRequests.$inferSelect;

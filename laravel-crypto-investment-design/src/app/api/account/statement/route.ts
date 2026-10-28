@@ -39,6 +39,7 @@ export async function GET() {
     `# Available cash,${centsToUsd(balances.cash)}`,
     `# Crypto at cost,${centsToUsd(balances.crypto)}`,
     `# Locked principal,${centsToUsd(balances.locked)}`,
+    `# Stake in open trades,${centsToUsd(balances.stake)}`,
     "# All figures are simulated. No real money is held or transferred.",
   ];
 

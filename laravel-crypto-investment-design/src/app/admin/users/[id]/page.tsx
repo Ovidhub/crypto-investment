@@ -97,10 +97,19 @@ export default async function AdminUserDetailPage({
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard label="Available cash" value={formatUsd(centsToNumber(balances.cash))} tone="brand" />
         <StatCard label="Crypto at cost" value={formatUsd(centsToNumber(balances.crypto))} />
         <StatCard label="Locked in plans" value={formatUsd(centsToNumber(balances.locked))} />
+        <StatCard
+          label="In open trades"
+          value={formatUsd(centsToNumber(balances.stake))}
+          hint={
+            <Link href="/admin/trades" className="text-brand hover:underline">
+              Settlement desk →
+            </Link>
+          }
+        />
         <StatCard
           label="Positions"
           value={positions.length}
