@@ -1,5 +1,5 @@
 import { db, isDemoMode } from "@/db";
-import { users } from "@/db/schema";
+import { transactions, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { ACCOUNTS, credit, debit, postJournal, syncCachedCash } from "@/lib/ledger";
 import { hashPassword, verifyPassword } from "@/lib/password";
@@ -87,6 +87,12 @@ export async function registerUser(input: RegisterInput): Promise<RegisterResult
       credit(ACCOUNTS.userCash(created.id), DEMO_CREDIT_CENTS),
     ],
   });
+  await db.insert(transactions).values({
+    userId: created.id,
+    type: "demo_credit",
+    usdValue: centsToUsd(DEMO_CREDIT_CENTS),
+    note: "Simulated starting credit — not real money",
+  });
   await syncCachedCash(created.id);
 
   if (referredById) {
@@ -102,6 +108,12 @@ export async function registerUser(input: RegisterInput): Promise<RegisterResult
         debit(ACCOUNTS.referralExpense, bonus),
         credit(ACCOUNTS.userCash(referredById), bonus),
       ],
+    });
+    await db.insert(transactions).values({
+      userId: referredById,
+      type: "referral_bonus",
+      usdValue: centsToUsd(bonus),
+      note: `Referral bonus for ${email}`,
     });
     await syncCachedCash(referredById);
     await notify({

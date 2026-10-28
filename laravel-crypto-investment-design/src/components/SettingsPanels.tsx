@@ -87,12 +87,20 @@ export default function SettingsPanels({ email }: { email: string }) {
           Download a JSON copy of your profile, balances and plan positions. The
           export is generated from the ledger, so it always matches what you see.
         </p>
-        <a
-          href="/api/account/export"
-          className="mt-4 inline-block rounded-xl border border-line px-5 py-2.5 text-sm font-semibold text-[#c7cedb] hover:border-brand hover:text-white"
-        >
-          Download my data
-        </a>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <a
+            href="/api/account/export"
+            className="inline-block rounded-xl border border-line px-5 py-2.5 text-sm font-semibold text-[#c7cedb] hover:border-brand hover:text-white"
+          >
+            Download my data (JSON)
+          </a>
+          <a
+            href="/api/account/statement"
+            className="inline-block rounded-xl border border-line px-5 py-2.5 text-sm font-semibold text-[#c7cedb] hover:border-brand hover:text-white"
+          >
+            Download statement (CSV)
+          </a>
+        </div>
       </div>
     </div>
   );

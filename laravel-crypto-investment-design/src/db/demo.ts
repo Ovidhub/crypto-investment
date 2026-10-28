@@ -80,6 +80,7 @@ CREATE TABLE transactions (
   amount numeric(28,10),
   price numeric(18,6),
   usd_value numeric(18,2) NOT NULL,
+  note text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX transactions_user_idx ON transactions (user_id);

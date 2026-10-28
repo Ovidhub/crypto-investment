@@ -103,6 +103,8 @@ export const transactions = pgTable(
     amount: numeric("amount", { precision: 28, scale: 10 }),
     price: numeric("price", { precision: 18, scale: 6 }),
     usdValue: numeric("usd_value", { precision: 18, scale: 2 }).notNull(),
+    // Reason attached to operator adjustments; null for market activity.
+    note: text("note"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

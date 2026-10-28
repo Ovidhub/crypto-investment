@@ -47,6 +47,15 @@ export const ACCOUNTS = {
   yieldExpense: { code: "expense:simulated-yield", name: "Simulated plan yield", kind: "expense", normal: "debit" },
   referralExpense: { code: "expense:referral-bonus", name: "Referral bonuses (simulated)", kind: "expense", normal: "debit" },
   roundingEquity: { code: "equity:rounding", name: "Rounding", kind: "equity", normal: "credit" },
+  // Counter-account for operator credits/debits. An adjustment moves value
+  // between platform equity and a user's wallet — never between a user and
+  // "profit" — so it cannot masquerade as trading performance.
+  operatorEquity: {
+    code: "equity:operator-adjustments",
+    name: "Operator adjustments",
+    kind: "equity",
+    normal: "credit",
+  },
 } as const;
 
 export type AccountSpec = {

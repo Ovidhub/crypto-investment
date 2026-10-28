@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { formatUsd } from "@/lib/format";
@@ -90,7 +91,12 @@ export default function AdminUsersTable({
             {filtered.map((u) => (
               <tr key={u.id} className="border-b border-line/60 last:border-0">
                 <td className="px-6 py-4">
-                  <p className="font-semibold text-white">{u.name}</p>
+                  <Link
+                    href={`/admin/users/${u.id}`}
+                    className="font-semibold text-white hover:text-brand"
+                  >
+                    {u.name}
+                  </Link>
                   <p className="text-xs text-[#7c8698]">{u.email}</p>
                   <p className="font-mono text-[10px] text-[#5d6675]">{u.referralCode}</p>
                 </td>

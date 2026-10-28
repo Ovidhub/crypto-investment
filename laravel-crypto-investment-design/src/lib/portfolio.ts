@@ -127,6 +127,9 @@ const LABELS: Record<string, string> = {
   plan_deposit: "Plan funding",
   plan_release: "Principal released",
   demo_credit: "Demo credit",
+  referral_bonus: "Referral bonus",
+  adjustment_credit: "Operator credit",
+  adjustment_debit: "Operator debit",
 };
 
 export async function getActivity(userId: number, limit = 50): Promise<ActivityItem[]> {
@@ -134,9 +137,17 @@ export async function getActivity(userId: number, limit = 50): Promise<ActivityI
   return rows.map((t) => {
     const usd = Number(t.usdValue);
     const direction: ActivityItem["direction"] =
-      t.type === "deposit" || t.type === "interest" || t.type === "demo_credit" || t.type === "sell"
+      t.type === "deposit" ||
+      t.type === "interest" ||
+      t.type === "demo_credit" ||
+      t.type === "sell" ||
+      t.type === "referral_bonus" ||
+      t.type === "adjustment_credit"
         ? "in"
-        : t.type === "buy" || t.type === "withdraw" || t.type === "plan_deposit"
+        : t.type === "buy" ||
+            t.type === "withdraw" ||
+            t.type === "plan_deposit" ||
+            t.type === "adjustment_debit"
           ? "out"
           : "neutral";
     return {
@@ -146,9 +157,11 @@ export async function getActivity(userId: number, limit = 50): Promise<ActivityI
       detail:
         t.symbol && t.amount
           ? `${Number(t.amount).toFixed(6)} ${t.symbol} @ $${Number(t.price ?? 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}`
-          : t.type === "demo_credit"
-            ? "Simulated funds — not real money"
-            : "",
+          : t.note
+            ? `Reason: ${t.note}`
+            : t.type === "demo_credit"
+              ? "Simulated funds — not real money"
+              : "",
       usd,
       direction,
       createdAt: new Date(t.createdAt),

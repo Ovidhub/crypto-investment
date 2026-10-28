@@ -57,6 +57,7 @@ export default function DashboardShell({
       items: [
         { href: "/admin", label: "Overview", icon: "▚" },
         { href: "/admin/requests", label: "Approvals", icon: "⇄" },
+        { href: "/admin/adjustments", label: "Adjustments", icon: "±" },
         { href: "/admin/kyc", label: "Verification", icon: "✓" },
         { href: "/admin/books", label: "Ledger", icon: "▤" },
       ],
