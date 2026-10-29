@@ -6,7 +6,7 @@ import { logAudit, notify } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
-const ROLES = new Set(["user", "support", "admin"]);
+const ROLES = new Set(["user", "support", "admin", "owner"]);
 
 export async function PATCH(req: Request) {
   const auth = await apiAdmin();
@@ -37,7 +37,7 @@ export async function PATCH(req: Request) {
   let message = "";
 
   if (action === "suspend") {
-    if (target.role === "admin") {
+    if (target.role === "admin" || target.role === "owner") {
       return Response.json(
         { error: "Suspend another admin only after demoting them." },
         { status: 400 },
@@ -55,13 +55,32 @@ export async function PATCH(req: Request) {
     if (!ROLES.has(next)) {
       return Response.json({ error: "Unknown role." }, { status: 400 });
     }
+    // Only a super admin may grant or revoke the super admin role.
+    if ((next === "owner" || target.role === "owner") && auth.user.role !== "owner") {
+      return Response.json(
+        { error: "Only the super admin can change the super admin role." },
+        { status: 403 },
+      );
+    }
+    if (target.role === "owner" && next !== "owner") {
+      const owners = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.role, "owner"));
+      if (owners.length <= 1) {
+        return Response.json(
+          { error: "Keep at least one super admin account." },
+          { status: 400 },
+        );
+      }
+    }
     if (target.role === "admin" && next !== "admin") {
       // Never allow the last admin to be demoted into a locked-out platform.
       const admins = await db
         .select({ id: users.id })
         .from(users)
         .where(eq(users.role, "admin"));
-      if (admins.length <= 1) {
+      if (admins.length <= 1 && next !== "owner") {
         return Response.json(
           { error: "Keep at least one admin account." },
           { status: 400 },

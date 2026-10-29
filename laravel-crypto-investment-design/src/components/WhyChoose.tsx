@@ -2,14 +2,16 @@ import type { Coin } from "@/lib/coins";
 import { formatPct } from "@/lib/format";
 import CoinBadge from "./CoinBadge";
 
-const REASONS = [
-  { icon: "🔗", title: "Blockchain consulting for your business" },
-  { icon: "🚀", title: "Kickstart your crypto journey today" },
-  { icon: "⚙️", title: "Designed for serious trading platforms" },
-  { icon: "🏦", title: "Launch your yield strategy today" },
-];
+import { copy, getSiteContent } from "@/lib/content";
 
-export default function WhyChoose({ coins }: { coins: Coin[] }) {
+const ICONS = ["🔗", "🚀", "⚙️", "🏦"];
+
+export default async function WhyChoose({ coins }: { coins: Coin[] }) {
+  const c = await getSiteContent();
+  const REASONS = [1, 2, 3, 4].map((n, i) => ({
+    icon: ICONS[i],
+    title: copy(c, `home.why.reason${n}`),
+  }));
   const holdings = coins.slice(0, 4);
   const avg =
     holdings.reduce((s, c) => s + c.change24h, 0) / (holdings.length || 1);
@@ -19,14 +21,13 @@ export default function WhyChoose({ coins }: { coins: Coin[] }) {
       <div className="grid items-center gap-12 lg:grid-cols-2">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand">
-            Why choose Enethi
+            {copy(c, "home.why.eyebrow")}
           </p>
           <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3rem)] font-bold leading-tight">
-            Features of the crypto mobile application
+            {copy(c, "home.why.title")}
           </h2>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-[#9aa3b2]">
-            One application with multiple options to give you total freedom of
-            buying &amp; selling. Built for beginners and pros alike.
+            {copy(c, "home.why.intro")}
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">

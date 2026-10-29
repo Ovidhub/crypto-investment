@@ -1,30 +1,20 @@
-const STEPS = [
-  {
-    step: "01",
-    title: "Create your account",
-    text: "Sign up in under two minutes and verify your identity securely.",
-  },
-  {
-    step: "02",
-    title: "Fund your wallet",
-    text: "Deposit with card, bank transfer or crypto — instant and fee-free.",
-  },
-  {
-    step: "03",
-    title: "Start earning",
-    text: "Buy, trade or stake and watch your passive income grow daily.",
-  },
-];
+import { copy, getSiteContent } from "@/lib/content";
 
-export default function HowItWorks() {
+export default async function HowItWorks() {
+  const c = await getSiteContent();
+  const STEPS = [1, 2, 3].map((n) => ({
+    step: String(n).padStart(2, "0"),
+    title: copy(c, `home.steps.item${n}.title`),
+    text: copy(c, `home.steps.item${n}.text`),
+  }));
   return (
     <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
       <div className="mb-10 text-center">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
-          Simple process
+          {copy(c, "home.steps.eyebrow")}
         </p>
         <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3rem)] font-bold">
-          Start earning in 3 easy steps
+          {copy(c, "home.steps.title")}
         </h2>
       </div>
 

@@ -33,7 +33,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
         return;
       }
       const dest =
-        data.role === "admin"
+        data.role === "admin" || data.role === "owner"
           ? "/admin"
           : data.profileComplete === false
             ? "/onboarding"

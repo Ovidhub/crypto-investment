@@ -3,6 +3,7 @@ import { waitlist } from "@/db/schema";
 import { sql } from "drizzle-orm";
 import { fetchLiveCoins } from "@/lib/coins";
 import { getCurrentUser } from "@/lib/auth";
+import { copy, getSiteContent } from "@/lib/content";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import LogoMarquee from "@/components/LogoMarquee";
@@ -31,17 +32,22 @@ async function getWaitlistTotal(): Promise<number> {
 }
 
 export default async function HomePage() {
-  const [coins, total, me] = await Promise.all([
+  const [coins, total, me, content] = await Promise.all([
     fetchLiveCoins(),
     getWaitlistTotal(),
     getCurrentUser(),
+    getSiteContent(),
   ]);
 
   const baseInvestors = 5218 + total;
 
   return (
     <>
-      <Navbar loggedIn={!!me} />
+      <Navbar
+        loggedIn={!!me}
+        siteName={copy(content, "brand.name")}
+        logo={content["brand.logo"] ?? ""}
+      />
       <main>
         <Hero investors={baseInvestors} />
         <LogoMarquee />
@@ -53,7 +59,15 @@ export default async function HomePage() {
         <Stats />
         <HowItWorks />
         <Faq />
-        <JoinCta initialTotal={baseInvestors} />
+        <JoinCta
+          initialTotal={baseInvestors}
+          copy={{
+            title: copy(content, "home.cta.title"),
+            subtitle: copy(content, "home.cta.subtitle"),
+            button: copy(content, "home.cta.button"),
+            success: copy(content, "home.cta.success"),
+          }}
+        />
       </main>
       <Footer />
     </>

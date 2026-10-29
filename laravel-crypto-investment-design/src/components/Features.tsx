@@ -1,40 +1,30 @@
-const FEATURES = [
-  {
-    icon: "◈",
-    title: "Trade on live prices",
-    text: "Buy and sell the top coins at live market prices with integer-cent settlement. A 0.50% execution fee is booked to the platform ledger on every fill.",
-  },
-  {
-    icon: "◷",
-    title: "Plans",
-    text: "Lock capital in a plan and watch a daily accrual post. Every credit is arithmetic on a rate you can inspect, never a promised return.",
-  },
-  {
-    icon: "▤",
-    title: "Books you can audit",
-    text: "Every balance traces to a balanced journal entry. The admin ledger screen shows debits, credits and the difference in real time.",
-  },
-];
+import { copy, getSiteContent } from "@/lib/content";
 
-export default function Features() {
+const ICONS = ["◈", "◷", "▤"];
+
+export default async function Features() {
+  const c = await getSiteContent();
+  const features = [1, 2, 3].map((n, i) => ({
+    icon: ICONS[i],
+    title: copy(c, `home.features.item${n}.title`),
+    text: copy(c, `home.features.item${n}.text`),
+  }));
   return (
     <section id="features" className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
       <div className="mb-12 max-w-2xl">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand">
-          What is actually built
+          {copy(c, "home.features.eyebrow")}
         </p>
         <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3rem)] font-bold leading-tight">
-          A full product surface, built on a real ledger
+          {copy(c, "home.features.title")}
         </h2>
         <p className="mt-4 text-sm leading-relaxed text-[#9aa3b2]">
-          Enethi is a complete crypto investment platform: accounts, wallets, a
-          double-entry ledger, approval queues, plans, referrals, notifications
-          and an admin console, all backed by one source of truth for money.
+          {copy(c, "home.features.intro")}
         </p>
       </div>
 
       <div className="grid gap-5 md:grid-cols-3">
-        {FEATURES.map((f) => (
+        {features.map((f) => (
           <div
             key={f.title}
             className="group relative overflow-hidden rounded-3xl border border-line bg-card p-7 transition-all hover:-translate-y-1 hover:border-brand/40"

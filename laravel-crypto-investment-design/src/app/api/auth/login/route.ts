@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import { db, isDemoMode } from "@/db";
 import { users } from "@/db/schema";
 import { verifyPassword, setSession } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
@@ -38,7 +38,11 @@ export async function POST(req: Request) {
         action: "auth.login.failed",
       });
       return Response.json(
-        { error: "Invalid email or password." },
+        {
+          error: !user && isDemoMode
+            ? "No account with that email is stored yet. This deployment has no database attached, so a sign-up can be lost between requests — try creating the account again, and ask the operator to attach a database so accounts are permanent."
+            : "Invalid email or password.",
+        },
         { status: 401 },
       );
     }

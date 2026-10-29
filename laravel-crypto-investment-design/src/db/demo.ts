@@ -255,6 +255,23 @@ CREATE TABLE feature_flags (
   enabled boolean NOT NULL DEFAULT true,
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+
+CREATE TABLE site_content (
+  key varchar(80) PRIMARY KEY,
+  value text NOT NULL,
+  updated_by integer,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE media_assets (
+  id serial PRIMARY KEY,
+  filename varchar(160) NOT NULL,
+  mime varchar(60) NOT NULL,
+  size_bytes integer NOT NULL,
+  data text NOT NULL,
+  uploaded_by integer,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
 `;
 
 type QueryConfigLike = {
@@ -365,9 +382,10 @@ export function createDemoDatabase(): DemoDatabase {
   // pg-mem's sequence and would break later registrations.
   run(
     `INSERT INTO users
-      (name, email, password_hash, role, status, balance_usd, referral_code, kyc_status, created_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-    ["Platform Admin", adminEmail, adminPasswordHash, "admin", "active", "0.00", "ADMIN001", "verified", isoDaysAgo(120)],
+      (name, email, password_hash, role, status, balance_usd, referral_code, kyc_status,
+       profile_completed_at, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+    ["Platform Owner", adminEmail, adminPasswordHash, "owner", "active", "0.00", "ADMIN001", "verified", isoDaysAgo(120), isoDaysAgo(120)],
   );
 
   // ── Seed clients (ids 2-6) ───────────────────────────────────────

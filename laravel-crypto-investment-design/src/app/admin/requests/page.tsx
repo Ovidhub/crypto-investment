@@ -12,7 +12,7 @@ export default async function AdminRequestsPage() {
     pendingDepositRows(),
     pendingWithdrawalRows(),
   ]);
-  const canApprove = me.role === "admin";
+  const canApprove = me.role === "admin" || me.role === "owner";
 
   const depositRows = deposits.map((d) => ({
     id: d.id,

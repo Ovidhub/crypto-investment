@@ -24,9 +24,15 @@ cp .env.local.example .env.local   # paste the generated values
 npm run dev                # http://localhost:3000
 ```
 
-No database is required to try it: without `DATABASE_URL` the app boots an
-in-process Postgres (pg-mem) with a full seed. That data lives in the server
-process and resets on restart.
+No database is required to try it locally: without `DATABASE_URL` the app boots
+an in-process Postgres (pg-mem) with a full seed.
+
+> **On Vercel you must set `DATABASE_URL`.** Serverless functions are separate
+> processes, so the in-memory database is not shared between them: an account
+> created by one request is invisible to the next, and sign-in fails with
+> "Invalid email or password". With `DATABASE_URL` set, the app creates its
+> schema and seed data on first use (see `src/db/bootstrap.ts`) — no migration
+> step needed.
 
 ### Reviewer account
 
@@ -54,7 +60,7 @@ live trade.
 | `AUTH_SECRET` | Signs session cookies. Long random value. |
 | `ADMIN_EMAIL` | Email of the seeded admin account. |
 | `ADMIN_PASSWORD_HASH` | scrypt hash of the admin password (`npm run env:generate`). |
-| `DATABASE_URL` | Optional Postgres URL. Without it the demo DB is in-memory. |
+| `DATABASE_URL` | **Required in production.** Any Postgres (Neon, Supabase, RDS). Tables and seed rows are created automatically on first query. Without it the database is in-memory and accounts do not persist between serverless invocations. |
 | `CRON_SECRET` | Optional. When set, `/api/cron/accrue` requires `Authorization: Bearer <secret>`. |
 | `DEMO_LOGIN_EMAIL` / `DEMO_LOGIN_PASSWORD` | Optional. Credentials of the seeded demo customer (demo mode only). |
 
@@ -202,9 +208,39 @@ Endpoints: `POST /api/trades` (user opens), `GET|POST /api/admin/trades`
 
 ### Roles
 
-`user` → `support` → `admin`. Support can read queues; only admins can approve,
-change roles or flip flags. The last admin cannot be demoted. Every privileged
-action writes to `audit_log`.
+`user` → `support` → `admin` → `owner` (super admin).
+
+| Role | Can do |
+| --- | --- |
+| `support` | Read queues, customers and the ledger. Cannot move money. |
+| `admin` | Approvals, wallet adjustments, trade settlement, plans, users, flags. |
+| `owner` | Everything above **plus** website content, the image library and team management. |
+
+The last admin and the last super admin cannot be demoted or suspended. Every
+privileged action writes to `audit_log`.
+
+### Super admin: website content and images
+
+`/admin/content` edits the live copy of the public site. Every editable string is
+declared in `src/lib/content.ts` with a default value, grouped by page:
+
+- brand name, page title, meta description, logo, support email
+- home: hero, market strip, feature cards, insight block, steps, why-choose, CTA
+- about, pricing and contact headlines
+- footer about text and copyright
+
+Saved values live in the `site_content` table; a blank field falls back to the
+default, so nothing can be left broken. Headlines support `*word*` to render a
+word in the brand gradient. Layout is fixed — this is a copy and image editor,
+not a page builder.
+
+`/admin/media` is the image library: upload a PNG/JPEG/WEBP/GIF/AVIF (max 2 MB),
+copy its URL, and paste it into any image field. Uploads are stored in Postgres
+and served from `/api/media/[id]`, so they survive redeploys (a Vercel function
+filesystem is read-only).
+
+`/admin/team` creates staff accounts, changes roles, issues temporary passwords
+and suspends staff. Generated passwords are shown exactly once.
 
 ---
 
@@ -223,7 +259,7 @@ These are refusals, not omissions:
 
 Still to build: 2FA, device/session history, email verification, self-serve
 account deletion, copy-trading and bot-trading simulators, support ticketing,
-CMS-driven blog.
+a visual page builder.
 
 ---
 

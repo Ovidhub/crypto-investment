@@ -2,20 +2,21 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContactForm from "@/components/ContactForm";
 import { getCurrentUser } from "@/lib/auth";
+import { copy, getSiteContent } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
-const CHANNELS = [
-  { icon: "✉️", label: "Email us", value: "support@enethi.com" },
-  { icon: "💬", label: "Live chat", value: "Available 24/7 in-app" },
-  { icon: "🏢", label: "Headquarters", value: "Singapore · London · NYC" },
-];
+const CHANNEL_ICONS = ["✉️", "💬", "🏢"];
 
 export default async function ContactPage() {
-  const me = await getCurrentUser();
+  const [me, content] = await Promise.all([getCurrentUser(), getSiteContent()]);
   return (
     <>
-      <Navbar loggedIn={!!me} />
+      <Navbar
+        loggedIn={!!me}
+        siteName={copy(content, "brand.name")}
+        logo={content["brand.logo"] ?? ""}
+      />
       <main>
         <section className="relative overflow-hidden px-5 pb-16 pt-36 sm:px-8">
           <div className="pointer-events-none absolute inset-0 -z-10">
@@ -31,12 +32,15 @@ export default async function ContactPage() {
                 Let&apos;s <span className="brand-gradient">talk</span>
               </h1>
               <p className="mt-5 max-w-md text-base text-[#9aa3b2]">
-                Questions about investing, security or partnerships? Our team is
-                here to help around the clock.
+                {copy(content, "contact.intro")}
               </p>
 
               <div className="mt-8 space-y-4">
-                {CHANNELS.map((c) => (
+                {[
+                  { icon: CHANNEL_ICONS[0], label: "Email us", value: copy(content, "contact.email") },
+                  { icon: CHANNEL_ICONS[1], label: "Live chat", value: copy(content, "contact.chat") },
+                  { icon: CHANNEL_ICONS[2], label: "Headquarters", value: copy(content, "contact.office") },
+                ].map((c) => (
                   <div
                     key={c.label}
                     className="flex items-center gap-4 rounded-2xl border border-line bg-card p-4"

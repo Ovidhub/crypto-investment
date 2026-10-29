@@ -82,6 +82,18 @@ export default function DashboardShell({
     },
   ];
 
+  // Super admin only: the website itself, plus who can operate it.
+  if (user.role === "owner") {
+    adminGroups.push({
+      title: "Super admin",
+      items: [
+        { href: "/admin/content", label: "Website content", icon: "✎" },
+        { href: "/admin/media", label: "Images", icon: "▣" },
+        { href: "/admin/team", label: "Team & roles", icon: "☗" },
+      ],
+    });
+  }
+
   const groups = variant === "admin" ? adminGroups : userGroups;
 
   async function logout() {
@@ -119,7 +131,7 @@ export default function DashboardShell({
             </Link>
             {variant === "admin" && (
               <span className="ml-auto rounded-full bg-brand/15 px-2 py-0.5 text-[10px] font-bold text-brand">
-                ADMIN
+                {user.role === "owner" ? "OWNER" : "ADMIN"}
               </span>
             )}
           </div>

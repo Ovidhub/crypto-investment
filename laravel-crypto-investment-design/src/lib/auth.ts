@@ -16,7 +16,9 @@ const SECRET =
 const COOKIE = "enethi_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
-export const ROLES = ["user", "support", "admin"] as const;
+// owner = super admin: everything admin can do, plus website content,
+// media and the staff roster.
+export const ROLES = ["user", "support", "admin", "owner"] as const;
 export type Role = (typeof ROLES)[number];
 
 export type SessionUser = {
@@ -167,7 +169,17 @@ export async function requireUser(): Promise<SessionUser> {
 }
 
 export function isStaff(role: string): boolean {
-  return role === "admin" || role === "support";
+  return role === "admin" || role === "owner" || role === "support";
+}
+
+/** Super admin — content, media, roles and every operational screen. */
+export function isOwner(role: string): boolean {
+  return role === "owner";
+}
+
+/** admin or owner, for menus. */
+export function isAdmin(role: string): boolean {
+  return role === "admin" || role === "owner";
 }
 
 /** Admin or support. */
@@ -180,7 +192,14 @@ export async function requireStaff(): Promise<SessionUser> {
 /** Full admin only — approvals, settings, ledger adjustments. */
 export async function requireAdmin(): Promise<SessionUser> {
   const user = await requireUser();
-  if (user.role !== "admin") redirect("/dashboard");
+  if (!isAdmin(user.role)) redirect("/dashboard");
+  return user;
+}
+
+/** Super admin only — website content, media library and staff management. */
+export async function requireOwner(): Promise<SessionUser> {
+  const user = await requireUser();
+  if (!isOwner(user.role)) redirect("/admin");
   return user;
 }
 
@@ -223,9 +242,26 @@ export async function apiAdmin(): Promise<
 > {
   const result = await apiUser();
   if (!result.user) return result;
-  if (result.user.role !== "admin") {
+  if (!isAdmin(result.user.role)) {
     return {
       response: Response.json({ error: "Not allowed." }, { status: 403 }),
+    };
+  }
+  return result;
+}
+
+/** API guard for super-admin-only routes. */
+export async function apiOwner(): Promise<
+  { user: SessionUser; response?: never } | { user?: never; response: Response }
+> {
+  const result = await apiUser();
+  if (!result.user) return result;
+  if (!isOwner(result.user.role)) {
+    return {
+      response: Response.json(
+        { error: "Only the super admin can do that." },
+        { status: 403 },
+      ),
     };
   }
   return result;

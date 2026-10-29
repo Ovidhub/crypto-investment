@@ -2,6 +2,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Stats from "@/components/Stats";
 import { getCurrentUser } from "@/lib/auth";
+import { copy, getSiteContent } from "@/lib/content";
+import Accent from "@/components/Accent";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -47,10 +49,14 @@ const NOT_BUILT = [
 ];
 
 export default async function AboutPage() {
-  const me = await getCurrentUser();
+  const [me, content] = await Promise.all([getCurrentUser(), getSiteContent()]);
   return (
     <>
-      <Navbar loggedIn={!!me} />
+      <Navbar
+        loggedIn={!!me}
+        siteName={copy(content, "brand.name")}
+        logo={content["brand.logo"] ?? ""}
+      />
       <main>
         <section className="relative overflow-hidden px-5 pb-16 pt-28 sm:px-8">
           <div className="pointer-events-none absolute inset-0 -z-10">
@@ -62,14 +68,10 @@ export default async function AboutPage() {
               About this build
             </span>
             <h1 className="mt-6 font-display text-[clamp(2.4rem,5vw,3.8rem)] font-bold leading-[1.02]">
-              A crypto platform{" "}
-              <span className="brand-gradient">you can read the code of</span>
+              <Accent text={copy(content, "about.title")} />
             </h1>
             <p className="mt-6 text-base leading-relaxed text-[#9aa3b2]">
-              Enethi is a working reference implementation of a crypto
-              investment product. Accounts, wallets, plans, approvals and the
-              admin console are production code, built on a double-entry ledger
-              and every screen says so.
+              {copy(content, "about.intro")}
             </p>
           </div>
         </section>

@@ -399,6 +399,31 @@ export const kycSubmissions = pgTable("kyc_submissions", {
     .defaultNow(),
 });
 
+// ── CMS: editable website copy and images ──────────────────────────
+// One row per editable slot. Missing keys fall back to the defaults declared
+// in src/lib/content.ts, so a fresh database still renders the full site.
+export const siteContent = pgTable("site_content", {
+  key: varchar("key", { length: 80 }).primaryKey(),
+  value: text("value").notNull(),
+  updatedBy: integer("updated_by"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+// Uploaded images (base64 payload + metadata) served from /api/media/[id].
+export const mediaAssets = pgTable("media_assets", {
+  id: serial("id").primaryKey(),
+  filename: varchar("filename", { length: 160 }).notNull(),
+  mime: varchar("mime", { length: 60 }).notNull(),
+  sizeBytes: integer("size_bytes").notNull(),
+  data: text("data").notNull(),
+  uploadedBy: integer("uploaded_by"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const featureFlags = pgTable("feature_flags", {
   key: varchar("key", { length: 60 }).primaryKey(),
   enabled: boolean("enabled").notNull().default(true),
@@ -424,3 +449,5 @@ export type LedgerEntry = typeof ledgerEntries.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
 export type AuditEntry = typeof auditLog.$inferSelect;
 export type KycSubmission = typeof kycSubmissions.$inferSelect;
+export type SiteContentRow = typeof siteContent.$inferSelect;
+export type MediaAsset = typeof mediaAssets.$inferSelect;

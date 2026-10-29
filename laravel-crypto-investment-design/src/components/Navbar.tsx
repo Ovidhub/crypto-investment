@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const LINKS = [
@@ -10,7 +11,15 @@ const LINKS = [
   { href: "/contact", label: "Contact" },
 ];
 
-export default function Navbar({ loggedIn = false }: { loggedIn?: boolean }) {
+export default function Navbar({
+  loggedIn = false,
+  siteName = "Enethi",
+  logo = "",
+}: {
+  loggedIn?: boolean;
+  siteName?: string;
+  logo?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -30,14 +39,19 @@ export default function Navbar({ loggedIn = false }: { loggedIn?: boolean }) {
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <a href="#top" className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
-            E
-          </span>
+        <Link href="/" className="flex items-center gap-2.5">
+          {logo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logo} alt={siteName} className="h-9 w-9 rounded-xl object-cover" />
+          ) : (
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
+              {siteName.slice(0, 1).toUpperCase()}
+            </span>
+          )}
           <span className="font-display text-lg font-bold tracking-tight">
-            Enethi
+            {siteName}
           </span>
-        </a>
+        </Link>
 
         <div className="hidden items-center gap-8 md:flex">
           {LINKS.map((l) => (

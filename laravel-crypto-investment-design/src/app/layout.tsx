@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getSiteContent } from "@/lib/content";
 import type { ReactNode } from "react";
 import "@fontsource/inter/latin-400.css";
 import "@fontsource/inter/latin-500.css";
@@ -9,19 +10,24 @@ import "@fontsource/space-grotesk/latin-600.css";
 import "@fontsource/space-grotesk/latin-700.css";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "Enethi — Invest In Crypto, Earn Passive Income Easily",
-  description:
-    "Enethi is a fast, secure crypto investment platform. Track 99+ coins, build a passive income portfolio, and trade with confidence.",
-  keywords: [
-    "crypto",
-    "investment",
-    "bitcoin",
-    "ethereum",
-    "trading",
-    "passive income",
-  ],
-};
+/** Title and description come from the CMS so the brand stays consistent. */
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getSiteContent();
+  const name = content["brand.name"] || "Enethi";
+  const tagline = content["brand.tagline"] || "Crypto investing platform";
+  return {
+    title: `${name} — ${tagline}`,
+    description: content["brand.description"],
+    keywords: [
+      "crypto",
+      "investment",
+      "bitcoin",
+      "ethereum",
+      "trading",
+      "passive income",
+    ],
+  };
+}
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

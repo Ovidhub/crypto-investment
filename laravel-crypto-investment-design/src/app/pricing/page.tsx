@@ -4,16 +4,25 @@ import Faq from "@/components/Faq";
 import { getCurrentUser } from "@/lib/auth";
 import { plansWithStats } from "@/lib/plans";
 import Link from "next/link";
+import { copy, getSiteContent } from "@/lib/content";
+import Accent from "@/components/Accent";
 
 export const dynamic = "force-dynamic";
 
 export default async function PricingPage() {
-  const me = await getCurrentUser();
-  const plans = await plansWithStats();
+  const [me, content, plans] = await Promise.all([
+    getCurrentUser(),
+    getSiteContent(),
+    plansWithStats(),
+  ]);
 
   return (
     <>
-      <Navbar loggedIn={!!me} />
+      <Navbar
+        loggedIn={!!me}
+        siteName={copy(content, "brand.name")}
+        logo={content["brand.logo"] ?? ""}
+      />
       <main>
         <section className="relative overflow-hidden px-5 pb-10 pt-28 sm:px-8">
           <div className="pointer-events-none absolute inset-0 -z-10">
@@ -22,16 +31,13 @@ export default async function PricingPage() {
           </div>
           <div className="mx-auto max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/5 px-4 py-1.5 text-xs font-medium text-[#c7cedb]">
-              Our products
+              {copy(content, "pricing.eyebrow")}
             </span>
             <h1 className="mt-6 font-display text-[clamp(2.4rem,5vw,3.8rem)] font-bold leading-[1.02]">
-              Plans, with the{" "}
-              <span className="brand-gradient">maths shown</span>
+              <Accent text={copy(content, "pricing.title")} />
             </h1>
             <p className="mt-6 text-base text-[#9aa3b2]">
-              No subscription is charged and no card is collected. These are the
-              products in our catalogue, read live from the
-              database.
+              {copy(content, "pricing.intro")}
             </p>
           </div>
         </section>

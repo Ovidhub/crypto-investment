@@ -17,7 +17,7 @@ type Row = {
   createdAt: string | Date;
 };
 
-const ROLE_OPTIONS = ["user", "support", "admin"];
+const ROLE_OPTIONS = ["user", "support", "admin", "owner"];
 
 export default function AdminUsersTable({
   rows,
