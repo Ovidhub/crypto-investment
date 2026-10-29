@@ -21,14 +21,15 @@ import Footer from "@/components/Footer";
 export const dynamic = "force-dynamic";
 
 /**
- * How many people have actually joined: registered accounts plus waitlist
- * sign-ups. Nothing is added to this number.
+ * How many customers have actually joined: non-staff accounts plus waitlist
+ * sign-ups. Staff accounts are excluded, and nothing is added to the number.
  */
 async function getInvestorTotal(): Promise<number> {
   try {
     const result = await db.execute(
       sql`select (
-        (select count(*) from users) + (select count(*) from waitlist)
+        (select count(*) from users where role = 'user')
+        + (select count(*) from waitlist)
       )::int as total`,
     );
     const rows = (result as unknown as { rows?: Array<{ total: number }> }).rows ?? [];
