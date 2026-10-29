@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { db, isDemoMode, pool } from "@/db";
-import { sql } from "drizzle-orm";
+import { db } from "@/db";
+import { users } from "@/db/schema";
+import { DEMO_ACCOUNT } from "@/lib/demo-access";
+import { eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -15,34 +17,51 @@ function cap<T>(promise: Promise<T>, ms: number, label: string) {
   ]);
 }
 
-/** TEMPORARY: verifies the pooled app layer now answers. */
+/** TEMPORARY: end-to-end sign-in check against the deployed login route. */
 export async function GET() {
-  const out: Record<string, unknown> = { isDemoMode };
-  const t0 = Date.now();
+  const out: Record<string, unknown> = {};
+  const origin = "https://enethi-crypto-investment.vercel.app";
+
   try {
-    const ping = await cap(pool.query("select 1 as ok"), 15_000, "pool.query");
-    out.poolMs = Date.now() - t0;
-    out.poolOk = Array.isArray(ping.rows);
-  } catch (error) {
-    out.poolMs = Date.now() - t0;
-    out.poolError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-  }
-  const t1 = Date.now();
-  try {
-    const rows = await cap(
-      db.execute(sql`select
-        (select count(*) from users)::int as users,
-        (select count(*) from site_content)::int as content_rows,
-        (select count(*) from plans)::int as plans,
-        (select count(*) from ledger_accounts)::int as ledger_accounts`),
-      15_000,
-      "db.execute",
+    const response = await cap(
+      fetch(`${origin}/api/auth/login`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          email: DEMO_ACCOUNT.email,
+          password: DEMO_ACCOUNT.password,
+        }),
+      }),
+      20_000,
+      "login fetch",
     );
-    out.dbMs = Date.now() - t1;
-    out.counts = (rows as unknown as { rows?: unknown[] }).rows;
+    out.reviewerLogin = {
+      status: response.status,
+      body: await response.json().catch(() => null),
+      setCookie: Boolean(response.headers.get("set-cookie")),
+    };
   } catch (error) {
-    out.dbMs = Date.now() - t1;
-    out.dbError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    out.reviewerLogin = {
+      error: error instanceof Error ? `${error.name}: ${error.message}` : String(error),
+    };
   }
+
+  try {
+    const [owner] = await db
+      .select({ email: users.email, role: users.role, status: users.status })
+      .from(users)
+      .where(eq(users.role, "owner"))
+      .limit(1);
+    out.owner = owner
+      ? {
+          emailDomain: owner.email.split("@")[1] ?? "",
+          role: owner.role,
+          status: owner.status,
+        }
+      : null;
+  } catch (error) {
+    out.ownerError = error instanceof Error ? error.message : String(error);
+  }
+
   return NextResponse.json(out);
 }
