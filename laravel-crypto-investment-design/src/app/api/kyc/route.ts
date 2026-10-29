@@ -81,7 +81,7 @@ export async function POST(req: Request) {
   await notify({
     userId: auth.user.id,
     title: "Verification submitted",
-    body: "Your simulated identity check is in the review queue.",
+    body: "Your identity check is in the review queue.",
   });
   await logAudit({
     actorId: auth.user.id,

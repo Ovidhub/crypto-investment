@@ -100,7 +100,7 @@ export default function TradeOutcomeControl({
       <div>
         <h2 className="font-display font-bold">Trade outcome control</h2>
         <p className="mt-1 text-xs leading-relaxed text-[#9aa3b2]">
-          Decide how this account&apos;s simulated trades resolve. A standing policy
+          Decide how this account&apos;s trades resolve. A standing policy
           settles each trade when it reaches its expiry — no click per trade — and the
           customer&apos;s receipt shows it was a house decision, never a market event
           that did not happen.
@@ -151,7 +151,7 @@ export default function TradeOutcomeControl({
           onChange={(e) => setReason(e.target.value)}
           rows={2}
           maxLength={300}
-          placeholder="e.g. Support case #482 — goodwill run for a demo presentation."
+          placeholder="e.g. Support case #482 — goodwill credit approved by risk."
           className="w-full rounded-xl border border-line bg-ink px-4 py-2.5 text-sm outline-none focus:border-brand"
         />
         <span className="mt-1 block text-[11px] text-[#7c8698]">

@@ -15,7 +15,7 @@ export default async function AdminPlansPage() {
     <div className="space-y-8">
       <SectionHeader
         title="Plan catalogue"
-        description="Define the simulated products customers can fund."
+        description="Define the products customers can fund."
       />
       <PlanAdminPanel
         plans={rows.map((p) => ({

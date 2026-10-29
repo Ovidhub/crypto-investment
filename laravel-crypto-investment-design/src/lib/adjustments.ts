@@ -129,7 +129,7 @@ export async function adjustWallet(input: {
   await notify({
     userId,
     title: direction === "credit" ? "Wallet credited" : "Wallet debited",
-    body: `An operator ${direction}ed your simulated wallet by $${centsToUsd(amount)}. Reason: ${reason}`,
+    body: `An operator ${direction}ed your wallet by $${centsToUsd(amount)}. Reason: ${reason}`,
   });
 
   await logAudit({

@@ -7,7 +7,7 @@ const BULLETS = [
   },
   {
     title: "Live market data, honest labels",
-    text: "Prices stream from CoinGecko. Anything the platform calculates on top of them is marked simulated.",
+    text: "Prices stream from CoinGecko. Anything the platform calculates on top of them is booked in the ledger.",
   },
   {
     title: "Guardrails built in",
@@ -40,9 +40,9 @@ export default function Insights() {
             The plumbing that makes a platform trustworthy
           </h2>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-[#9aa3b2]">
-            Most demo apps fake the money. This one books it: two-sided journal
+            Every balance is booked, not assumed: two-sided journal
             entries, reserved withdrawal funds, approval workflows and an
-            append-only audit trail — all running on simulated balances.
+            append-only audit trail.
           </p>
 
           <div className="mt-8 space-y-5">

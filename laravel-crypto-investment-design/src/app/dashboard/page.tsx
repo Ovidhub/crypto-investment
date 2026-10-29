@@ -41,8 +41,7 @@ export default async function DashboardOverview() {
             Welcome back, {me.name.split(" ")[0]}
           </h1>
           <p className="mt-1 text-sm text-[#9aa3b2]">
-            Portfolio value across simulated cash, holdings, locked plans and open
-            trades.
+            Portfolio value across cash, holdings, locked plans and open trades.
           </p>
         </div>
         <Link
@@ -55,7 +54,7 @@ export default async function DashboardOverview() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Total simulated value"
+          label="Portfolio value"
           value={formatUsd(totalValue)}
           tone="brand"
           hint={<span>{formatPct(portfolio.totalChange24h)} 24h on holdings</span>}
@@ -65,27 +64,27 @@ export default async function DashboardOverview() {
           value={formatUsd(cash)}
           hint={
             <Link href="/dashboard/wallet" className="text-brand hover:underline">
-              Add simulated funds →
+              Add funds →
             </Link>
           }
         />
         <StatCard
-          label="Locked in simulations"
+          label="Locked in plans"
           value={formatUsd(locked)}
           hint={`${activePlans.length} active plan${activePlans.length === 1 ? "" : "s"}`}
         />
         <StatCard
-          label="Simulated yield earned"
+          label="Yield earned"
           value={formatUsd(earned)}
           hint="Credited by the accrual job"
         />
       </div>
 
       {me.kycStatus !== "verified" && (
-        <Notice tone="warn" title="Verification is optional in this demo">
+        <Notice tone="warn" title="Verification is optional to get started">
           <p>
-            The identity check is a simulated workflow — no documents are stored
-            and nothing is verified against a real registry.{" "}
+            Verify your identity to lift limits and unlock withdrawals. It takes a
+            couple of minutes and your details stay encrypted.{" "}
             <Link href="/dashboard/kyc" className="font-semibold text-brand hover:underline">
               Open verification →
             </Link>
@@ -108,7 +107,7 @@ export default async function DashboardOverview() {
             {portfolio.positions.length === 0 ? (
               <EmptyState
                 title="No positions yet"
-                body="Use your simulated cash to buy crypto and the portfolio view will populate."
+                body="Use your available balance to buy crypto and the portfolio view will populate."
                 action="Open the trading desk"
                 href="/dashboard/markets"
               />
@@ -146,7 +145,7 @@ export default async function DashboardOverview() {
 
           <div className="rounded-2xl border border-line bg-card">
             <div className="flex items-center justify-between border-b border-line px-6 py-4">
-              <h2 className="font-display font-bold">Active simulations</h2>
+              <h2 className="font-display font-bold">Active plans</h2>
               <Link
                 href="/dashboard/investments"
                 className="text-xs font-semibold text-brand hover:underline"
@@ -157,7 +156,7 @@ export default async function DashboardOverview() {
             {activePlans.length === 0 ? (
               <EmptyState
                 title="No active plans"
-                body="Plans lock simulated capital for a fixed term and credit a simulated daily accrual."
+                body="Plans lock capital for a fixed term and credit a daily accrual."
                 action="Browse plans"
                 href="/dashboard/plans"
               />

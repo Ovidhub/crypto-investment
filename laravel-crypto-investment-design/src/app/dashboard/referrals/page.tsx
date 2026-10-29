@@ -32,7 +32,7 @@ export default async function ReferralsPage() {
     <div className="space-y-8">
       <SectionHeader
         title="Referrals"
-        description="Share your code. Each successful signup credits a simulated bonus to your wallet and posts the matching expense in the ledger."
+        description="Share your code. Each successful signup credits a bonus to your wallet and posts the matching expense in the ledger."
       />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
@@ -41,7 +41,7 @@ export default async function ReferralsPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <StatCard label="Signups with your code" value={referees.length} />
             <StatCard
-              label="Simulated bonuses"
+              label="Bonuses earned"
               value={formatUsd(earned)}
               tone="accent"
             />
@@ -60,7 +60,7 @@ export default async function ReferralsPage() {
           {referees.length === 0 ? (
             <EmptyState
               title="No referrals yet"
-              body="Share the link above. The first signup credits a simulated bonus immediately."
+              body="Share the link above. The first signup credits a bonus immediately."
             />
           ) : (
             <div className="divide-y divide-line/60">

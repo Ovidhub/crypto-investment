@@ -73,7 +73,7 @@ function limitError(amount: bigint, min: bigint, max: bigint, label: string) {
 export async function requestDeposit(
   userId: number,
   rawAmount: string,
-  method = "simulated",
+  method = "bank_transfer",
 ): Promise<WalletResult> {
   if (!(await flagEnabled("deposits"))) {
     return { ok: false, error: "Deposits are temporarily disabled.", status: 503 };
@@ -107,7 +107,7 @@ export async function requestDeposit(
   return {
     ok: true,
     id: row.id,
-    message: `Simulated deposit ${row.reference} submitted for review.`,
+    message: `Deposit ${row.reference} submitted for review.`,
   };
 }
 
@@ -210,7 +210,7 @@ export async function approveDeposit(
 
   await postJournal({
     kind: "deposit.approve",
-    memo: `Simulated deposit #${requestId} approved`,
+    memo: `Deposit #${requestId} approved`,
     refType: "deposit_request",
     refId: requestId,
     actorId: admin.id,
@@ -228,7 +228,7 @@ export async function approveDeposit(
   await notify({
     userId: row.userId,
     title: "Deposit approved",
-    body: `$${centsToUsd(amount)} of simulated funds were credited to your wallet.`,
+    body: `$${centsToUsd(amount)} was credited to your wallet.`,
   });
   await logAudit({
     actorId: admin.id,
@@ -315,7 +315,7 @@ export async function approveWithdrawal(
   // Release the reservation out of the platform.
   await postJournal({
     kind: "withdrawal.approve",
-    memo: `Simulated withdrawal #${requestId} paid`,
+    memo: `Withdrawal #${requestId} paid`,
     refType: "withdrawal_request",
     refId: requestId,
     actorId: admin.id,
@@ -333,7 +333,7 @@ export async function approveWithdrawal(
   await notify({
     userId: row.userId,
     title: "Withdrawal approved",
-    body: `$${centsToUsd(amount)} of simulated funds were released to ${row.destination}.`,
+    body: `$${centsToUsd(amount)} was sent to ${row.destination}.`,
   });
   await logAudit({
     actorId: admin.id,

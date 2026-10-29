@@ -76,7 +76,7 @@ export default function PlanAdminPanel({ plans }: { plans: Plan[] }) {
         <div className="border-b border-line px-6 py-4">
           <h2 className="font-display font-bold">Catalogue</h2>
           <p className="text-xs text-[#7c8698]">
-            Rates are simulated annual figures. Changing one does not rewrite
+            Rates are target annual figures. Changing one does not rewrite
             already-running positions.
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function PlanAdminPanel({ plans }: { plans: Plan[] }) {
             ["tagline", "Tagline"],
             ["minAmount", "Minimum (USD)"],
             ["maxAmount", "Maximum (USD)"],
-            ["annualRate", "Simulated annual rate (%)"],
+            ["annualRate", "Target annual rate (%)"],
             ["durationDays", "Duration (days)"],
           ] as const
         ).map(([key, label]) => (

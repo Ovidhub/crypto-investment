@@ -28,20 +28,20 @@ No database is required to try it: without `DATABASE_URL` the app boots an
 in-process Postgres (pg-mem) with a full seed. That data lives in the server
 process and resets on restart.
 
-### Demo sign-in
+### Reviewer account
 
-The seed includes a funded, non-admin customer so the user side can be reviewed
-without registering (shown on `/login` in demo mode, one click):
+The seed includes a funded customer so the product can be inspected without a
+fresh signup:
 
 ```
-demo@enethi.app
+amara@enethi.app
 Enethi-Demo-2026!42
 ```
 
-Override with `DEMO_LOGIN_EMAIL` / `DEMO_LOGIN_PASSWORD`. The one-click
-`POST /api/auth/demo` door is **disabled** whenever `DATABASE_URL` is set — it
-only exists in the in-memory demo. The demo account starts with $24,562.50 cash,
-three coin positions, one settled win, one settled loss and one live trade.
+Override with `DEMO_LOGIN_EMAIL` / `DEMO_LOGIN_PASSWORD`. It is an ordinary
+customer account (no admin rights) with a complete profile. It opens with
+$24,562.50 cash, three coin positions, one settled win, one settled loss and one
+live trade.
 
 ## Deploy
 
@@ -112,9 +112,9 @@ difference live.
 | Area | Pages | Notes |
 | --- | --- | --- |
 | Marketing | `/`, `/pricing`, `/about`, `/contact`, `/legal/{risk,terms,privacy}` | Honest copy; pricing reads the live plan catalogue. |
-| Account | `/login`, `/register` (+ `?ref=CODE`), `/suspended` | scrypt hashes, HMAC-signed HTTP-only cookie, login rate limiting. |
+| Account | `/login`, `/register` (+ `?ref=CODE`), `/onboarding`, `/suspended` | scrypt hashes, HMAC-signed HTTP-only cookie, login rate limiting, mandatory profile onboarding. |
 | Portfolio | `/dashboard`, `/dashboard/portfolio`, `/dashboard/markets` | Live CoinGecko prices, cost-basis estimate, 0.50% fee quoted up front. |
-| Trades | `/dashboard/trades` | Stake simulated cash on a direction (5 min – 4 h). Stake is escrowed, then the desk settles it. |
+| Trades | `/dashboard/trades` | Stake cash on a direction (5 min – 4 h). Stake is escrowed, then the desk settles it. |
 | Wallet | `/dashboard/wallet` | Deposit/withdrawal **requests**; withdrawals reserve funds before review. |
 | Plans | `/dashboard/plans`, `/dashboard/plans/[slug]`, `/dashboard/investments` | Locked principal, daily simulated accrual, early close. |
 | Growth | `/dashboard/referrals`, `/dashboard/notifications`, `/dashboard/support` | $25 simulated referral bonus per signup, in-app notifications. |
@@ -133,7 +133,22 @@ The credit is booked as `debit expense:simulated-yield / credit user cash`.
 Re-running the job the same day is a no-op. At the end of the term the principal
 moves back to available cash.
 
-### Simulated trade desk
+### Profile onboarding
+
+A new account can sign in but cannot reach the dashboard until the onboarding
+form is complete: phone, country, date of birth (18+), street address, city,
+optional postal code and occupation, plus trading experience and stated goal.
+`users.profile_completed_at` is the gate — `src/app/dashboard/layout.tsx`
+redirects to `/onboarding` while it is null, and the API validates every field
+server-side (`src/lib/profile.ts`).
+
+- `POST /api/profile` saves the form (and is reused for later edits).
+- `/dashboard/settings` shows the details with an **Edit** link to
+  `/onboarding?edit=1`.
+- `/admin/users/[id]` shows the customer's profile for the operator.
+- Completion and later edits are written to the audit trail.
+
+### Trade desk
 
 A user stakes their **own** simulated cash on a direction (long or short) for a
 fixed window. Opening a trade moves the stake from

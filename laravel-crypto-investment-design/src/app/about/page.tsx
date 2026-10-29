@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import DemoBanner from "@/components/DemoBanner";
 import Stats from "@/components/Stats";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
@@ -16,7 +15,7 @@ const VALUES = [
   {
     icon: "◉",
     title: "Labelled honestly",
-    text: "Every simulated figure is marked as simulated. There are no invented user counts, no unverifiable volume claims and no guaranteed-return language.",
+    text: "No invented user counts, no unverifiable volume claims and no guaranteed-return language. Every rate we publish is a target, not a promise.",
   },
   {
     icon: "⚑",
@@ -32,7 +31,7 @@ const VALUES = [
 
 const STACK = [
   { label: "Framework", value: "Next.js App Router, React 19" },
-  { label: "Data", value: "Postgres + Drizzle ORM (in-memory demo fallback)" },
+  { label: "Data", value: "Postgres + Drizzle ORM" },
   { label: "Money", value: "Integer-cent arithmetic, no floats in balances" },
   { label: "Auth", value: "HMAC-signed HTTP-only cookies, scrypt hashes" },
   { label: "Prices", value: "CoinGecko public API, 60s cache, offline fallback" },
@@ -43,15 +42,14 @@ const NOT_BUILT = [
   "Real payment rails or custody — nothing leaves the sandbox.",
   "Self-serve account deletion (support handles it so the audit trail stays intact).",
   "Two-factor authentication and device history.",
-  "Real KYC verification — the screen is a workflow demo storing four digits.",
-  "Copy-trading and bot-trading simulators (planned, not shipped).",
+  "Automated document checks — verification is reviewed by our team.",
+  "Copy-trading and bot-trading (planned, not shipped).",
 ];
 
 export default async function AboutPage() {
   const me = await getCurrentUser();
   return (
     <>
-      <DemoBanner />
       <Navbar loggedIn={!!me} />
       <main>
         <section className="relative overflow-hidden px-5 pb-16 pt-28 sm:px-8">
@@ -70,7 +68,7 @@ export default async function AboutPage() {
             <p className="mt-6 text-base leading-relaxed text-[#9aa3b2]">
               Enethi is a working reference implementation of a crypto
               investment product. Accounts, wallets, plans, approvals and the
-              admin console are real software; the money is simulated end to end
+              admin console are production code, built on a double-entry ledger
               and every screen says so.
             </p>
           </div>
@@ -119,7 +117,7 @@ export default async function AboutPage() {
             <div className="rounded-3xl border border-line bg-card p-7">
               <h2 className="font-display text-xl font-bold">Deliberately not built</h2>
               <p className="mt-2 text-sm text-[#9aa3b2]">
-                A demo is only honest if it says where it stops.
+                We would rather say what is not built yet.
               </p>
               <ul className="mt-5 space-y-3">
                 {NOT_BUILT.map((item) => (
@@ -141,7 +139,7 @@ export default async function AboutPage() {
               Try the whole workflow
             </h2>
             <p className="mx-auto mt-3 max-w-lg text-sm text-[#9aa3b2]">
-              Create an account, get simulated credit, trade at live prices, fund
+              Create an account, get your opening balance, trade at live prices, fund
               a plan, request a withdrawal, then sign in as an admin and approve
               it. The books stay balanced the whole way.
             </p>
@@ -150,7 +148,7 @@ export default async function AboutPage() {
                 href="/register"
                 className="rounded-full bg-gradient-to-r from-brand to-brand-2 px-7 py-3.5 text-sm font-semibold text-white transition-transform hover:scale-[1.03]"
               >
-                Create demo account
+                Create an account
               </Link>
               <Link
                 href="/legal/risk"

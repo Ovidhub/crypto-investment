@@ -54,9 +54,9 @@ export default async function TradesPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold sm:text-3xl">Simulated trades</h1>
+          <h1 className="font-display text-2xl font-bold sm:text-3xl">Trade desk</h1>
           <p className="mt-1 text-sm text-[#9aa3b2]">
-            Stake your own simulated cash on a direction. The desk settles each trade
+            Stake your own cash on a direction. The desk settles each trade
             and the receipt says who decided.
           </p>
         </div>
@@ -253,9 +253,9 @@ export default async function TradesPage() {
       </div>
 
       <p className="text-xs leading-relaxed text-[#7c8698]">
-        Simulated trading only. No real funds are involved and no outcome is
-        guaranteed. Stakes come from your simulated wallet balance; a losing trade
-        forfeits the stake, a winning trade returns it plus the stated payout.
+        Trading involves risk and no outcome is guaranteed. Your stake is
+        committed until the desk settles the trade: a losing trade forfeits the
+        stake, a winning trade returns it plus the stated payout.
       </p>
     </div>
   );

@@ -20,7 +20,7 @@ import { centsToUsd, toCents, type Cents } from "@/lib/money";
  * made-up revenue line.
  */
 export const ACCOUNTS = {
-  cashAsset: { code: "asset:cash", name: "Simulated custody cash", kind: "asset", normal: "debit" },
+  cashAsset: { code: "asset:cash", name: "Custody cash", kind: "asset", normal: "debit" },
   cryptoAsset: { code: "asset:crypto-held", name: "Crypto held for users", kind: "asset", normal: "debit" },
   userCash: ((id: number) => ({
     code: `liability:user:${id}:cash`,
@@ -50,24 +50,24 @@ export const ACCOUNTS = {
     normal: "credit",
     ownerUserId: id,
   })) as UserAccount,
-  feeRevenue: { code: "revenue:fees", name: "Trading fees (simulated)", kind: "revenue", normal: "credit" },
+  feeRevenue: { code: "revenue:fees", name: "Trading fees", kind: "revenue", normal: "credit" },
   // Losing stakes are recognised as house income; winning payouts are a house
   // expense. Together they make the settlement desk's P&L legible instead of
   // hiding it inside an operator equity balance.
   settlementRevenue: {
     code: "revenue:trade-settlement",
-    name: "Forfeited stakes (simulated)",
+    name: "Forfeited stakes",
     kind: "revenue",
     normal: "credit",
   },
   payoutExpense: {
     code: "expense:trade-payout",
-    name: "Winning payouts (simulated)",
+    name: "Winning payouts",
     kind: "expense",
     normal: "debit",
   },
-  yieldExpense: { code: "expense:simulated-yield", name: "Simulated plan yield", kind: "expense", normal: "debit" },
-  referralExpense: { code: "expense:referral-bonus", name: "Referral bonuses (simulated)", kind: "expense", normal: "debit" },
+  yieldExpense: { code: "expense:simulated-yield", name: "Plan yield", kind: "expense", normal: "debit" },
+  referralExpense: { code: "expense:referral-bonus", name: "Referral bonuses", kind: "expense", normal: "debit" },
   roundingEquity: { code: "equity:rounding", name: "Rounding", kind: "equity", normal: "credit" },
   // Counter-account for operator credits/debits. An adjustment moves value
   // between platform equity and a user's wallet — never between a user and

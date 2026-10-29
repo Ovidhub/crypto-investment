@@ -83,7 +83,7 @@ export default async function AdminRequestsPage() {
       </div>
 
       <Notice tone="warn" title="Approval posts to the ledger">
-        Approving a deposit debits simulated custody cash and credits the
+        Approving a deposit debits custody cash and credits the
         user&apos;s wallet liability. Approving a withdrawal releases the reserved
         funds out of custody. Both write an audit entry with your identity.
       </Notice>

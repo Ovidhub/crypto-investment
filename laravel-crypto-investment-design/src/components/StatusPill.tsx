@@ -3,6 +3,7 @@ const TONES: Record<string, string> = {
   approved: "bg-accent/15 text-accent",
   verified: "bg-accent/15 text-accent",
   completed: "bg-accent/15 text-accent",
+  complete: "bg-accent/15 text-accent",
   paused: "bg-[#f5a524]/15 text-[#f5a524]",
   pending: "bg-[#f5a524]/15 text-[#f5a524]",
   unverified: "bg-white/10 text-[#9aa3b2]",

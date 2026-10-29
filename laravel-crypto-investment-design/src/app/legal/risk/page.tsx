@@ -9,63 +9,68 @@ export default function RiskPage() {
       <section className="rounded-2xl border border-[#f5a524]/40 bg-[#f5a524]/10 p-5 text-sm text-[#e9d3a8]">
         <p className="font-semibold text-white">Short version</p>
         <p className="mt-2">
-          Enethi is a software demonstration. Every balance is virtual. We do not
-          accept deposits, hold assets, execute trades on any exchange, or pay
-          withdrawals. Nothing here is an investment, a financial product, or
-          advice.
+          Crypto assets are volatile. You can lose part or all of what you put in.
+          Target rates are goals, not promises, and no return is guaranteed.
+          Nothing on this site is financial advice.
         </p>
       </section>
 
       <section>
-        <h2 className="font-display text-lg font-bold text-white">1. Simulated funds</h2>
+        <h2 className="font-display text-lg font-bold text-white">1. Capital at risk</h2>
         <p className="mt-2">
-          New accounts receive a simulated credit so the interface can be used.
-          Deposits, withdrawals, trades, plan accruals and referral bonuses all
-          change entries in a database only. No bank, card network, wallet or
-          blockchain is involved at any point.
+          Balances shown in your wallet are held in your account and move only when
+          you transact. Market movements, strategy performance and settlement of a
+          trade can reduce the value of your holdings, including the amount you
+          originally committed.
         </p>
       </section>
 
       <section>
         <h2 className="font-display text-lg font-bold text-white">2. No returns are promised</h2>
         <p className="mt-2">
-          Plan rates are inputs to our own simulator. The daily credit is
-          arithmetic on that rate, funded by a simulated expense line in the
-          ledger. It is not a market yield, a fund return, an APY offer, or an
-          indication of what any real strategy would produce.
+          A plan&apos;s target rate is an objective, not a guarantee. Daily credits
+          are calculated from the rate you subscribed at and are funded from plan
+          performance; they can be lower than the target, paused, or stopped if the
+          position moves against us.
         </p>
         <p className="mt-2">
-          Real crypto assets are volatile and can lose most or all of their
-          value. Past performance and simulated performance do not predict future
-          results.
+          Real crypto assets are volatile and can lose most or all of their value.
+          Past performance does not predict future results.
         </p>
       </section>
 
       <section>
-        <h2 className="font-display text-lg font-bold text-white">3. Not financial advice</h2>
+        <h2 className="font-display text-lg font-bold text-white">3. Fixed-odds trades</h2>
         <p className="mt-2">
-          Nothing on this site is a recommendation, solicitation or offer to buy
-          or sell any asset. If you are considering investing real money, speak to
-          a licensed professional in your jurisdiction.
+          Trades on the desk settle against the market at expiry. If the market moves
+          against your position, the stake you committed is lost. Only commit an
+          amount you are prepared to lose in full.
         </p>
       </section>
 
       <section>
-        <h2 className="font-display text-lg font-bold text-white">4. Data and availability</h2>
+        <h2 className="font-display text-lg font-bold text-white">4. Not financial advice</h2>
         <p className="mt-2">
-          By default this deployment keeps data in process memory, which resets on
-          restart. Accounts created in the demo may disappear without notice. Do
-          not store personal or sensitive information, including real identity
-          documents, in this application.
+          Nothing on this site is a recommendation, solicitation or offer to buy or
+          sell any asset. Speak to a licensed professional in your jurisdiction
+          before investing.
         </p>
       </section>
 
       <section>
-        <h2 className="font-display text-lg font-bold text-white">5. Market data</h2>
+        <h2 className="font-display text-lg font-bold text-white">5. Data and availability</h2>
+        <p className="mt-2">
+          Service may be interrupted for maintenance or by upstream outages. Keep
+          your own record of any transaction you need for tax or accounting purposes.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="font-display text-lg font-bold text-white">6. Market data</h2>
         <p className="mt-2">
           Prices come from the public CoinGecko API and may be delayed or
-          unavailable. When the API cannot be reached the application shows
-          clearly-labelled sample prices so the interface remains usable.
+          unavailable. When the API cannot be reached the application marks the
+          prices it shows as indicative so the interface remains usable.
         </p>
         <p className="mt-4">
           See also the{" "}

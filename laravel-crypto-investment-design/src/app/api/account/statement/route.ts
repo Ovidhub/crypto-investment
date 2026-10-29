@@ -35,12 +35,12 @@ export async function GET() {
         .join(","),
     ),
     "",
-    "# Closing balances (simulated)",
+    "# Closing balances",
     `# Available cash,${centsToUsd(balances.cash)}`,
     `# Crypto at cost,${centsToUsd(balances.crypto)}`,
     `# Locked principal,${centsToUsd(balances.locked)}`,
     `# Stake in open trades,${centsToUsd(balances.stake)}`,
-    "# All figures are simulated. No real money is held or transferred.",
+    "# Figures are in USD at the close of the statement period.",
   ];
 
   await logAudit({

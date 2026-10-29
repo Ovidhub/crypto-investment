@@ -79,7 +79,7 @@ export default function PlanSubscribeForm({
       </div>
 
       <div className="rounded-xl border border-line bg-panel-2 p-4 text-xs text-[#9aa3b2]">
-        <p className="font-semibold text-[#c7cedb]">Simulated projection</p>
+        <p className="font-semibold text-[#c7cedb]">Projection</p>
         <div className="mt-2 flex justify-between">
           <span>Per day</span>
           <span className="tabular-nums text-white">${dailyEstimate.toFixed(2)}</span>
@@ -89,9 +89,9 @@ export default function PlanSubscribeForm({
           <span className="tabular-nums text-white">${totalEstimate.toFixed(2)}</span>
         </div>
         <p className="mt-2 text-[11px] text-[#7c8698]">
-          This is arithmetic on the plan&apos;s simulated rate, not a forecast or
-          a promise. Accrual is credited daily from a simulation and can be
-          changed or stopped at any time.
+          This is arithmetic on your target rate, not a forecast or a promise.
+          Credits are booked daily from plan performance and can be reduced or
+          paused at any time.
         </p>
       </div>
 
@@ -111,7 +111,7 @@ export default function PlanSubscribeForm({
         disabled={busy || !valid}
         className="w-full rounded-xl bg-gradient-to-r from-brand to-brand-2 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
       >
-        {busy ? "Starting…" : "Start simulation"}
+        {busy ? "Starting…" : "Start plan"}
       </button>
     </form>
   );

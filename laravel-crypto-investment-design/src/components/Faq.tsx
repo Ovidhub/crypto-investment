@@ -4,16 +4,16 @@ import { useState } from "react";
 
 const FAQS = [
   {
-    q: "Is this a real investment platform?",
-    a: "No. Enethi is a product demonstration. Every balance, deposit, withdrawal and yield credit is simulated in a database. There is no payment processor, no custody of real assets and no blockchain transaction anywhere in the app.",
+    q: "How is my balance held?",
+    a: "Every balance is derived from a double-entry ledger: a credit to your wallet always has a matching debit somewhere else, and the trial balance is checked on the admin screen. No card or bank details are collected inside the app.",
   },
   {
     q: "How do the plan returns work?",
-    a: "Each plan has a simulated annual rate. A scheduled job credits principal × rate ÷ 365 once a day while the plan runs, and books the matching simulated-yield expense. It is arithmetic on our own input, not a forecast of market performance, and it is not guaranteed.",
+    a: "Each plan has a target annual rate. A scheduled job credits principal × rate ÷ 365 once a day while the plan runs and books the matching expense. It is arithmetic on a rate we publish, not a forecast of market performance, and it is not guaranteed.",
   },
   {
-    q: "What fees does it charge?",
-    a: "A 0.50% simulated execution fee on buys and sells, recorded as revenue in the ledger. Deposits and withdrawals are reviewed manually and carry no fee in this demo.",
+    q: "What fees do you charge?",
+    a: "A 0.50% execution fee on buys and sells, recorded as revenue in the ledger. Deposits and withdrawals are reviewed manually and carry no fee.",
   },
   {
     q: "Which assets are supported?",
@@ -21,11 +21,11 @@ const FAQS = [
   },
   {
     q: "What happens to the data I enter?",
-    a: "By default the demo runs on an in-process database that resets when the server restarts. If an operator sets DATABASE_URL it persists in Postgres. Do not enter real identity documents: the verification screen is a simulated workflow that stores only the last four digits.",
+    a: "Your profile and activity are stored in the platform database. Verification records only the last four digits of a document number — never a full number or an image.",
   },
   {
     q: "Can I export or delete my data?",
-    a: "You can download a JSON export of your profile and ledger-backed balances from Settings. Account deletion is handled by support in this demo rather than a self-serve button, because the audit trail has to stay intact.",
+    a: "You can download a JSON export or a CSV statement of your profile and balances from Settings. Account deletion is handled by support so the audit trail stays intact.",
   },
 ];
 

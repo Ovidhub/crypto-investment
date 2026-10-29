@@ -90,9 +90,9 @@ export default function SimTradeTicket({
   return (
     <form onSubmit={submit} className="space-y-5 rounded-2xl border border-line bg-card p-6">
       <div>
-        <h2 className="font-display font-bold">Open a simulated trade</h2>
+        <h2 className="font-display font-bold">Open a trade</h2>
         <p className="mt-1 text-xs text-[#9aa3b2]">
-          Your stake is real simulated cash from your wallet. It is held in escrow
+          Your stake comes out of your available cash and is held in escrow
           until an operator settles the trade.
         </p>
       </div>
@@ -240,7 +240,7 @@ export default function SimTradeTicket({
       </button>
 
       <p className="text-[11px] leading-relaxed text-[#7c8698]">
-        Simulated only. Minimum stake $10.00, maximum $10,000 per trade, at most{" "}
+        Minimum stake $10.00, maximum $10,000 per trade, at most{" "}
         {maxOpen} open at once. The outcome is decided by the desk — an operator, or
         the explicit “settle at market” action — and is labelled on your receipt so
         you always see who decided.

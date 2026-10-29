@@ -28,6 +28,13 @@ export type SessionUser = {
   balanceUsd: string;
   referralCode: string;
   kycStatus: string;
+  /** ISO timestamp once the onboarding form has been submitted. */
+  profileCompletedAt: string | null;
+};
+
+/** A DB row may hand us a Date; the cookie always stores an ISO string. */
+export type SessionInput = Omit<SessionUser, "profileCompletedAt"> & {
+  profileCompletedAt: Date | string | null;
 };
 
 type SessionPayload = {
@@ -40,7 +47,7 @@ function sign(payload: string): string {
   return createHmac("sha256", SECRET).update(payload).digest("base64url");
 }
 
-function createToken(user: number | SessionUser): string {
+function createToken(user: number | SessionInput): string {
   const payload: SessionPayload =
     typeof user === "number"
       ? { id: user, ts: Date.now() }
@@ -56,6 +63,9 @@ function createToken(user: number | SessionUser): string {
             balanceUsd: user.balanceUsd,
             referralCode: user.referralCode,
             kycStatus: user.kycStatus,
+            profileCompletedAt: user.profileCompletedAt
+              ? new Date(user.profileCompletedAt).toISOString()
+              : null,
           },
         };
   const b64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
@@ -84,7 +94,7 @@ function readToken(token: string): SessionPayload | null {
   }
 }
 
-export async function setSession(user: number | SessionUser): Promise<void> {
+export async function setSession(user: number | SessionInput): Promise<void> {
   const store = await cookies();
   store.set(COOKIE, createToken(user), {
     httpOnly: true,
@@ -127,6 +137,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
         balanceUsd: users.balanceUsd,
         referralCode: users.referralCode,
         kycStatus: users.kycStatus,
+        profileCompletedAt: users.profileCompletedAt,
       })
       .from(users)
       .where(
@@ -135,7 +146,13 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
           : eq(users.id, session.id),
       )
       .limit(1);
-    return u ?? null;
+    if (!u) return null;
+    return {
+      ...u,
+      profileCompletedAt: u.profileCompletedAt
+        ? new Date(u.profileCompletedAt).toISOString()
+        : null,
+    };
   } catch {
     return null;
   }

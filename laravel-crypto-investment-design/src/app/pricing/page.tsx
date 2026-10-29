@@ -1,7 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Faq from "@/components/Faq";
-import DemoBanner from "@/components/DemoBanner";
 import { getCurrentUser } from "@/lib/auth";
 import { plansWithStats } from "@/lib/plans";
 import Link from "next/link";
@@ -14,7 +13,6 @@ export default async function PricingPage() {
 
   return (
     <>
-      <DemoBanner />
       <Navbar loggedIn={!!me} />
       <main>
         <section className="relative overflow-hidden px-5 pb-10 pt-28 sm:px-8">
@@ -24,7 +22,7 @@ export default async function PricingPage() {
           </div>
           <div className="mx-auto max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/5 px-4 py-1.5 text-xs font-medium text-[#c7cedb]">
-              Simulated products
+              Our products
             </span>
             <h1 className="mt-6 font-display text-[clamp(2.4rem,5vw,3.8rem)] font-bold leading-[1.02]">
               Plans, with the{" "}
@@ -32,7 +30,7 @@ export default async function PricingPage() {
             </h1>
             <p className="mt-6 text-base text-[#9aa3b2]">
               No subscription is charged and no card is collected. These are the
-              simulated products in the demo catalogue, read live from the
+              products in our catalogue, read live from the
               database.
             </p>
           </div>
@@ -59,7 +57,7 @@ export default async function PricingPage() {
                   >
                     {featured && (
                       <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-brand to-brand-2 px-4 py-1 text-xs font-bold text-white">
-                        Simulated rate
+                        Target annual rate
                       </span>
                     )}
                     <h2 className="font-display text-xl font-bold">{p.name}</h2>
@@ -69,7 +67,7 @@ export default async function PricingPage() {
                       <span className="font-display text-4xl font-bold text-white">
                         {(p.annualRateBp / 100).toFixed(2)}%
                       </span>
-                      <span className="mb-1 text-sm text-[#7c8698]">p.a. sim.</span>
+                      <span className="mb-1 text-sm text-[#7c8698]">p.a. target</span>
                     </div>
                     <p className="mt-1 text-xs text-[#7c8698]">
                       {p.durationDays}-day term · ${Number(p.minUsd).toLocaleString()}–
@@ -81,7 +79,7 @@ export default async function PricingPage() {
                         `~$${daily.toFixed(2)}/day on a $1,000 position`,
                         "Principal released at the end of the term",
                         "Close early at any time",
-                        `${p.subscribers} simulation${p.subscribers === 1 ? "" : "s"} opened so far`,
+                        `${p.subscribers} position${p.subscribers === 1 ? "" : "s"} opened so far`,
                       ].map((f) => (
                         <li key={f} className="flex items-center gap-3 text-sm text-[#c7cedb]">
                           <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent/15 text-xs text-accent">
@@ -100,7 +98,7 @@ export default async function PricingPage() {
                           : "border border-line bg-panel-2 text-white"
                       }`}
                     >
-                      {me ? "Configure plan" : "Create a demo account"}
+                      {me ? "Configure plan" : "Create an account"}
                     </Link>
                   </div>
                 );
@@ -112,7 +110,7 @@ export default async function PricingPage() {
             <p className="font-semibold text-white">What the rate means</p>
             <p className="mt-2">
               The daily credit is principal × annual rate ÷ 365, rounded down to
-              the cent. It is produced by our own simulator, booked as an expense
+              the cent. It is produced by our own model and booked as an expense
               in the ledger, and can be changed or stopped by an operator. It is
               not a market yield, a fund return, or a promise. Crypto markets can
               fall as well as rise, and nothing here is financial advice.

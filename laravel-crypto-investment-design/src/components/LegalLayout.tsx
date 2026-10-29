@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import DemoBanner from "@/components/DemoBanner";
 import { getCurrentUser } from "@/lib/auth";
 import type { ReactNode } from "react";
 
@@ -16,7 +15,6 @@ export default async function LegalLayout({
   const me = await getCurrentUser();
   return (
     <>
-      <DemoBanner />
       <Navbar loggedIn={!!me} />
       <main className="mx-auto max-w-3xl px-5 pb-24 pt-32 sm:px-8">
         <h1 className="font-display text-[clamp(2rem,4vw,2.8rem)] font-bold">{title}</h1>

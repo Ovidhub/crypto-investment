@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   const result = await requestDeposit(
     auth.user.id,
     String(amount),
-    typeof method === "string" ? method : "simulated",
+    typeof method === "string" ? method : "bank_transfer",
   );
   if (!result.ok) {
     return Response.json({ error: result.error }, { status: result.status ?? 400 });

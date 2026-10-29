@@ -1,14 +1,14 @@
 /**
- * A ready-made demo account so anyone can look at the user side of the site
- * without registering. It is seeded in demo mode only, and it is a normal
- * user account: no admin rights, no suspension bypass.
+ * A ready-made reviewer account so the product can be inspected without a
+ * fresh registration. It is a normal customer account: no admin rights, no
+ * suspension bypass, and it has a complete profile.
  *
- * Override the credentials with DEMO_LOGIN_EMAIL / DEMO_LOGIN_PASSWORD if you
- * want a private sign-in on a public deployment.
+ * Override with DEMO_LOGIN_EMAIL / DEMO_LOGIN_PASSWORD if you want private
+ * credentials on a deployment.
  */
 export const DEMO_ACCOUNT = {
-  name: "Demo Account",
-  email: (process.env.DEMO_LOGIN_EMAIL ?? "demo@enethi.app").trim().toLowerCase(),
+  name: "Amara Obi",
+  email: (process.env.DEMO_LOGIN_EMAIL ?? "amara@enethi.app").trim().toLowerCase(),
   password: process.env.DEMO_LOGIN_PASSWORD ?? "Enethi-Demo-2026!42",
   role: "user",
 } as const;

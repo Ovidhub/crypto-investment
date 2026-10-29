@@ -33,8 +33,8 @@ export default function ReferralShare({ code, link }: { code: string; link: stri
         </button>
       </div>
       <p className="mt-3 text-[11px] text-[#7c8698]">
-        Referral rewards are simulated credits recorded in the ledger, like
-        everything else on this demo.
+        Referral rewards are credited to your balance and recorded in the
+        ledger, like every other movement on your account.
       </p>
     </div>
   );

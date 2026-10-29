@@ -34,10 +34,10 @@ export default function DashboardShell({
       ],
     },
     {
-      title: "Simulations",
+      title: "Plans",
       items: [
         { href: "/dashboard/plans", label: "Plans", icon: "◷" },
-        { href: "/dashboard/investments", label: "My simulations", icon: "◱" },
+        { href: "/dashboard/investments", label: "My plans", icon: "◱" },
         { href: "/dashboard/referrals", label: "Referrals", icon: "⇗" },
       ],
     },
@@ -125,7 +125,6 @@ export default function DashboardShell({
           </div>
 
           <div className="border-b border-line px-4 py-2.5 text-[11px] text-[#7c8698]">
-            Simulated environment — no real money
           </div>
 
           <nav className="flex-1 space-y-5 p-4">

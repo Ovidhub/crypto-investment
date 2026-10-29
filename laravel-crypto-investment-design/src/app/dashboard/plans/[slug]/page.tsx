@@ -38,7 +38,7 @@ export default async function PlanDetailPage({
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-line bg-card p-5">
-              <p className="text-xs text-[#9aa3b2]">Simulated rate</p>
+              <p className="text-xs text-[#9aa3b2]">Target annual rate</p>
               <p className="mt-2 font-display text-2xl font-bold text-white">
                 {(plan.annualRateBp / 100).toFixed(2)}%
               </p>
@@ -56,7 +56,7 @@ export default async function PlanDetailPage({
               <p className="mt-2 font-display text-2xl font-bold text-white">
                 {formatUsd(daily)}
               </p>
-              <p className="text-[11px] text-[#7c8698]">simulated accrual</p>
+              <p className="text-[11px] text-[#7c8698]">daily accrual</p>
             </div>
           </div>
 
@@ -66,11 +66,11 @@ export default async function PlanDetailPage({
               <li>
                 <span className="font-semibold text-white">1. Principal is locked.</span>{" "}
                 The amount moves from available cash to a locked liability in the
-                ledger, so it can&apos;t be spent while the simulation runs.
+                ledger, so it can&apos;t be spent while the plan runs.
               </li>
               <li>
                 <span className="font-semibold text-white">2. Daily accrual posts.</span>{" "}
-                A scheduled job credits the simulated daily rate to your wallet
+                A scheduled job credits the daily rate to your wallet
                 and books the matching expense.
               </li>
               <li>
@@ -83,9 +83,9 @@ export default async function PlanDetailPage({
 
           <Notice tone="danger" title="Risk disclosure">
             <p>
-              Simulated figures are arbitrary model outputs. Past or simulated
-              performance does not indicate future results, and this platform
-              does not accept real deposits or pay real withdrawals.
+              Target rates are objectives, not guarantees. Credits depend on plan
+              performance, past performance does not indicate future results, and
+              your capital is at risk.
             </p>
           </Notice>
         </div>
@@ -104,7 +104,7 @@ export default async function PlanDetailPage({
             href="/dashboard/wallet"
             className="block rounded-xl border border-line px-5 py-3 text-center text-sm font-semibold text-[#c7cedb] hover:border-brand hover:text-white"
           >
-            Add simulated funds
+            Add funds
           </Link>
         </div>
       </div>

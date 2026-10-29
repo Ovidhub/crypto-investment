@@ -55,7 +55,11 @@ export async function POST(req: Request) {
       actorEmail: user.email,
       action: "auth.login",
     });
-    return Response.json({ ok: true, role: user.role });
+    return Response.json({
+      ok: true,
+      role: user.role,
+      profileComplete: user.profileCompletedAt !== null,
+    });
   } catch {
     return Response.json({ error: "Login failed." }, { status: 500 });
   }

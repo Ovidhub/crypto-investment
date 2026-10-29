@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     title: decision === "approved" ? "Verification approved" : "Verification not approved",
     body:
       decision === "approved"
-        ? "Your simulated identity check was approved."
+        ? "Your identity check was approved."
         : `Please resubmit. ${typeof note === "string" ? note : ""}`.trim(),
   });
   await logAudit({

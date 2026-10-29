@@ -42,7 +42,7 @@ export default async function WalletPage() {
     <div className="space-y-8">
       <SectionHeader
         title="Wallet"
-        description="Simulated cash movements, reviewed by an operator before they post."
+        description="Deposits and withdrawals, reviewed by an operator before they post."
       />
       <Notice tone="info">
         No payment processor is connected. Deposit requests only create a review

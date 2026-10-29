@@ -18,14 +18,14 @@ export default async function MarketsPage() {
         <div>
           <h1 className="font-display text-2xl font-bold sm:text-3xl">Spot trading</h1>
           <p className="mt-1 text-sm text-[#9aa3b2]">
-            Buy and sell crypto at live market prices with your simulated cash.
+            Buy and sell crypto at live market prices with your available balance.
           </p>
         </div>
         <Link
           href="/dashboard/trades"
           className="rounded-xl border border-line px-4 py-2 text-sm text-[#c7cedb] hover:border-brand hover:text-white"
         >
-          Simulated trade desk →
+          Trade desk →
         </Link>
       </div>
       <TradePanel

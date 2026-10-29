@@ -98,7 +98,7 @@ export async function subscribeToPlan(
   // Lock the principal: available cash down, locked liability up.
   await postJournal({
     kind: "plan.subscribe",
-    memo: `Principal locked in ${plan.name} (simulation #${row.id})`,
+    memo: `Principal locked in ${plan.name} (investment #${row.id})`,
     refType: "investment",
     refId: row.id,
     actorId: userId,
@@ -116,8 +116,8 @@ export async function subscribeToPlan(
 
   await notify({
     userId,
-    title: `Simulation started: ${plan.name}`,
-    body: `$${centsToUsd(amount)} of simulated capital is locked for ${plan.durationDays} days. Yields are simulated, not guaranteed.`,
+    title: `Plan started: ${plan.name}`,
+    body: `$${centsToUsd(amount)} is locked for ${plan.durationDays} days. Credits depend on performance and are not guaranteed.`,
   });
   await logAudit({
     actorId: userId,
@@ -130,7 +130,7 @@ export async function subscribeToPlan(
   return {
     ok: true,
     id: row.id,
-    message: `${plan.name} simulation started with $${centsToUsd(amount)}.`,
+    message: `${plan.name} started with $${centsToUsd(amount)}.`,
   };
 }
 
@@ -190,7 +190,7 @@ export async function accrueAll(now = new Date()) {
 
     await postJournal({
       kind: "plan.accrual",
-      memo: `Simulated yield — investment #${inv.id} day ${inv.daysPaid + 1}`,
+      memo: `Plan yield — investment #${inv.id} day ${inv.daysPaid + 1}`,
       refType: "investment",
       refId: inv.id,
       postings: [
@@ -282,7 +282,7 @@ export async function completeInvestment(investmentId: number): Promise<PlanResu
   await releasePrincipal(investmentId);
   await notify({
     userId: inv.userId,
-    title: "Simulation finished",
+    title: "Plan completed",
     body: `Your principal of $${centsToUsd(toCents(inv.principalUsd))} was released to your wallet.`,
   });
   return { ok: true, message: "Principal released." };

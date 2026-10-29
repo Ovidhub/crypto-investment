@@ -64,7 +64,7 @@ export default function WalletPanel({
     <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
       <div className="space-y-4">
         <div className="rounded-2xl border border-line bg-gradient-to-br from-brand/15 to-brand-2/5 p-6">
-          <p className="text-xs text-[#9aa3b2]">Available simulated cash</p>
+          <p className="text-xs text-[#9aa3b2]">Available cash</p>
           <p className="mt-2 font-display text-3xl font-bold tabular-nums text-white">
             ${Number(cash).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
@@ -123,7 +123,7 @@ export default function WalletPanel({
             {tab === "withdraw" && (
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-[#c7cedb]">
-                  Destination (simulated wallet address)
+                  Destination wallet address
                 </label>
                 <input
                   value={destination}
@@ -136,8 +136,8 @@ export default function WalletPanel({
 
             <p className="rounded-xl border border-line bg-panel-2 px-4 py-3 text-xs text-[#9aa3b2]">
               {tab === "deposit"
-                ? "This is a simulated deposit request. No payment is taken and no card or bank details are collected. An admin approves it in the queue, then virtual funds appear in your wallet."
-                : "Withdrawals are simulated too. Your funds are reserved immediately, then an admin reviews the request. Nothing is sent to a real blockchain address."}
+                ? "No card or bank details are collected in the app. Your request goes to the approvals queue, where an operator approves or rejects it and the decision is recorded in the audit trail."
+                : "Your balance is reserved immediately, then an operator reviews the request before anything is released to the address you gave. Nothing is sent to a real blockchain address."}
             </p>
 
             {message && (

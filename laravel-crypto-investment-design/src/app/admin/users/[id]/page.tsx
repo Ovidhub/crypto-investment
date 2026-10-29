@@ -17,6 +17,11 @@ import { formatUsd } from "@/lib/format";
 import { centsToNumber, centsToUsd } from "@/lib/money";
 import { fetchLiveCoins } from "@/lib/coins";
 import {
+  INVESTMENT_GOALS,
+  TRADING_EXPERIENCE,
+  getProfile,
+} from "@/lib/profile";
+import {
   getOutcomePolicy,
   isOutcomePolicy,
   listUserTrades,
@@ -97,6 +102,7 @@ export default async function AdminUserDetailPage({
       fetchLiveCoins(),
     ]);
 
+  const profile = await getProfile(userId);
   const prices: Record<string, number> = {};
   for (const coin of coins) prices[coin.id] = coin.price;
 
@@ -193,6 +199,59 @@ export default async function AdminUserDetailPage({
               }))}
               prices={prices}
             />
+          </div>
+
+          <div className="rounded-2xl border border-line bg-card">
+            <div className="flex items-center justify-between border-b border-line px-6 py-4">
+              <div>
+                <h2 className="font-display font-bold">Customer profile</h2>
+                <p className="text-xs text-[#7c8698]">
+                  Collected at onboarding and used on statements and payouts.
+                </p>
+              </div>
+              <StatusPill status={profile.complete ? "complete" : "pending"} />
+            </div>
+            {!profile.complete ? (
+              <p className="px-6 py-6 text-sm text-[#9aa3b2]">
+                This customer has not finished the profile steps yet.
+              </p>
+            ) : (
+              <dl className="divide-y divide-line/60 text-sm">
+                {[
+                  ["Phone", profile.phone],
+                  ["Country", profile.country],
+                  ["Date of birth", profile.dateOfBirth],
+                  [
+                    "Address",
+                    [profile.addressLine, profile.city, profile.postalCode]
+                      .filter(Boolean)
+                      .join(", "),
+                  ],
+                  ["Occupation", profile.occupation],
+                  [
+                    "Trading experience",
+                    TRADING_EXPERIENCE.find((o) => o.key === profile.tradingExperience)?.label ??
+                      profile.tradingExperience,
+                  ],
+                  [
+                    "Stated goal",
+                    INVESTMENT_GOALS.find((o) => o.key === profile.investmentGoal)?.label ??
+                      profile.investmentGoal,
+                  ],
+                  [
+                    "Profile completed",
+                    profile.completedAt
+                      ? new Date(profile.completedAt).toLocaleString("en-US")
+                      : "—",
+                  ],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex items-start justify-between gap-4 px-6 py-3">
+                    <dt className="text-[#7c8698]">{label}</dt>
+                    <dd className="max-w-[62%] text-right text-[#c7cedb]">{value || "—"}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
           </div>
 
           <div className="rounded-2xl border border-line bg-card">

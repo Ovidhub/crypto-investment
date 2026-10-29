@@ -32,7 +32,7 @@ export default async function AdminAdjustmentsPage() {
     <div className="space-y-8">
       <SectionHeader
         title="Wallet adjustments"
-        description="Credit or debit a simulated balance when a customer needs a correction. Every action is journaled, reasoned and audited."
+        description="Credit or debit a customer balance when one needs a correction. Every action is journaled, reasoned and audited."
       />
 
       <div className="grid gap-4 sm:grid-cols-3">

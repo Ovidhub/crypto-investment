@@ -8,11 +8,11 @@ export const dynamic = "force-dynamic";
 const FAQ = [
   {
     q: "Is any of this real money?",
-    a: "No. Every balance is simulated. There is no payment processor, no custody and no blockchain transaction anywhere in the product.",
+    a: "Your balance is held on Enethi's ledger and every movement is booked as a two-sided journal entry. No card or bank details are collected in the app.",
   },
   {
     q: "Why did my deposit stay pending?",
-    a: "Deposits and withdrawals are deliberately manual. An admin reviews each request in the approvals queue before virtual funds move.",
+    a: "Deposits and withdrawals are reviewed by hand. A request sits in the approvals queue until an operator approves or rejects it, and the decision is written to the audit trail.",
   },
   {
     q: "How is the plan accrual calculated?",
@@ -20,11 +20,11 @@ const FAQ = [
   },
   {
     q: "Can I withdraw?",
-    a: "You can request a simulated withdrawal. It reserves your balance, then an admin approves or rejects it. Nothing is sent to a real address.",
+    a: "Request a withdrawal from your wallet. It reserves the balance immediately, then an operator approves or rejects it before anything is released to the destination you gave.",
   },
   {
-    q: "What happens to my data in demo mode?",
-    a: "The demo database lives in server memory and resets on a cold start. Configure DATABASE_URL for persistence.",
+    q: "Where is my data stored?",
+    a: "Your profile, balances and activity are stored in the platform database. You can download a copy of everything from Settings at any time.",
   },
 ];
 
@@ -35,7 +35,7 @@ export default async function SupportPage() {
     <div className="space-y-8">
       <SectionHeader
         title="Support"
-        description="Answers to the questions this demo raises most often."
+        description="Answers to the questions we are asked most often."
       />
 
       <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">

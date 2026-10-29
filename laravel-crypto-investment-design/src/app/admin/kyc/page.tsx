@@ -13,7 +13,7 @@ export default async function AdminKycPage() {
     <div className="space-y-8">
       <SectionHeader
         title="Verification queue"
-        description="Simulated identity checks. Only the last four digits of a document are stored."
+        description="Identity checks. Only the last four digits of a document are stored."
       />
       <div className="rounded-2xl border border-line bg-card">
         <KycReviewTable

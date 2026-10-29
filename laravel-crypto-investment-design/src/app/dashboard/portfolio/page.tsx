@@ -25,7 +25,7 @@ export default async function PortfolioPage() {
     <div className="space-y-8">
       <SectionHeader
         title="Holdings"
-        description="Live prices valued against your simulated positions and recorded cost basis."
+        description="Live prices valued against your positions and recorded cost basis."
         action={
           <Link
             href="/dashboard/markets"
@@ -52,7 +52,7 @@ export default async function PortfolioPage() {
         {portfolio.positions.length === 0 ? (
           <EmptyState
             title="No holdings"
-            body="Buy your first coin with simulated cash to build a portfolio."
+            body="Buy your first coin to build a portfolio."
             action="Open the trading desk"
             href="/dashboard/markets"
           />

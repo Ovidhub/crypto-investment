@@ -65,6 +65,20 @@ export const users = pgTable(
     tradeOutcome: varchar("trade_outcome", { length: 10 })
       .notNull()
       .default("manual"),
+    // Profile details collected on first sign-in. Null until the customer
+    // finishes the onboarding form; `profileCompletedAt` is the gate.
+    phone: varchar("phone", { length: 40 }),
+    country: varchar("country", { length: 60 }),
+    dateOfBirth: varchar("date_of_birth", { length: 10 }),
+    addressLine: varchar("address_line", { length: 200 }),
+    city: varchar("city", { length: 120 }),
+    postalCode: varchar("postal_code", { length: 20 }),
+    occupation: varchar("occupation", { length: 120 }),
+    // none | beginner | intermediate | experienced
+    tradingExperience: varchar("trading_experience", { length: 20 }),
+    // grow_savings | retirement | short_term | learn | other
+    investmentGoal: varchar("investment_goal", { length: 30 }),
+    profileCompletedAt: timestamp("profile_completed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -227,7 +241,7 @@ export const depositRequests = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     amountUsd: numeric("amount_usd", { precision: 18, scale: 2 }).notNull(),
-    method: varchar("method", { length: 30 }).notNull().default("simulated"),
+    method: varchar("method", { length: 30 }).notNull().default("bank_transfer"),
     reference: varchar("reference", { length: 80 }),
     status: varchar("status", { length: 20 }).notNull().default("pending"),
     adminNote: text("admin_note"),

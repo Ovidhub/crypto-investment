@@ -9,7 +9,7 @@ export default function CloseInvestmentButton({ id }: { id: number }) {
   const [error, setError] = useState<string | null>(null);
 
   async function close() {
-    if (!window.confirm("Release the principal now and stop further simulated accrual?")) {
+    if (!window.confirm("Release the principal now and stop further accrual?")) {
       return;
     }
     setBusy(true);
@@ -21,7 +21,7 @@ export default function CloseInvestmentButton({ id }: { id: number }) {
         body: JSON.stringify({ id }),
       });
       const data = (await res.json()) as { error?: string };
-      if (!res.ok) setError(data.error ?? "Could not close the simulation.");
+      if (!res.ok) setError(data.error ?? "Could not close the plan.");
       else router.refresh();
     } catch {
       setError("Network error.");

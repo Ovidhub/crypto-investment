@@ -16,7 +16,7 @@ export default async function InvestmentsPage() {
   return (
     <div className="space-y-8">
       <SectionHeader
-        title="My simulations"
+        title="My plans"
         description="Active and closed plan positions. Accrual is credited once per day."
         action={
           <Link
@@ -32,7 +32,7 @@ export default async function InvestmentsPage() {
         {rows.length === 0 ? (
           <EmptyState
             title="No plan positions"
-            body="Start a simulation to see it tracked here with daily accrual and a release date."
+            body="Start a plan to see it tracked here with daily accrual and a release date."
             action="Browse plans"
             href="/dashboard/plans"
           />

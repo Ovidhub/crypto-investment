@@ -222,8 +222,8 @@ export default function TradePanel({
           </div>
 
           <p className="rounded-lg border border-line bg-panel-2 px-3 py-2 text-[11px] text-[#7c8698]">
-            Trades execute against live market prices but settle in simulated
-            funds. Fees are booked to the platform ledger.
+            Trades execute against live market prices and settle in your
+            account balance. Fees are booked to the platform ledger.
           </p>
 
           {msg && (

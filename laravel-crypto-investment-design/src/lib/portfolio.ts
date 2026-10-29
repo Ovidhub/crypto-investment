@@ -127,10 +127,10 @@ const LABELS: Record<string, string> = {
   withdraw: "Withdrawal",
   buy: "Buy",
   sell: "Sell",
-  interest: "Simulated yield",
+  interest: "Plan yield",
   plan_deposit: "Plan funding",
   plan_release: "Principal released",
-  demo_credit: "Demo credit",
+  opening_credit: "Welcome credit",
   referral_bonus: "Referral bonus",
   adjustment_credit: "Operator credit",
   adjustment_debit: "Operator debit",
@@ -147,7 +147,7 @@ export async function getActivity(userId: number, limit = 50): Promise<ActivityI
     const direction: ActivityItem["direction"] =
       t.type === "deposit" ||
       t.type === "interest" ||
-      t.type === "demo_credit" ||
+      t.type === "opening_credit" ||
       t.type === "sell" ||
       t.type === "referral_bonus" ||
       t.type === "adjustment_credit" ||
@@ -172,8 +172,8 @@ export async function getActivity(userId: number, limit = 50): Promise<ActivityI
             ? t.type.startsWith("adjustment_")
               ? `Reason: ${t.note}`
               : t.note
-            : t.type === "demo_credit"
-              ? "Simulated funds — not real money"
+            : t.type === "opening_credit"
+              ? "Credited when your account was opened"
               : "",
       usd,
       direction,

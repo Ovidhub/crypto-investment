@@ -47,9 +47,9 @@ export default function KycForm({ currentStatus }: { currentStatus: string }) {
   return (
     <form onSubmit={submit} className="space-y-4 rounded-2xl border border-line bg-card p-6">
       <div>
-        <h2 className="font-display font-bold">Identity check (simulated)</h2>
+        <h2 className="font-display font-bold">Identity verification</h2>
         <p className="mt-1 text-xs text-[#9aa3b2]">
-          This demo stores only your name, country, document type and the last
+          We store only your name, country, document type and the last
           four digits. Do not upload or type a real document number — nothing is
           verified against any registry.
         </p>

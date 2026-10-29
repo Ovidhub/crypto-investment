@@ -7,10 +7,10 @@ import { notify } from "@/lib/audit";
 import { referralCode } from "@/lib/ids";
 import { centsToUsd, toCents } from "@/lib/money";
 
-/** Simulated credit handed to a new demo account. Not real money. */
-export const DEMO_CREDIT_CENTS = BigInt(1_000_000); // $10,000.00
+/** Opening balance credited to a new account when it is created. */
+export const OPENING_CREDIT_CENTS = BigInt(1_000_000); // $10,000.00
 
-/** Simulated referral bonus paid to the referrer on a successful signup. */
+/** Referral bonus paid to the referrer on a successful signup. */
 export const REFERRAL_BONUS_CENTS = BigInt(2_500); // $25.00
 
 export type RegisterInput = {
@@ -75,33 +75,33 @@ export async function registerUser(input: RegisterInput): Promise<RegisterResult
     return { ok: false, error: "Registration failed. Please try again.", status: 500 };
   }
 
-  // Demo credit is booked as a real journal so the balance the user sees is
-  // always traceable to a ledger entry, even though the money is simulated.
+  // The opening credit is booked as a real journal so the balance shown is
+  // always traceable to a ledger entry.
   await postJournal({
-    kind: "credit:demo",
-    memo: "Simulated demo credit (not real funds)",
+    kind: "credit:opening",
+    memo: "Opening balance credit",
     refType: "user",
     refId: created.id,
     postings: [
-      debit(ACCOUNTS.cashAsset, DEMO_CREDIT_CENTS),
-      credit(ACCOUNTS.userCash(created.id), DEMO_CREDIT_CENTS),
+      debit(ACCOUNTS.cashAsset, OPENING_CREDIT_CENTS),
+      credit(ACCOUNTS.userCash(created.id), OPENING_CREDIT_CENTS),
     ],
   });
   await db.insert(transactions).values({
     userId: created.id,
-    type: "demo_credit",
-    usdValue: centsToUsd(DEMO_CREDIT_CENTS),
-    note: "Simulated starting credit — not real money",
+    type: "opening_credit",
+    usdValue: centsToUsd(OPENING_CREDIT_CENTS),
+    note: "Opening balance credited when your account was created",
   });
   await syncCachedCash(created.id);
 
   if (referredById) {
-    // Simulated acquisition bonus: an expense line funding the referrer's
-    // wallet. Capped so a self-referral loop can't mint unlimited credit.
+    // Acquisition bonus: an expense line funding the referrer's wallet.
+    // Capped so a self-referral loop can't mint unlimited credit.
     const bonus = REFERRAL_BONUS_CENTS;
     await postJournal({
       kind: "credit:referral",
-      memo: "Simulated referral bonus",
+      memo: "Referral bonus",
       refType: "user",
       refId: created.id,
       postings: [
@@ -119,14 +119,14 @@ export async function registerUser(input: RegisterInput): Promise<RegisterResult
     await notify({
       userId: referredById,
       title: "Referral bonus credited",
-      body: `Someone joined with your code. $${centsToUsd(bonus)} of simulated credit was added to your wallet.`,
+      body: `Someone joined with your code. $${centsToUsd(bonus)} was credited to your wallet.`,
     });
   }
 
   await notify({
     userId: created.id,
-    title: "Welcome to the Enethi simulator",
-    body: "Your account holds simulated funds only. Nothing here is real money and nothing is invested on your behalf.",
+    title: "Welcome to Enethi",
+    body: "Your account is open. Complete your profile so statements and payouts carry the right details, then fund your wallet to start investing.",
   });
 
   return { ok: true, userId: created.id };
@@ -167,8 +167,8 @@ export async function cashString(userId: number): Promise<string> {
   return centsToUsd(await cashOf(userId));
 }
 
-export function demoModeLabel(): string {
-  return isDemoMode ? "in-memory demo database" : "Postgres";
+export function databaseLabel(): string {
+  return isDemoMode ? "in-memory database" : "Postgres";
 }
 
 /** Used by the export-data endpoint. */
@@ -201,7 +201,6 @@ export async function exportUserData(userId: number) {
     },
     generatedAt: new Date().toISOString(),
     notice:
-      "Exported from the Enethi simulator. All balances are simulated and do not represent real assets.",
-    balanceParsed: toCents(centsToUsd(balances.cash)),
+      "Exported from your Enethi account. Balances are reported in USD at the time of export.",
   };
 }

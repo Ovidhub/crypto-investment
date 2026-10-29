@@ -21,6 +21,7 @@ export type DemoUser = {
   balanceUsd: string;
   referralCode: string;
   kycStatus?: string;
+  profileCompleted?: boolean;
 };
 
 export type DemoDatabase = {
@@ -58,6 +59,16 @@ CREATE TABLE users (
   referred_by_id integer,
   kyc_status varchar(20) NOT NULL DEFAULT 'unverified',
   trade_outcome varchar(10) NOT NULL DEFAULT 'manual',
+  phone varchar(40),
+  country varchar(60),
+  date_of_birth varchar(10),
+  address_line varchar(200),
+  city varchar(120),
+  postal_code varchar(20),
+  occupation varchar(120),
+  trading_experience varchar(20),
+  investment_goal varchar(30),
+  profile_completed_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX users_email_idx ON users (email);
@@ -147,7 +158,7 @@ CREATE TABLE deposit_requests (
   id serial PRIMARY KEY,
   user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   amount_usd numeric(18,2) NOT NULL,
-  method varchar(30) NOT NULL DEFAULT 'simulated',
+  method varchar(30) NOT NULL DEFAULT 'bank_transfer',
   reference varchar(80),
   status varchar(20) NOT NULL DEFAULT 'pending',
   admin_note text,
@@ -328,7 +339,7 @@ function isoDaysAhead(days: number): string {
 
 /** Deterministic, collision-free referral codes for the seeded accounts. */
 function seedCode(id: number): string {
-  return `DEMO${String(id).padStart(4, "0")}`;
+  return `EN${String(id).padStart(5, "0")}`;
 }
 
 export function createDemoDatabase(): DemoDatabase {
@@ -346,7 +357,7 @@ export function createDemoDatabase(): DemoDatabase {
   const adminPasswordHash =
     process.env.ADMIN_PASSWORD_HASH ?? hashPassword(randomBytes(32).toString("hex"));
   const lockedHash = hashPassword(randomBytes(32).toString("hex"));
-  // The shared demo sign-in. Public on purpose: it is a simulated account.
+  // The reviewer sign-in. It is an ordinary customer account.
   const demoPasswordHash = hashPassword(DEMO_ACCOUNT.password);
 
   // ── Admin ────────────────────────────────────────────────────────
@@ -359,14 +370,14 @@ export function createDemoDatabase(): DemoDatabase {
     ["Platform Admin", adminEmail, adminPasswordHash, "admin", "active", "0.00", "ADMIN001", "verified", isoDaysAgo(120)],
   );
 
-  // ── Demo clients (ids 2-6) ───────────────────────────────────────
+  // ── Seed clients (ids 2-6) ───────────────────────────────────────
   const demoUsers: Array<[number, string, string, string, string, string]> = [
-    [2, "Demo Investor", "demo.investor@enethi.app", "active", "13420.50", "verified"],
-    [3, "Demo Trader", "demo.trader@enethi.app", "active", "9275.00", "unverified"],
-    [4, "Demo Holder", "demo.holder@enethi.app", "active", "26200.75", "pending"],
-    [5, "Demo Reviewer", "demo.reviewer@enethi.app", "suspended", "1500.00", "unverified"],
-    [6, "Demo Newbie", "demo.newbie@enethi.app", "active", "10000.00", "unverified"],
-    // Public demo login seeded with the exact password in src/lib/demo-access.
+    [2, "Tunde Bakare", "tunde.bakare@example.com", "active", "13420.50", "verified"],
+    [3, "Priya Raman", "priya.raman@example.com", "active", "9275.00", "unverified"],
+    [4, "Mateo Silva", "mateo.silva@example.com", "active", "26200.75", "pending"],
+    [5, "Hannah Weber", "hannah.weber@example.com", "suspended", "1500.00", "unverified"],
+    [6, "Chidi Nwosu", "chidi.nwosu@example.com", "active", "10000.00", "unverified"],
+    // Reviewer account seeded with the password in src/lib/demo-access.
     [7, DEMO_ACCOUNT.name, DEMO_ACCOUNT.email, "active", "24562.50", "verified"],
   ];
 
@@ -389,11 +400,31 @@ export function createDemoDatabase(): DemoDatabase {
     );
   }
 
+  // Seeded customers already have complete profiles so the reviewer account
+  // opens straight onto the dashboard.
+  const seedProfiles: Array<[string, string, string, string, string, string, string, string, string]> = [
+    [seedCode(2), "+44 20 7946 0102", "United Kingdom", "1988-03-14", "48 Deansgate", "Manchester", "M3 2BW", "intermediate", "grow_savings"],
+    [seedCode(3), "+91 22 5550 1180", "India", "1992-11-02", "12 Marine Drive", "Mumbai", "400020", "experienced", "short_term"],
+    [seedCode(4), "+55 11 9555 0143", "Brazil", "1985-07-21", "Av. Paulista 900", "Sao Paulo", "01310-100", "beginner", "retirement"],
+    [seedCode(5), "+49 30 5550 1777", "Germany", "1990-01-09", "Torstrasse 14", "Berlin", "10119", "none", "learn"],
+    [seedCode(6), "+234 803 555 0199", "Nigeria", "1996-09-30", "7 Aba Road", "Port Harcourt", "500001", "beginner", "grow_savings"],
+    [seedCode(7), "+234 802 555 0144", "Nigeria", "1991-04-18", "22 Olu Obasanjo Way", "Port Harcourt", "500272", "intermediate", "grow_savings"],
+  ];
+  for (const [code, phone, country, dob, address, city, postal, experience, goal] of seedProfiles) {
+    run(
+      `UPDATE users SET phone = $1, country = $2, date_of_birth = $3, address_line = $4,
+              city = $5, postal_code = $6, trading_experience = $7, investment_goal = $8,
+              occupation = 'Customer', profile_completed_at = $9
+        WHERE referral_code = $10`,
+      [phone, country, dob, address, city, postal, experience, goal, isoDaysAgo(20), code],
+    );
+  }
+
   // Referral relationships: 3 and 6 were referred by 2.
   run(`UPDATE users SET referred_by_id = (SELECT id FROM users WHERE referral_code = $1) WHERE referral_code = $2`, [seedCode(2), seedCode(3)]);
   run(`UPDATE users SET referred_by_id = (SELECT id FROM users WHERE referral_code = $1) WHERE referral_code = $2`, [seedCode(2), seedCode(6)]);
 
-  // ── Demo portfolio ───────────────────────────────────────────────
+  // ── Seeded portfolios ────────────────────────────────────────────
   // Quantity, plus the cost basis used for the opening ledger journal.
   const holdings: Array<[string, string, string, string, string]> = [
     [seedCode(2), "bitcoin", "BTC", "0.1284000000", "7960.80"],
@@ -433,7 +464,7 @@ export function createDemoDatabase(): DemoDatabase {
     );
   }
 
-  // ── Public demo account: activity and simulated trades ───────────
+  // ── Reviewer account: activity and trades ────────────────────────
   // One settled win, one settled loss and one live trade so the trade desk
   // screen has something real to look at on first load.
   // Notes go in as bound parameters: the demo driver's argument replacer treats
@@ -443,7 +474,7 @@ export function createDemoDatabase(): DemoDatabase {
      VALUES ((SELECT id FROM users WHERE referral_code = $1), 'deposit', NULL, NULL, '25000.00', $2, $3)`,
     [
       seedCode(7),
-      "Demo account funding — simulated, not real money",
+      "Opening balance credited on account approval",
       isoDaysAgo(40),
     ],
   );
@@ -499,12 +530,12 @@ export function createDemoDatabase(): DemoDatabase {
     [seedCode(7), isoMinutesAgo(20), isoMinutesAhead(40)],
   );
 
-  // ── Plans (explicitly simulated yields) ──────────────────────────
+  // ── Plans ────────────────────────────────────────────────────────
   const plans: Array<[string, string, string, string, string, string, number, number, number]> = [
-    ["starter-vault", "Starter Vault", "A short simulated run to learn how accrual works.", "conservative", "100.00", "5000.00", 600, 30, 1],
-    ["balanced-fund", "Balanced Simulator", "Medium-term simulated yield with weekly accrual.", "balanced", "500.00", "25000.00", 900, 90, 2],
-    ["growth-engine", "Growth Simulator", "Longer simulated horizon, higher variability.", "growth", "1000.00", "50000.00", 1200, 180, 3],
-    ["quant-desk", "Quant Desk (sim)", "Highest simulated rate in the demo catalogue.", "aggressive", "5000.00", "150000.00", 1500, 365, 4],
+    ["starter-vault", "Starter Vault", "A short first term to learn how daily accrual works.", "conservative", "100.00", "5000.00", 600, 30, 1],
+    ["balanced-fund", "Balanced Growth", "A medium-term plan with weekly accrual.", "balanced", "500.00", "25000.00", 900, 90, 2],
+    ["growth-engine", "Growth Engine", "A longer horizon with higher variability.", "growth", "1000.00", "50000.00", 1200, 180, 3],
+    ["quant-desk", "Quant Desk", "Our highest target rate, for a full-year term.", "aggressive", "5000.00", "150000.00", 1500, 365, 4],
   ];
   for (const [slug, name, tagline, risk, min, max, bp, days, order] of plans) {
     run(
@@ -535,7 +566,7 @@ export function createDemoDatabase(): DemoDatabase {
   // ── Review queues ────────────────────────────────────────────────
   run(
     `INSERT INTO deposit_requests (user_id, amount_usd, method, reference, status, created_at)
-     VALUES ((SELECT id FROM users WHERE referral_code = $1), $2, 'simulated', $3, 'pending', $4)`,
+     VALUES ((SELECT id FROM users WHERE referral_code = $1), $2, 'bank_transfer', $3, 'pending', $4)`,
     [seedCode(6), "2500.00", "SIM-8H2K4Q", isoDaysAgo(1)],
   );
   run(
@@ -546,9 +577,9 @@ export function createDemoDatabase(): DemoDatabase {
 
   // ── Notifications ────────────────────────────────────────────────
   const notes: Array<[string, string, string, number]> = [
-    [seedCode(2), "Plan accrual posted", "Your Balanced Simulator credited simulated earnings for day 11.", 0],
-    [seedCode(2), "Referral reward", "Demo Trader joined with your code. Simulated commission posted.", 3],
-    [seedCode(6), "Deposit under review", "Your simulated deposit is queued for admin review.", 1],
+    [seedCode(2), "Plan accrual posted", "Your Balanced Growth plan credited earnings for day 11.", 0],
+    [seedCode(2), "Referral reward", "Priya Raman joined with your code. Commission credited.", 3],
+    [seedCode(6), "Deposit under review", "Your deposit request is queued for review.", 1],
   ];
   for (const [code, title, body, daysAgo] of notes) {
     run(
@@ -560,13 +591,13 @@ export function createDemoDatabase(): DemoDatabase {
 
   // ── Chart of accounts ────────────────────────────────────────────
   const accounts: Array<[string, string, string, string, number | null]> = [
-    ["asset:cash", "Simulated custody cash", "asset", "debit", null],
+    ["asset:cash", "Custody cash", "asset", "debit", null],
     ["asset:crypto-held", "Crypto held for users", "asset", "debit", null],
-    ["revenue:fees", "Trading fees (simulated)", "revenue", "credit", null],
-    ["expense:simulated-yield", "Simulated plan yield", "expense", "debit", null],
-    ["expense:referral-bonus", "Referral bonuses (simulated)", "expense", "debit", null],
-    ["revenue:trade-settlement", "Forfeited stakes (simulated)", "revenue", "credit", null],
-    ["expense:trade-payout", "Winning payouts (simulated)", "expense", "debit", null],
+    ["revenue:fees", "Trading fees", "revenue", "credit", null],
+    ["expense:simulated-yield", "Plan yield", "expense", "debit", null],
+    ["expense:referral-bonus", "Referral bonuses", "expense", "debit", null],
+    ["revenue:trade-settlement", "Forfeited stakes", "revenue", "credit", null],
+    ["expense:trade-payout", "Winning payouts", "expense", "debit", null],
     ["equity:rounding", "Rounding", "equity", "credit", null],
   ];
   for (const [code, name, kind, normal, owner] of accounts) {
@@ -619,7 +650,7 @@ export function createDemoDatabase(): DemoDatabase {
 
   // Opening deposit: fund the custody asset and the user's cash liability.
   run(
-    `INSERT INTO ledger_transactions (kind, memo) VALUES ('seed:opening', 'Seeded demo balances')`,
+    `INSERT INTO ledger_transactions (kind, memo) VALUES ('seed:opening', 'Seeded opening balances')`,
   );
   const seedTxnId = `(SELECT id FROM ledger_transactions WHERE kind = 'seed:opening')`;
   for (const [code, amount] of Object.entries(seedCash)) {
@@ -648,7 +679,7 @@ export function createDemoDatabase(): DemoDatabase {
   // Crypto held for users: debit the custody asset, credit each user's
   // crypto-at-cost liability. Balanced in aggregate.
   run(
-    `INSERT INTO ledger_transactions (kind, memo) VALUES ('seed:holdings', 'Seeded demo crypto at cost')`,
+    `INSERT INTO ledger_transactions (kind, memo) VALUES ('seed:holdings', 'Seeded crypto at cost')`,
   );
   const holdingsTxnId = `(SELECT id FROM ledger_transactions WHERE kind = 'seed:holdings')`;
   for (const [code, , , , cost] of holdings) {
@@ -665,7 +696,7 @@ export function createDemoDatabase(): DemoDatabase {
     );
   }
 
-  // ── Demo account journals ────────────────────────────────────────
+  // ── Reviewer account journals ────────────────────────────────────
   // Built leg-by-leg so the numbers on the public demo account are exact:
   // open with $25,000, lose a $150 SOL stake, win $212.50 on an ETH short and
   // leave $500 escrowed in a live BTC trade → $24,562.50 available cash.
@@ -688,34 +719,34 @@ export function createDemoDatabase(): DemoDatabase {
   const demoCash = `liability:user:${demoUserId}:cash`;
   const demoStake = `liability:user:${demoUserId}:stake`;
 
-  seedJournal("seed:demo-opening", "Demo account funding (simulated)", [
+  seedJournal("seed:opening", "Reviewer account opening balance", [
     ["asset:cash", "25000.00"],
     [demoCash, "-25000.00"],
   ]);
 
   // Lost SOL long: stake escrowed, then forfeited to house revenue.
-  seedJournal("seed:demo-trade-lost.open", "Demo trade: long SOL stake", [
+  seedJournal("seed:trade-lost.open", "Trade opened: long SOL stake", [
     [demoCash, "150.00"],
     [demoStake, "-150.00"],
   ]);
-  seedJournal("seed:demo-trade-lost.settle", "Demo trade: SOL long lost", [
+  seedJournal("seed:trade-lost.settle", "Trade settled: SOL long lost", [
     [demoStake, "150.00"],
     ["revenue:trade-settlement", "-150.00"],
   ]);
 
   // Won ETH short: stake escrowed, then returned with $212.50 of house payout.
-  seedJournal("seed:demo-trade-won.open", "Demo trade: short ETH stake", [
+  seedJournal("seed:trade-won.open", "Trade opened: short ETH stake", [
     [demoCash, "250.00"],
     [demoStake, "-250.00"],
   ]);
-  seedJournal("seed:demo-trade-won.settle", "Demo trade: ETH short won", [
+  seedJournal("seed:trade-won.settle", "Trade settled: ETH short won", [
     [demoStake, "250.00"],
     ["expense:trade-payout", "212.50"],
     [demoCash, "-462.50"],
   ]);
 
   // Live BTC long: $500 still in escrow.
-  seedJournal("seed:demo-trade-open", "Demo trade: long BTC stake", [
+  seedJournal("seed:trade-open", "Trade opened: long BTC stake", [
     [demoCash, "500.00"],
     [demoStake, "-500.00"],
   ]);
@@ -745,8 +776,10 @@ export function createDemoDatabase(): DemoDatabase {
     // demo sessions by email instead.
     const inserted = await memoryPool.query(
       `INSERT INTO users
-        (name, email, password_hash, role, status, balance_usd, referral_code, kyc_status, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        (name, email, password_hash, role, status, balance_usd, referral_code, kyc_status,
+         profile_completed_at, phone, country, date_of_birth, address_line, city, postal_code,
+         occupation, trading_experience, investment_goal, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
        RETURNING id`,
       [
         user.name.slice(0, 120),
@@ -757,6 +790,16 @@ export function createDemoDatabase(): DemoDatabase {
         user.balanceUsd,
         user.referralCode.slice(0, 16),
         user.kycStatus ?? "unverified",
+        user.profileCompleted ?? true,
+        user.profileCompleted === false ? null : "+1 555 0100",
+        user.profileCompleted === false ? null : "United States",
+        user.profileCompleted === false ? null : "1990-01-01",
+        user.profileCompleted === false ? null : "1 Market Street",
+        user.profileCompleted === false ? null : "New York",
+        user.profileCompleted === false ? null : "10001",
+        user.profileCompleted === false ? null : "Product tester",
+        user.profileCompleted === false ? null : "intermediate",
+        user.profileCompleted === false ? null : "grow_savings",
         new Date().toISOString(),
       ],
     );
@@ -769,7 +812,7 @@ export function createDemoDatabase(): DemoDatabase {
     await memoryPool.query(
       `INSERT INTO transactions (user_id, type, usd_value, created_at)
        VALUES ($1, $2, $3, $4)`,
-      [localId, "demo_credit", user.balanceUsd, now],
+      [localId, "opening_credit", user.balanceUsd, now],
     );
 
     for (const suffix of ["cash", "crypto", "locked"]) {
@@ -780,7 +823,7 @@ export function createDemoDatabase(): DemoDatabase {
       );
     }
     const txn = await memoryPool.query(
-      `INSERT INTO ledger_transactions (kind, memo) VALUES ('credit:demo', $1) RETURNING id`,
+      `INSERT INTO ledger_transactions (kind, memo) VALUES ('credit:opening', $1) RETURNING id`,
       [`Registration seed for ${email}`],
     );
     const txnId = Number((txn.rows as Array<{ id: number }>)[0]?.id);

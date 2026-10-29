@@ -36,8 +36,8 @@ export default async function AdminOverview() {
       />
 
       {isDemoMode && (
-        <Notice tone="warn" title="Demo database">
-          Running on the in-process demo database. Data resets on cold start and
+        <Notice tone="warn" title="Ephemeral database">
+          Running on the in-process database. Data resets on cold start and
           is not shared between instances. Set <code>DATABASE_URL</code> for
           persistence.
         </Notice>
@@ -56,14 +56,14 @@ export default async function AdminOverview() {
           }
         />
         <StatCard
-          label="Active simulations"
+          label="Active plans"
           value={stats.activeInvestments}
           hint={`${formatUsd(plans.principal)} principal locked`}
         />
         <StatCard
           label="Trailing trade volume"
           value={formatUsd(stats.volume, { compact: true })}
-          hint="simulated settlement"
+          hint="settled to plan members"
         />
       </div>
 

@@ -28,7 +28,7 @@ export async function GET(req: Request) {
       investments: results.length,
       credited: credited.length,
       totalCredited: total.toFixed(2),
-      note: "Simulated accrual only. No real funds are involved.",
+      note: "Daily accrual complete.",
       results,
     });
   } catch (error) {

@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
+import {
+  INVESTMENT_GOALS,
+  TRADING_EXPERIENCE,
+  getProfile,
+} from "@/lib/profile";
 import SettingsPanels from "@/components/SettingsPanels";
 import SectionHeader from "@/components/SectionHeader";
 import StatusPill from "@/components/StatusPill";
@@ -8,6 +13,10 @@ export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const me = await requireUser();
+  const profile = await getProfile(me.id);
+  const experience =
+    TRADING_EXPERIENCE.find((o) => o.key === profile.tradingExperience)?.label ?? "—";
+  const goal = INVESTMENT_GOALS.find((o) => o.key === profile.investmentGoal)?.label ?? "—";
 
   return (
     <div className="space-y-8">
@@ -43,6 +52,59 @@ export default async function SettingsPage() {
                 <dd className="text-right font-mono text-[#c7cedb]">{me.referralCode}</dd>
               </div>
             </dl>
+
+            <div className="mt-5 border-t border-line pt-4">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-[#7c8698]">
+                  Contact &amp; profile
+                </h3>
+                <Link href="/onboarding?edit=1" className="text-xs font-semibold text-brand hover:underline">
+                  Edit
+                </Link>
+              </div>
+              <dl className="mt-3 space-y-2 text-sm">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-[#7c8698]">Phone</dt>
+                  <dd className="text-right text-[#c7cedb]">{profile.phone || "—"}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-[#7c8698]">Country</dt>
+                  <dd className="text-right text-[#c7cedb]">{profile.country || "—"}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-[#7c8698]">Date of birth</dt>
+                  <dd className="text-right text-[#c7cedb]">{profile.dateOfBirth || "—"}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-[#7c8698]">Address</dt>
+                  <dd className="max-w-[60%] text-right text-[#c7cedb]">
+                    {profile.addressLine
+                      ? [profile.addressLine, profile.city, profile.postalCode]
+                          .filter(Boolean)
+                          .join(", ")
+                      : "—"}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-[#7c8698]">Occupation</dt>
+                  <dd className="text-right text-[#c7cedb]">{profile.occupation || "—"}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-[#7c8698]">Experience</dt>
+                  <dd className="text-right text-[#c7cedb]">{experience}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-[#7c8698]">Goal</dt>
+                  <dd className="text-right text-[#c7cedb]">{goal}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-[#7c8698]">Profile</dt>
+                  <dd className="text-right">
+                    <StatusPill status={profile.complete ? "complete" : "pending"} />
+                  </dd>
+                </div>
+              </dl>
+            </div>
           </div>
 
           <div className="rounded-2xl border border-line bg-panel-2 p-5 text-xs text-[#7c8698]">

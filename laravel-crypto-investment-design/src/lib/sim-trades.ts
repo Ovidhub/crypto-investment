@@ -701,7 +701,7 @@ export async function setOutcomePolicy(input: {
     await notify({
       userId: input.userId,
       title: "Trade settlement terms updated",
-      body: `How your simulated trades settle has been changed to: ${POLICY_LABELS[input.policy]}. ${POLICY_DESCRIPTIONS[input.policy]}${typed ? ` Note: ${typed}` : ""}`,
+      body: `How your trades settle has been changed to: ${POLICY_LABELS[input.policy]}. ${POLICY_DESCRIPTIONS[input.policy]}${typed ? ` Note: ${typed}` : ""}`,
     });
   }
 

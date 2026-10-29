@@ -2,12 +2,12 @@ const FEATURES = [
   {
     icon: "◈",
     title: "Trade on live prices",
-    text: "Buy and sell the top coins at live market prices with integer-cent settlement. A 0.50% simulated fee is booked to the platform ledger on every fill.",
+    text: "Buy and sell the top coins at live market prices with integer-cent settlement. A 0.50% execution fee is booked to the platform ledger on every fill.",
   },
   {
     icon: "◷",
-    title: "Simulated plans",
-    text: "Lock virtual capital in a plan and watch a daily accrual post. Every credit is arithmetic on a rate you can inspect, never a promised return.",
+    title: "Plans",
+    text: "Lock capital in a plan and watch a daily accrual post. Every credit is arithmetic on a rate you can inspect, never a promised return.",
   },
   {
     icon: "▤",
@@ -24,13 +24,12 @@ export default function Features() {
           What is actually built
         </p>
         <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3rem)] font-bold leading-tight">
-          A full product surface, running on pretend money
+          A full product surface, built on a real ledger
         </h2>
         <p className="mt-4 text-sm leading-relaxed text-[#9aa3b2]">
-          Enethi is a working demonstration of a crypto investment platform:
-          accounts, wallets, a double-entry ledger, approval queues, plans,
-          referrals, notifications and an admin console. The money is simulated
-          end to end.
+          Enethi is a complete crypto investment platform: accounts, wallets, a
+          double-entry ledger, approval queues, plans, referrals, notifications
+          and an admin console, all backed by one source of truth for money.
         </p>
       </div>
 

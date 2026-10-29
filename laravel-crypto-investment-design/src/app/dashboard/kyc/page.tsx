@@ -21,12 +21,12 @@ export default async function KycPage() {
     <div className="space-y-8">
       <SectionHeader
         title="Verification"
-        description="A simulated identity-check workflow: submission, queue, admin decision and audit trail — without storing any real document."
+        description="Submit your identity details for review. Only the last four digits of your document number are stored."
         action={<StatusPill status={me.kycStatus} />}
       />
 
       <Notice tone="warn" title="Do not enter real documents">
-        This demo stores only the last four digits of whatever you type and never
+        We store only the last four digits of whatever you type and never
         uploads an image. Enter fake data so no real identity document leaves
         your device.
       </Notice>
@@ -68,7 +68,7 @@ export default async function KycPage() {
             ) : (
               <p className="mt-3 text-sm text-[#9aa3b2]">
                 Nothing submitted yet. Your account works fully without it —
-                verification only unlocks the badge in this demo.
+                verification unlocks the verified badge on your account.
               </p>
             )}
           </div>

@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       .limit(1);
     if (user) await setSession(user);
 
-    return Response.json({ ok: true });
+    return Response.json({ ok: true, role: "user", profileComplete: false });
   } catch {
     return Response.json({ error: "Registration failed." }, { status: 500 });
   }

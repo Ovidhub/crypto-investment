@@ -83,7 +83,7 @@ export async function POST(req: Request) {
   const values = {
     slug,
     name: name.trim().slice(0, 80),
-    tagline: (typeof tagline === "string" ? tagline.trim() : "").slice(0, 200) || "Simulated plan",
+    tagline: (typeof tagline === "string" ? tagline.trim() : "").slice(0, 200) || "Investment plan",
     riskLevel: "balanced",
     minAmountUsd: centsToUsd(min),
     maxAmountUsd: centsToUsd(max),

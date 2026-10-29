@@ -18,14 +18,14 @@ export default async function PlansPage() {
   return (
     <div className="space-y-8">
       <SectionHeader
-        title="Simulation plans"
-        description="Each plan locks simulated capital for a fixed term and credits a simulated daily accrual. Rates are inputs to a model, not forecasts of real returns."
+        title="Investment plans"
+        description="Each plan locks capital for a fixed term and credits a daily accrual. Rates are inputs to our model, not forecasts and not a promise."
       />
 
       <Notice tone="info" title="How this works">
         <p>
           The accrual job credits your wallet once a day while a plan is active,
-          funded from a simulated-yield expense line in the ledger. Nothing is
+          funded from the plan-yield expense line in the ledger. Nothing is
           traded on a real exchange and no return is guaranteed.
         </p>
       </Notice>
@@ -77,11 +77,11 @@ export default async function PlansPage() {
                   </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-[#7c8698]">Simulations opened</dt>
+                  <dt className="text-[#7c8698]">Plans opened</dt>
                   <dd className="tabular-nums text-[#c7cedb]">{plan.subscribers}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-[#7c8698]">Simulated principal</dt>
+                  <dt className="text-[#7c8698]">Principal</dt>
                   <dd className="tabular-nums text-[#c7cedb]">
                     {formatUsd(Number(plan.simulatedPrincipal))}
                   </dd>
