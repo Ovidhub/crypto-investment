@@ -52,7 +52,9 @@ export default function JoinCta({
       setMessage(copy.success);
       setName("");
       setEmail("");
-      if (typeof data.total === "number") setTotal(data.total);
+      // The displayed count includes registered accounts, so just add this
+      // sign-up rather than trusting the waitlist-only total.
+      setTotal((current) => current + 1);
     } catch {
       setStatus("error");
       setMessage("Network error. Please try again.");
