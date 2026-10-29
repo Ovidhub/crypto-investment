@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import BrandMark from "@/components/BrandMark";
 
 const LINKS = [
   { href: "/#features", label: "Features" },
@@ -44,9 +45,8 @@ export default function Navbar({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={logo} alt={siteName} className="h-9 w-9 rounded-xl object-cover" />
           ) : (
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
-              {siteName.slice(0, 1).toUpperCase()}
-            </span>
+            // A super admin can still swap this from Admin → Content → Brand.
+            <BrandMark size={30} />
           )}
           <span className="font-display text-lg font-bold tracking-tight">
             {siteName}

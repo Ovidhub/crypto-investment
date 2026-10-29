@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import BrandMark from "@/components/BrandMark";
 
 export default function AuthForm({ mode }: { mode: "login" | "register" }) {
   const router = useRouter();
@@ -55,9 +56,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
 
       <div className="w-full max-w-md">
         <Link href="/" className="mb-8 flex items-center justify-center gap-2.5">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
-            E
-          </span>
+          <BrandMark size={32} />
           <span className="font-display text-xl font-bold">Actuatrades</span>
         </Link>
 

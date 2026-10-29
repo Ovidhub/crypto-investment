@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
 import ProfileForm from "@/components/ProfileForm";
+import BrandMark from "@/components/BrandMark";
 
 export const dynamic = "force-dynamic";
 
@@ -29,9 +30,7 @@ export default async function OnboardingPage({
       <div className="mx-auto w-full max-w-2xl">
         <div className="mb-8 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
-              E
-            </span>
+            <BrandMark size={32} />
             <span className="font-display text-xl font-bold">Actuatrades</span>
           </Link>
           <span className="text-xs text-[#7c8698]">

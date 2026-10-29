@@ -1,4 +1,5 @@
 import { copy, getSiteContent } from "@/lib/content";
+import BrandMark from "@/components/BrandMark";
 
 const COLUMNS = [
   {
@@ -38,9 +39,7 @@ export default async function Footer() {
         <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
             <a href="#top" className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
-                E
-              </span>
+              <BrandMark size={30} />
               <span className="font-display text-lg font-bold">
                 {copy(c, "brand.name")}
               </span>

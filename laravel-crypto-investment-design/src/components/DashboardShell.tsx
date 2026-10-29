@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
+import BrandMark from "@/components/BrandMark";
 
 type NavItem = { href: string; label: string; icon: string; badge?: number };
 
@@ -124,9 +125,7 @@ export default function DashboardShell({
         <div className="flex h-full flex-col">
           <div className="flex h-16 items-center gap-2.5 border-b border-line px-6">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
-                E
-              </span>
+              <BrandMark size={30} />
               <span className="font-display text-lg font-bold">Actuatrades</span>
             </Link>
             {variant === "admin" && (

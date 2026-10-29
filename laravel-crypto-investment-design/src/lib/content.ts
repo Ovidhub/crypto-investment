@@ -58,7 +58,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         label: "Logo image",
         type: "image",
         value: "",
-        help: "Leave empty to use the built-in letter mark.",
+        help: "Leave empty to use the built-in Actuatrades mark. Recommend a square PNG on a transparent background.",
       },
       {
         key: "brand.supportEmail",
