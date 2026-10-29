@@ -90,14 +90,14 @@ body {
 }
 
 .brand-gradient {
-  background: linear-gradient(92deg, #b57bff 0%, #7c3aed 55%, #22e58a 130%);
+  background: linear-gradient(92deg, #ff3b47 0%, #ed1c24 60%, #ff7a5c 130%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .glow-brand {
-  box-shadow: 0 0 0 1px rgba(181,123,255,0.25), 0 20px 60px -18px rgba(124,58,237,0.55);
+  box-shadow: 0 0 0 1px rgba(255,59,71,0.25), 0 20px 60px -18px rgba(237,28,36,0.5);
 }
 .glow-accent {
   box-shadow: 0 0 0 1px rgba(34,229,138,0.25), 0 20px 60px -18px rgba(34,229,138,0.5);
