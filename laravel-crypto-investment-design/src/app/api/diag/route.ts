@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { BOOTSTRAP_DDL } from "@/db/bootstrap";
+import { db, isDemoMode, pool } from "@/db";
+import { sql } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 function cap<T>(promise: Promise<T>, ms: number, label: string) {
   return Promise.race([
@@ -14,65 +15,34 @@ function cap<T>(promise: Promise<T>, ms: number, label: string) {
   ]);
 }
 
-async function probe(fn: () => Promise<unknown>, ms: number, label: string) {
+/** TEMPORARY: verifies the pooled app layer now answers. */
+export async function GET() {
+  const out: Record<string, unknown> = { isDemoMode };
   const t0 = Date.now();
   try {
-    const value = await cap(fn(), ms, label);
-    return { ms: Date.now() - t0, ok: true, value };
+    const ping = await cap(pool.query("select 1 as ok"), 15_000, "pool.query");
+    out.poolMs = Date.now() - t0;
+    out.poolOk = Array.isArray(ping.rows);
   } catch (error) {
-    return {
-      ms: Date.now() - t0,
-      ok: false,
-      error: error instanceof Error ? `${error.name}: ${error.message}` : String(error),
-    };
+    out.poolMs = Date.now() - t0;
+    out.poolError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
   }
-}
-
-/** TEMPORARY: narrow down where the pooled connection stalls. */
-export async function GET() {
-  const url = process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? "";
-  const { Pool, Client } = await import("pg");
-  const out: Record<string, unknown> = {};
-
-  out.poolWithTimeouts = await probe(async () => {
-    const pool = new Pool({
-      connectionString: url,
-      ssl: { rejectUnauthorized: false },
-      max: 5,
-      idleTimeoutMillis: 10_000,
-      connectionTimeoutMillis: 10_000,
-      statement_timeout: 20_000,
-      query_timeout: 25_000,
-    });
-    const r = await pool.query("select 1 as ok");
-    await pool.end();
-    return r.rows;
-  }, 8_000, "pool with timeouts");
-
-  out.poolPlain = await probe(async () => {
-    const pool = new Pool({
-      connectionString: url,
-      ssl: { rejectUnauthorized: false },
-      max: 5,
-      connectionTimeoutMillis: 10_000,
-    });
-    const r = await pool.query("select 1 as ok");
-    await pool.end();
-    return r.rows;
-  }, 8_000, "plain pool");
-
-  out.batchedDdl = await probe(async () => {
-    const client = new Client({
-      connectionString: url,
-      ssl: { rejectUnauthorized: false },
-      connectionTimeoutMillis: 8_000,
-      query_timeout: 6_000,
-    });
-    await client.connect();
-    await client.query(BOOTSTRAP_DDL);
-    await client.end();
-    return "ddl ok";
-  }, 9_000, "batched ddl");
-
+  const t1 = Date.now();
+  try {
+    const rows = await cap(
+      db.execute(sql`select
+        (select count(*) from users)::int as users,
+        (select count(*) from site_content)::int as content_rows,
+        (select count(*) from plans)::int as plans,
+        (select count(*) from ledger_accounts)::int as ledger_accounts`),
+      15_000,
+      "db.execute",
+    );
+    out.dbMs = Date.now() - t1;
+    out.counts = (rows as unknown as { rows?: unknown[] }).rows;
+  } catch (error) {
+    out.dbMs = Date.now() - t1;
+    out.dbError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+  }
   return NextResponse.json(out);
 }

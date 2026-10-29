@@ -1,5 +1,5 @@
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
-import { Pool, type PoolClient } from "pg";
+import { Client, Pool } from "pg";
 import { createDemoDatabase, type DemoUser } from "./demo";
 import { runBootstrap } from "./bootstrap";
 
@@ -13,8 +13,7 @@ import { runBootstrap } from "./bootstrap";
  */
 export function resolveDatabaseUrl(): string | undefined {
   // `next build` collects page data before any traffic is served. There is no
-  // reason for a build to open a connection (and a slow one previously stalled
-  // static generation past its timeout), so the build always uses defaults.
+  // reason for a build to open a connection, so builds always use the defaults.
   if (process.env.NEXT_PHASE === "phase-production-build") return undefined;
   const candidates = [
     process.env.DATABASE_URL,
@@ -43,78 +42,93 @@ const databaseUrl = resolveDatabaseUrl();
 /** True when no database is configured, so the in-memory engine is used. */
 export const isDemoMode = !databaseUrl;
 
+/** Upper bound on the one-shot schema bootstrap. */
+const BOOTSTRAP_TIMEOUT_MS = 25_000;
+
 type DatabaseInstance = {
   pool: Pool;
   ensureUser?: (user: DemoUser) => Promise<void>;
-  bootstrap?: Promise<void>;
 };
-
-/** Upper bound on the one-shot schema bootstrap. */
-const BOOTSTRAP_TIMEOUT_MS = 25_000;
 
 const globalForDb = globalThis as typeof globalThis & {
   __enethiDatabase?: DatabaseInstance;
 };
 
-/**
- * Wrap a real Postgres pool so the schema bootstrap runs exactly once before
- * the first query of the process. Both query() and connect() (used by
- * drizzle transactions) are covered, and the bootstrap itself talks to the
- * raw, unwrapped pool so it cannot recurse.
- */
-function bootstrapPool(pool: Pool): Pool {
-  const rawQuery = pool.query.bind(pool) as Pool["query"];
-  const rawConnect = pool.connect.bind(pool);
+function sslOptions(url: string) {
+  const needsSsl = /sslmode=require|ssl=true|neon\.tech|supabase|prisma\.io|vercel-storage/i.test(
+    url,
+  );
+  return needsSsl ? { rejectUnauthorized: false } : undefined;
+}
 
-  const run: Promise<void> = (async () => {
+/**
+ * Run the idempotent DDL once per process, on a dedicated connection.
+ *
+ * This deliberately does not borrow from the pool. Every pooled query waits for
+ * the bootstrap to finish, so a bootstrap that borrowed a pooled connection
+ * would wait on itself and hang forever.
+ */
+function startBootstrap(url: string): Promise<void> {
+  return (async () => {
+    const client = new Client({
+      connectionString: url,
+      ssl: sslOptions(url),
+      connectionTimeoutMillis: 10_000,
+      statement_timeout: 20_000,
+      query_timeout: 25_000,
+    });
+    const deadline = new Promise<void>((resolve) =>
+      setTimeout(resolve, BOOTSTRAP_TIMEOUT_MS),
+    );
     try {
-      // Two lambdas can cold-start at the same moment, and concurrent DDL on
-      // the same table is a lock wait: never let that hang a request.
+      await client.connect();
       await Promise.race([
-        runBootstrap(async (text, values) => rawQuery(text, values as never)),
-        new Promise((resolve) => setTimeout(resolve, BOOTSTRAP_TIMEOUT_MS)),
+        runBootstrap((text, values) => client.query(text, values as never[])),
+        deadline,
       ]);
     } catch (error) {
       // Never take the site down because of a bootstrap hiccup: log it and let
-      // the request surface its own error if a table really is missing.
+      // each request surface its own error if a table really is missing.
       console.error("Schema bootstrap failed", error);
+    } finally {
+      await client.end().catch(() => undefined);
     }
   })();
-
-  pool.query = (async (...args: Parameters<Pool["query"]>) => {
-    await run;
-    return (rawQuery as (...a: Parameters<Pool["query"]>) => unknown)(...args);
-  }) as Pool["query"];
-
-  pool.connect = (async () => {
-    await run;
-    const client = (await rawConnect()) as PoolClient;
-    return client;
-  }) as Pool["connect"];
-
-  return pool;
 }
 
+/**
+ * The app's pool. Queries wait for the schema bootstrap, then go straight to
+ * the underlying pg pool; the pool itself is left untouched so that its own
+ * internals (which re-enter `connect`) keep working.
+ */
 function createInstance(): DatabaseInstance {
-  if (databaseUrl) {
-    const needsSsl = /sslmode=require|neon\.tech|supabase|prisma\.io|vercel-storage/i.test(
-      databaseUrl,
-    );
-    const pool = bootstrapPool(
-      new Pool({
-        connectionString: databaseUrl,
-        ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
-        max: 5,
-        idleTimeoutMillis: 10_000,
-        connectionTimeoutMillis: 10_000,
-        // Fail loudly and fast instead of waiting forever on a locked table.
-        statement_timeout: 20_000,
-        query_timeout: 25_000,
-      }),
-    );
-    return { pool };
-  }
-  return createDemoDatabase();
+  if (!databaseUrl) return createDemoDatabase();
+
+  const base = new Pool({
+    connectionString: databaseUrl,
+    ssl: sslOptions(databaseUrl),
+    max: 5,
+    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 10_000,
+    statement_timeout: 20_000,
+    query_timeout: 25_000,
+  });
+
+  const ready = startBootstrap(databaseUrl);
+
+  const pool = {
+    query: (async (...args: Parameters<Pool["query"]>) => {
+      await ready;
+      return (base.query as (...a: Parameters<Pool["query"]>) => unknown)(...args);
+    }) as Pool["query"],
+    connect: (async () => {
+      await ready;
+      return base.connect();
+    }) as Pool["connect"],
+    end: () => base.end(),
+  } as unknown as Pool;
+
+  return { pool };
 }
 
 const instance = (globalForDb.__enethiDatabase ??= createInstance());
