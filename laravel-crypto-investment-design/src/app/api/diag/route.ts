@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 /** TEMPORARY: connection diagnostics that bypass the shared pool/bootstrap. */
 export async function GET() {
@@ -34,6 +34,41 @@ export async function GET() {
   }
 
   const started = Date.now();
+
+  // Independent probe: does the app's own pooled connection answer?
+  const app: Record<string, unknown> = {};
+  try {
+    const dbModule = await Promise.race([
+      import("@/db"),
+      new Promise((resolve) => setTimeout(() => resolve(null), 5_000)),
+    ]);
+    if (!dbModule) {
+      app.imported = false;
+      app.note = "module import timed out";
+    } else {
+      const mod = dbModule as typeof import("@/db");
+      app.imported = true;
+      app.demoMode = mod.isDemoMode;
+      const t0 = Date.now();
+      try {
+        const row = await Promise.race([
+          mod.pool.query("select 1 as ok"),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("pool query exceeded 20s")), 20_000),
+          ),
+        ]);
+        app.poolQueryMs = Date.now() - t0;
+        app.poolOk = Array.isArray((row as { rows?: unknown[] }).rows);
+      } catch (error) {
+        app.poolQueryMs = Date.now() - t0;
+        app.poolError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+      }
+    }
+  } catch (error) {
+    app.imported = false;
+    app.error = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+  }
+
   let result: unknown;
   try {
     const { Client } = await import("pg");
@@ -55,6 +90,7 @@ export async function GET() {
   }
 
   return NextResponse.json({
+    app,
     host,
     present,
     result,
