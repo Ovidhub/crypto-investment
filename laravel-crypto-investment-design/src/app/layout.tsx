@@ -10,6 +10,13 @@ import "@fontsource/space-grotesk/latin-600.css";
 import "@fontsource/space-grotesk/latin-700.css";
 import "./globals.css";
 
+/**
+ * Every page renders per request: copy, prices and session all come from the
+ * database, so nothing may be baked in at build time (and the build must never
+ * try to reach the database).
+ */
+export const dynamic = "force-dynamic";
+
 /** Title and description come from the CMS so the brand stays consistent. */
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getSiteContent();

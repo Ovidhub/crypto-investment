@@ -12,6 +12,10 @@ import { runBootstrap } from "./bootstrap";
  * dashboard" is genuinely all that is required.
  */
 export function resolveDatabaseUrl(): string | undefined {
+  // `next build` collects page data before any traffic is served. There is no
+  // reason for a build to open a connection (and a slow one previously stalled
+  // static generation past its timeout), so the build always uses defaults.
+  if (process.env.NEXT_PHASE === "phase-production-build") return undefined;
   const candidates = [
     process.env.DATABASE_URL,
     process.env.POSTGRES_URL,
@@ -45,6 +49,9 @@ type DatabaseInstance = {
   bootstrap?: Promise<void>;
 };
 
+/** Upper bound on the one-shot schema bootstrap. */
+const BOOTSTRAP_TIMEOUT_MS = 25_000;
+
 const globalForDb = globalThis as typeof globalThis & {
   __enethiDatabase?: DatabaseInstance;
 };
@@ -61,7 +68,12 @@ function bootstrapPool(pool: Pool): Pool {
 
   const run: Promise<void> = (async () => {
     try {
-      await runBootstrap(async (text, values) => rawQuery(text, values as never));
+      // Two lambdas can cold-start at the same moment, and concurrent DDL on
+      // the same table is a lock wait: never let that hang a request.
+      await Promise.race([
+        runBootstrap(async (text, values) => rawQuery(text, values as never)),
+        new Promise((resolve) => setTimeout(resolve, BOOTSTRAP_TIMEOUT_MS)),
+      ]);
     } catch (error) {
       // Never take the site down because of a bootstrap hiccup: log it and let
       // the request surface its own error if a table really is missing.
@@ -95,6 +107,9 @@ function createInstance(): DatabaseInstance {
         max: 5,
         idleTimeoutMillis: 10_000,
         connectionTimeoutMillis: 10_000,
+        // Fail loudly and fast instead of waiting forever on a locked table.
+        statement_timeout: 20_000,
+        query_timeout: 25_000,
       }),
     );
     return { pool };

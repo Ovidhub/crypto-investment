@@ -18,6 +18,7 @@ import Faq from "@/components/Faq";
 import JoinCta from "@/components/JoinCta";
 import Footer from "@/components/Footer";
 
+// CMS copy and live prices are read per request.
 export const dynamic = "force-dynamic";
 
 async function getWaitlistTotal(): Promise<number> {
