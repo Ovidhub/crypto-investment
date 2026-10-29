@@ -1,8 +1,8 @@
 const STATS = [
-  { value: "6M+", label: "Active users" },
-  { value: "24/7", label: "User support" },
-  { value: "160+", label: "Countries" },
-  { value: "$22B+", label: "Trade volume" },
+  { value: "100%", label: "Ledger-backed balances" },
+  { value: "$0", label: "Real funds accepted" },
+  { value: "Live", label: "Market prices" },
+  { value: "2-sided", label: "Double-entry ledger" },
 ];
 
 export default function Stats() {
@@ -21,6 +21,9 @@ export default function Stats() {
           </div>
         ))}
       </div>
+      <p className="mt-4 text-center text-xs text-[#7c8698]">
+        These are facts about how Enethi is built, not traction metrics.
+      </p>
     </section>
   );
 }

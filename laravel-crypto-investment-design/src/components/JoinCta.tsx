@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Accent from "./Accent";
 
 const PLANS = [
   { id: "starter", name: "Starter", desc: "For first-time investors" },
@@ -10,7 +11,20 @@ const PLANS = [
 
 type Status = "idle" | "loading" | "success" | "error";
 
-export default function JoinCta({ initialTotal }: { initialTotal: number }) {
+type Copy = {
+  title: string;
+  subtitle: string;
+  button: string;
+  success: string;
+};
+
+export default function JoinCta({
+  initialTotal,
+  copy,
+}: {
+  initialTotal: number;
+  copy: Copy;
+}) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [plan, setPlan] = useState("starter");
@@ -35,10 +49,12 @@ export default function JoinCta({ initialTotal }: { initialTotal: number }) {
         return;
       }
       setStatus("success");
-      setMessage("You're on the list! Check your inbox for next steps.");
+      setMessage(copy.success);
       setName("");
       setEmail("");
-      if (typeof data.total === "number") setTotal(data.total);
+      // The displayed count includes registered accounts, so just add this
+      // sign-up rather than trusting the waitlist-only total.
+      setTotal((current) => current + 1);
     } catch {
       setStatus("error");
       setMessage("Network error. Please try again.");
@@ -54,11 +70,10 @@ export default function JoinCta({ initialTotal }: { initialTotal: number }) {
         <div className="relative grid items-center gap-10 lg:grid-cols-2">
           <div>
             <h2 className="font-display text-[clamp(2rem,4vw,3.2rem)] font-bold leading-tight">
-              Join <span className="brand-gradient">Enethi</span> now
+              <Accent text={copy.title} />
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-[#9aa3b2]">
-              Enethi is the platform to easily buy, sell and grow your digital
-              assets with many features. Claim your early-access spot today.
+              {copy.subtitle}
             </p>
             <div className="mt-6 flex items-center gap-3">
               <div className="flex -space-x-2">
@@ -122,7 +137,7 @@ export default function JoinCta({ initialTotal }: { initialTotal: number }) {
               disabled={status === "loading"}
               className="mt-4 w-full rounded-xl bg-gradient-to-r from-brand to-brand-2 px-6 py-3.5 text-sm font-semibold text-white transition-transform hover:scale-[1.01] disabled:opacity-60"
             >
-              {status === "loading" ? "Joining…" : "Get Started Free"}
+              {status === "loading" ? "Joining…" : copy.button}
             </button>
 
             {message && (

@@ -4,24 +4,28 @@ import { useState } from "react";
 
 const FAQS = [
   {
-    q: "Is Enethi safe to use?",
-    a: "Absolutely. We use cold-storage custody, mandatory 2FA, biometric login and carry full insurance on custodial assets. Your funds and data are always protected.",
+    q: "How is my balance held?",
+    a: "Every balance is derived from a double-entry ledger: a credit to your wallet always has a matching debit somewhere else, and the trial balance is checked on the admin screen. No card or bank details are collected inside the app.",
   },
   {
-    q: "How do I earn passive income?",
-    a: "You can stake supported assets or deposit into our yield vaults to earn up to 12% APY. Rewards compound automatically and can be withdrawn anytime.",
+    q: "How do the plan returns work?",
+    a: "Each plan has a target annual rate. A scheduled job credits principal × rate ÷ 365 once a day while the plan runs and books the matching expense. It is arithmetic on a rate we publish, not a forecast of market performance, and it is not guaranteed.",
   },
   {
-    q: "What are the trading fees?",
-    a: "Enethi charges a flat 0.1% maker/taker fee with no hidden charges. Deposits via crypto are always free, and card deposits carry a small processor fee.",
+    q: "What fees do you charge?",
+    a: "A 0.50% execution fee on buys and sells, recorded as revenue in the ledger. Deposits and withdrawals are reviewed manually and carry no fee.",
   },
   {
-    q: "Which cryptocurrencies are supported?",
-    a: "We support 99+ assets including Bitcoin, Ethereum, Solana, and all major DeFi and Layer-1 tokens. New coins are added every month.",
+    q: "Which assets are supported?",
+    a: "The 12 largest coins by market cap, priced live from CoinGecko. If that API is unreachable the app falls back to clearly-labelled sample prices so the interface still works.",
   },
   {
-    q: "Can I use Enethi in my country?",
-    a: "Enethi is available in 160+ countries. During sign-up we automatically check availability and applicable compliance requirements for your region.",
+    q: "What happens to the data I enter?",
+    a: "Your profile and activity are stored in the platform database. Verification records only the last four digits of a document number — never a full number or an image.",
+  },
+  {
+    q: "Can I export or delete my data?",
+    a: "You can download a JSON export or a CSV statement of your profile and balances from Settings. Account deletion is handled by support so the audit trail stays intact.",
   },
 ];
 

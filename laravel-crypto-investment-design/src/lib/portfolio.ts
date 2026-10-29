@@ -1,6 +1,8 @@
 import { db } from "@/db";
 import { holdings, transactions } from "@/db/schema";
 import { fetchLiveCoins, type Coin } from "@/lib/coins";
+import { userBalances } from "@/lib/ledger";
+import { centsToNumber } from "@/lib/money";
 import { desc, eq } from "drizzle-orm";
 
 export type PositionView = {
@@ -13,6 +15,8 @@ export type PositionView = {
   change24h: number;
   color: string;
   sparkline: number[];
+  costBasis: number;
+  unrealised: number;
 };
 
 export type PortfolioSummary = {
@@ -20,15 +24,20 @@ export type PortfolioSummary = {
   holdingsValue: number;
   totalChange24h: number; // weighted %
   coins: Coin[];
+  cash: number;
+  locked: number;
+  /** Committed to open simulated trades; still the user's money. */
+  stake: number;
+  investedValue: number;
+  totalValue: number;
+  cryptoAtCost: number;
 };
 
 export async function getPortfolio(userId: number): Promise<PortfolioSummary> {
-  const [rows, coins] = await Promise.all([
-    db
-      .select()
-      .from(holdings)
-      .where(eq(holdings.userId, userId)),
+  const [rows, coins, balances] = await Promise.all([
+    db.select().from(holdings).where(eq(holdings.userId, userId)),
     fetchLiveCoins(),
+    userBalances(userId),
   ]);
 
   const byId = new Map(coins.map((c) => [c.id, c]));
@@ -53,6 +62,8 @@ export async function getPortfolio(userId: number): Promise<PortfolioSummary> {
       change24h: coin.change24h,
       color: coin.color,
       sparkline: coin.sparkline,
+      costBasis: 0,
+      unrealised: 0,
     });
   }
 
@@ -62,11 +73,32 @@ export async function getPortfolio(userId: number): Promise<PortfolioSummary> {
 
   positions.sort((a, b) => b.value - a.value);
 
+  const cash = centsToNumber(balances.cash);
+  const locked = centsToNumber(balances.locked);
+  const investedValue = centsToNumber(balances.locked);
+  const cryptoAtCost = centsToNumber(balances.crypto);
+  const stake = centsToNumber(balances.stake);
+
+  // Allocate the user's recorded cost basis across positions pro rata so the
+  // unrealised P/L column is meaningful without per-lot bookkeeping.
+  if (cryptoAtCost > 0 && holdingsValue > 0) {
+    for (const p of positions) {
+      p.costBasis = Number(((p.value / holdingsValue) * cryptoAtCost).toFixed(2));
+      p.unrealised = Number((p.value - p.costBasis).toFixed(2));
+    }
+  }
+
   return {
     positions,
     holdingsValue,
     totalChange24h: weightedChange,
     coins,
+    cash,
+    locked,
+    stake,
+    investedValue,
+    totalValue: holdingsValue + cash + locked + stake,
+    cryptoAtCost,
   };
 }
 
@@ -77,4 +109,76 @@ export async function getTransactions(userId: number, limit = 20) {
     .where(eq(transactions.userId, userId))
     .orderBy(desc(transactions.createdAt))
     .limit(limit);
+}
+
+export type ActivityItem = {
+  id: string;
+  type: string;
+  label: string;
+  detail: string;
+  usd: number;
+  direction: "in" | "out" | "neutral";
+  createdAt: Date;
+  symbol?: string | null;
+};
+
+const LABELS: Record<string, string> = {
+  deposit: "Deposit",
+  withdraw: "Withdrawal",
+  buy: "Buy",
+  sell: "Sell",
+  interest: "Plan yield",
+  plan_deposit: "Plan funding",
+  plan_release: "Principal released",
+  opening_credit: "Welcome credit",
+  referral_bonus: "Referral bonus",
+  adjustment_credit: "Operator credit",
+  adjustment_debit: "Operator debit",
+  trade_open: "Stake escrowed",
+  trade_win: "Trade won",
+  trade_loss: "Trade lost",
+  trade_void: "Trade voided",
+};
+
+export async function getActivity(userId: number, limit = 50): Promise<ActivityItem[]> {
+  const rows = await getTransactions(userId, limit);
+  return rows.map((t) => {
+    const usd = Number(t.usdValue);
+    const direction: ActivityItem["direction"] =
+      t.type === "deposit" ||
+      t.type === "interest" ||
+      t.type === "opening_credit" ||
+      t.type === "sell" ||
+      t.type === "referral_bonus" ||
+      t.type === "adjustment_credit" ||
+      t.type === "trade_win" ||
+      t.type === "trade_void"
+        ? "in"
+        : t.type === "buy" ||
+            t.type === "withdraw" ||
+            t.type === "plan_deposit" ||
+            t.type === "adjustment_debit" ||
+            t.type === "trade_loss"
+          ? "out"
+          : "neutral";
+    return {
+      id: String(t.id),
+      type: t.type,
+      label: LABELS[t.type] ?? t.type,
+      detail:
+        t.symbol && t.amount && Number(t.amount) > 0
+          ? `${Number(t.amount).toFixed(6)} ${t.symbol} @ $${Number(t.price ?? 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}`
+          : t.note
+            ? t.type.startsWith("adjustment_")
+              ? `Reason: ${t.note}`
+              : t.note
+            : t.type === "opening_credit"
+              ? "Credited when your account was opened"
+              : "",
+      usd,
+      direction,
+      createdAt: new Date(t.createdAt),
+      symbol: t.symbol,
+    };
+  });
 }

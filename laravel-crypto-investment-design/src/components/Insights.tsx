@@ -1,21 +1,23 @@
 import Image from "next/image";
+import { copy, getSiteContent } from "@/lib/content";
 
 const BULLETS = [
   {
-    title: "Track your earnings easily",
-    text: "Real-time P&L, allocation breakdowns and performance history in one clean dashboard.",
+    title: "Every number is traceable",
+    text: "Balances come from the ledger, not from a column someone edited. The same journal that credits your wallet updates the platform's books.",
   },
   {
-    title: "Detailed market insights",
-    text: "AI-driven signals, sentiment analysis and on-chain data to guide smarter decisions.",
+    title: "Live market data, honest labels",
+    text: "Prices stream from CoinGecko. Anything the platform calculates on top of them is booked in the ledger.",
   },
   {
-    title: "Automated passive income",
-    text: "Earn up to 12% APY with staking and yield vaults that compound automatically.",
+    title: "Guardrails built in",
+    text: "Deposits and withdrawals require operator approval, withdrawals reserve funds first, and the accrual job is idempotent per day.",
   },
 ];
 
-export default function Insights() {
+export default async function Insights() {
+  const c = await getSiteContent();
   return (
     <section id="insights" className="relative overflow-hidden py-20">
       <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[420px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-[130px]" />
@@ -23,7 +25,8 @@ export default function Insights() {
         <div className="relative order-2 lg:order-1">
           <div className="relative mx-auto aspect-[4/5] w-full max-w-[440px]">
             <Image
-              src="/images/app-mockup.png"
+              src={copy(c, "home.insights.image")}
+              unoptimized
               alt="Enethi crypto app dashboard"
               fill
               className="object-contain drop-shadow-[0_30px_60px_rgba(34,229,138,0.25)]"
@@ -34,15 +37,15 @@ export default function Insights() {
 
         <div className="order-1 lg:order-2">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
-            Get more detailed insights
+            {copy(c, "home.insights.eyebrow")}
           </p>
           <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3rem)] font-bold leading-tight">
-            Track your earnings more easily &amp; more fast
+            {copy(c, "home.insights.title")}
           </h2>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-[#9aa3b2]">
-            A powerful mobile experience that puts the whole market in your
-            pocket. Monitor every position, react instantly and let your money
-            work while you sleep.
+            Every balance is booked, not assumed: two-sided journal
+            entries, reserved withdrawal funds, approval workflows and an
+            append-only audit trail.
           </p>
 
           <div className="mt-8 space-y-5">

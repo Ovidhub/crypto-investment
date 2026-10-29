@@ -2,128 +2,131 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Faq from "@/components/Faq";
 import { getCurrentUser } from "@/lib/auth";
+import { plansWithStats } from "@/lib/plans";
 import Link from "next/link";
+import { copy, getSiteContent } from "@/lib/content";
+import Accent from "@/components/Accent";
 
 export const dynamic = "force-dynamic";
 
-const PLANS = [
-  {
-    name: "Starter",
-    price: "$0",
-    period: "/mo",
-    desc: "For first-time investors getting started.",
-    features: [
-      "0.20% trading fee",
-      "Buy & sell 99+ coins",
-      "Basic portfolio tracking",
-      "Email support",
-    ],
-    cta: "Get started",
-    featured: false,
-  },
-  {
-    name: "Pro",
-    price: "$19",
-    period: "/mo",
-    desc: "For active traders who want an edge.",
-    features: [
-      "0.10% trading fee",
-      "Advanced charting & signals",
-      "Automated DCA & limit orders",
-      "Up to 8% APY staking",
-      "Priority 24/7 support",
-    ],
-    cta: "Start Pro trial",
-    featured: true,
-  },
-  {
-    name: "Whale",
-    price: "$99",
-    period: "/mo",
-    desc: "Institutional-grade tools & limits.",
-    features: [
-      "0.04% trading fee",
-      "Dedicated account manager",
-      "OTC desk & deep liquidity",
-      "Up to 12% APY yield vaults",
-      "API access & white-glove onboarding",
-    ],
-    cta: "Contact sales",
-    featured: false,
-  },
-];
-
 export default async function PricingPage() {
-  const me = await getCurrentUser();
+  const [me, content, plans] = await Promise.all([
+    getCurrentUser(),
+    getSiteContent(),
+    plansWithStats(),
+  ]);
+
   return (
     <>
-      <Navbar loggedIn={!!me} />
+      <Navbar
+        loggedIn={!!me}
+        siteName={copy(content, "brand.name")}
+        logo={content["brand.logo"] ?? ""}
+      />
       <main>
-        <section className="relative overflow-hidden px-5 pb-10 pt-36 sm:px-8">
+        <section className="relative overflow-hidden px-5 pb-10 pt-28 sm:px-8">
           <div className="pointer-events-none absolute inset-0 -z-10">
             <div className="absolute inset-0 grid-bg" />
             <div className="absolute left-1/2 top-0 h-[420px] w-[720px] -translate-x-1/2 rounded-full bg-brand-2/25 blur-[130px]" />
           </div>
           <div className="mx-auto max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/5 px-4 py-1.5 text-xs font-medium text-[#c7cedb]">
-              Pricing
+              {copy(content, "pricing.eyebrow")}
             </span>
             <h1 className="mt-6 font-display text-[clamp(2.4rem,5vw,3.8rem)] font-bold leading-[1.02]">
-              Simple, transparent{" "}
-              <span className="brand-gradient">pricing</span>
+              <Accent text={copy(content, "pricing.title")} />
             </h1>
             <p className="mt-6 text-base text-[#9aa3b2]">
-              Start free and upgrade as you grow. No hidden fees, cancel anytime.
+              {copy(content, "pricing.intro")}
             </p>
           </div>
         </section>
 
         <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
-          <div className="grid gap-6 lg:grid-cols-3">
-            {PLANS.map((p) => (
-              <div
-                key={p.name}
-                className={`relative flex flex-col rounded-3xl border p-8 ${
-                  p.featured
-                    ? "border-brand/50 bg-gradient-to-b from-brand/15 to-brand-2/5 glow-brand"
-                    : "border-line bg-card"
-                }`}
-              >
-                {p.featured && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-brand to-brand-2 px-4 py-1 text-xs font-bold text-white">
-                    Most popular
-                  </span>
-                )}
-                <h3 className="font-display text-xl font-bold">{p.name}</h3>
-                <p className="mt-2 text-sm text-[#9aa3b2]">{p.desc}</p>
-                <div className="mt-6 flex items-end gap-1">
-                  <span className="font-display text-4xl font-bold text-white">
-                    {p.price}
-                  </span>
-                  <span className="mb-1 text-sm text-[#7c8698]">{p.period}</span>
-                </div>
-                <ul className="mt-6 flex-1 space-y-3">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-[#c7cedb]">
-                      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent/15 text-xs text-accent">
-                        ✓
+          {plans.length === 0 ? (
+            <p className="rounded-3xl border border-line bg-card p-10 text-center text-sm text-[#9aa3b2]">
+              The catalogue is empty right now.
+            </p>
+          ) : (
+            <div className="grid gap-6 lg:grid-cols-3">
+              {plans.map((p, index) => {
+                const featured = index === 1;
+                const daily = (1000 * (p.annualRateBp / 10000)) / 365;
+                return (
+                  <div
+                    key={p.slug}
+                    className={`relative flex flex-col rounded-3xl border p-8 ${
+                      featured
+                        ? "border-brand/50 bg-gradient-to-b from-brand/15 to-brand-2/5 glow-brand"
+                        : "border-line bg-card"
+                    }`}
+                  >
+                    {featured && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-brand to-brand-2 px-4 py-1 text-xs font-bold text-white">
+                        Target annual rate
                       </span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/register"
-                  className={`mt-8 rounded-xl py-3.5 text-center text-sm font-semibold transition-transform hover:scale-[1.02] ${
-                    p.featured
-                      ? "bg-gradient-to-r from-brand to-brand-2 text-white"
-                      : "border border-line bg-panel-2 text-white"
-                  }`}
-                >
-                  {p.cta}
-                </Link>
-              </div>
-            ))}
+                    )}
+                    <h2 className="font-display text-xl font-bold">{p.name}</h2>
+                    <p className="mt-2 text-sm text-[#9aa3b2]">{p.tagline}</p>
+
+                    <div className="mt-6 flex items-end gap-1">
+                      <span className="font-display text-4xl font-bold text-white">
+                        {(p.annualRateBp / 100).toFixed(2)}%
+                      </span>
+                      <span className="mb-1 text-sm text-[#7c8698]">p.a. target</span>
+                    </div>
+                    <p className="mt-1 text-xs text-[#7c8698]">
+                      {p.durationDays}-day term · ${Number(p.minUsd).toLocaleString()}–
+                      ${Number(p.maxUsd).toLocaleString()}
+                    </p>
+
+                    <ul className="mt-6 flex-1 space-y-3">
+                      {[
+                        `~$${daily.toFixed(2)}/day on a $1,000 position`,
+                        "Principal released at the end of the term",
+                        "Close early at any time",
+                        `${p.subscribers} position${p.subscribers === 1 ? "" : "s"} opened so far`,
+                      ].map((f) => (
+                        <li key={f} className="flex items-center gap-3 text-sm text-[#c7cedb]">
+                          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent/15 text-xs text-accent">
+                            ✓
+                          </span>
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Link
+                      href={me ? `/dashboard/plans/${p.slug}` : "/register"}
+                      className={`mt-8 rounded-xl py-3.5 text-center text-sm font-semibold transition-transform hover:scale-[1.02] ${
+                        featured
+                          ? "bg-gradient-to-r from-brand to-brand-2 text-white"
+                          : "border border-line bg-panel-2 text-white"
+                      }`}
+                    >
+                      {me ? "Configure plan" : "Create an account"}
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="mt-10 rounded-3xl border border-line bg-panel-2 p-6 text-sm text-[#9aa3b2]">
+            <p className="font-semibold text-white">What the rate means</p>
+            <p className="mt-2">
+              The daily credit is principal × annual rate ÷ 365, rounded down to
+              the cent. It is produced by our own model and booked as an expense
+              in the ledger, and can be changed or stopped by an operator. It is
+              not a market yield, a fund return, or a promise. Crypto markets can
+              fall as well as rise, and nothing here is financial advice.
+            </p>
+            <Link
+              href="/legal/risk"
+              className="mt-3 inline-block text-xs font-semibold text-brand hover:underline"
+            >
+              Read the full risk disclosure →
+            </Link>
           </div>
         </section>
 

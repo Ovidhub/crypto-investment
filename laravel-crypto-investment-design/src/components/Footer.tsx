@@ -1,3 +1,5 @@
+import { copy, getSiteContent } from "@/lib/content";
+
 const COLUMNS = [
   {
     title: "My Account",
@@ -28,7 +30,8 @@ const COLUMNS = [
   },
 ];
 
-export default function Footer() {
+export default async function Footer() {
+  const c = await getSiteContent();
   return (
     <footer className="border-t border-line bg-panel">
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
@@ -38,11 +41,12 @@ export default function Footer() {
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
                 E
               </span>
-              <span className="font-display text-lg font-bold">Enethi</span>
+              <span className="font-display text-lg font-bold">
+                {copy(c, "brand.name")}
+              </span>
             </a>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#9aa3b2]">
-              The simplest way to invest in crypto and earn passive income.
-              Secure, fast and built for everyone.
+              {copy(c, "footer.about")}
             </p>
             <div className="mt-5 flex gap-3">
               {["𝕏", "in", "f", "▶"].map((s) => (
@@ -80,7 +84,7 @@ export default function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-line pt-6 sm:flex-row">
           <p className="text-xs text-[#6b7488]">
-            © {new Date().getFullYear()} Enethi. All rights reserved.
+            {copy(c, "footer.copyright")}
           </p>
           <p className="text-xs text-[#6b7488]">
             Crypto investing involves risk. Invest responsibly.

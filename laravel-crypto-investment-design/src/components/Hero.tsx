@@ -1,6 +1,9 @@
 import Image from "next/image";
+import Accent from "./Accent";
+import { copy, getSiteContent } from "@/lib/content";
 
-export default function Hero({ investors }: { investors: number }) {
+export default async function Hero({ investors }: { investors: number }) {
+  const c = await getSiteContent();
   return (
     <section id="top" className="relative overflow-hidden pt-28 pb-16 sm:pt-36">
       {/* background glow + grid */}
@@ -14,35 +17,32 @@ export default function Hero({ investors }: { investors: number }) {
         <div className="animate-fade-up">
           <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/5 px-4 py-1.5 text-xs font-medium text-[#c7cedb]">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            Crypto investing platform of the future
+            {copy(c, "home.hero.eyebrow")}
           </span>
 
           <h1 className="mt-6 font-display text-[clamp(2.6rem,6vw,4.6rem)] font-bold leading-[0.98] tracking-tight">
-            Invest In <span className="brand-gradient">Crypto</span> Earn Easy
-            Passive <span className="brand-gradient">Money</span> Easily
+            <Accent text={copy(c, "home.hero.title")} />
           </h1>
 
           <p className="mt-6 max-w-md text-base leading-relaxed text-[#9aa3b2]">
-            Enethi makes it simple to buy, sell and grow 99+ digital assets.
-            Bank-grade security, real-time market data and a portfolio that works
-            for you around the clock.
+            {copy(c, "home.hero.subtitle")}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <a
-              href="#join"
+              href={copy(c, "home.hero.primaryHref")}
               className="rounded-full bg-gradient-to-r from-brand to-brand-2 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-2/40 transition-transform hover:scale-[1.03]"
             >
-              Start Investing
+              {copy(c, "home.hero.primaryLabel")}
             </a>
             <a
-              href="#how"
+              href={copy(c, "home.hero.secondaryHref")}
               className="flex items-center gap-2 rounded-full border border-line bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
             >
               <span className="grid h-6 w-6 place-items-center rounded-full bg-white text-ink">
                 ▶
               </span>
-              How It Works?
+              {copy(c, "home.hero.secondaryLabel")}
             </a>
           </div>
 
@@ -60,7 +60,7 @@ export default function Hero({ investors }: { investors: number }) {
               <p className="font-display text-lg font-bold text-white">
                 {investors.toLocaleString()}+
               </p>
-              <p className="text-xs text-[#9aa3b2]">investors already onboard</p>
+              <p className="text-xs text-[#9aa3b2]">{copy(c, "home.hero.investorsLabel")}</p>
             </div>
           </div>
         </div>
@@ -71,7 +71,8 @@ export default function Hero({ investors }: { investors: number }) {
             <div className="absolute inset-0 animate-spin-slow rounded-full border border-brand/20" />
             <div className="absolute inset-10 rounded-full border border-white/5" />
             <Image
-              src="/images/hero-robot.png"
+              src={copy(c, "home.hero.image")}
+              unoptimized
               alt="AI powered crypto investing network"
               fill
               priority

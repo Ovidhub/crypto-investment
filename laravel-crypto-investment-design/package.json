@@ -6,13 +6,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "env:generate": "node scripts/generate-env.mjs"
   },
   "dependencies": {
+    "@fontsource/inter": "5.2.8",
+    "@fontsource/space-grotesk": "5.2.8",
     "dotenv": "17.3.1",
     "drizzle-orm": "0.45.2",
     "next": "16.2.6",
     "pg": "8.20.0",
+    "pg-mem": "3.0.14",
     "react": "19.2.6",
     "react-dom": "19.2.6"
   },

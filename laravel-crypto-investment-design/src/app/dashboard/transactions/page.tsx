@@ -1,81 +1,80 @@
-import { getCurrentUser } from "@/lib/auth";
-import { getTransactions } from "@/lib/portfolio";
+import { requireUser } from "@/lib/auth";
+import { getActivity } from "@/lib/portfolio";
 import { formatUsd } from "@/lib/format";
+import SectionHeader from "@/components/SectionHeader";
+import EmptyState from "@/components/EmptyState";
 
 export const dynamic = "force-dynamic";
 
-const TYPE_STYLE: Record<string, string> = {
-  buy: "bg-accent/15 text-accent",
-  deposit: "bg-accent/15 text-accent",
-  sell: "bg-[#f6465d]/15 text-[#f6465d]",
-  withdraw: "bg-[#f6465d]/15 text-[#f6465d]",
-};
-
 export default async function TransactionsPage() {
-  const me = (await getCurrentUser())!;
-  const txns = await getTransactions(me.id, 100);
+  const me = await requireUser();
+  const activity = await getActivity(me.id, 100);
+
+  const totalIn = activity
+    .filter((a) => a.direction === "in")
+    .reduce((sum, a) => sum + a.usd, 0);
+  const totalOut = activity
+    .filter((a) => a.direction === "out")
+    .reduce((sum, a) => sum + a.usd, 0);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold sm:text-3xl">
-          Transactions
-        </h1>
-        <p className="mt-1 text-sm text-[#9aa3b2]">
-          A complete history of your account activity.
-        </p>
+    <div className="space-y-8">
+      <SectionHeader
+        title="Activity"
+        description="Every row below comes from a posted ledger transaction. Downloaded statements reconcile to the same entries."
+      />
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-line bg-card p-5">
+          <p className="text-xs text-[#9aa3b2]">Entries</p>
+          <p className="mt-2 font-display text-2xl font-bold text-white">{activity.length}</p>
+        </div>
+        <div className="rounded-2xl border border-line bg-card p-5">
+          <p className="text-xs text-[#9aa3b2]">Credits</p>
+          <p className="mt-2 font-display text-2xl font-bold text-accent">
+            {formatUsd(totalIn)}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-line bg-card p-5">
+          <p className="text-xs text-[#9aa3b2]">Debits</p>
+          <p className="mt-2 font-display text-2xl font-bold text-[#c7cedb]">
+            {formatUsd(totalOut)}
+          </p>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-line bg-card">
-        {txns.length === 0 ? (
-          <p className="p-10 text-center text-sm text-[#9aa3b2]">
-            No transactions yet.
-          </p>
+        {activity.length === 0 ? (
+          <EmptyState
+            title="No activity"
+            body="Trades, deposits, withdrawals and plan accruals all appear here."
+          />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-line text-xs uppercase tracking-wider text-[#7c8698]">
-                  <th className="px-6 py-4 font-medium">Type</th>
-                  <th className="px-6 py-4 font-medium">Asset</th>
-                  <th className="px-6 py-4 text-right font-medium">Amount</th>
-                  <th className="px-6 py-4 text-right font-medium">Price</th>
-                  <th className="px-6 py-4 text-right font-medium">Value</th>
-                  <th className="px-6 py-4 text-right font-medium">Date</th>
+            <table className="w-full min-w-[680px] text-sm">
+              <thead className="border-b border-line text-left text-[11px] uppercase tracking-wider text-[#7c8698]">
+                <tr>
+                  <th className="px-6 py-3 font-semibold">Type</th>
+                  <th className="px-6 py-3 font-semibold">Detail</th>
+                  <th className="px-6 py-3 font-semibold">Amount</th>
+                  <th className="px-6 py-3 font-semibold">Date</th>
                 </tr>
               </thead>
-              <tbody>
-                {txns.map((t) => (
-                  <tr
-                    key={t.id}
-                    className="border-b border-line/60 last:border-0"
-                  >
-                    <td className="px-6 py-4">
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${TYPE_STYLE[t.type] ?? "bg-white/10 text-white"}`}
-                      >
-                        {t.type}
-                      </span>
+              <tbody className="divide-y divide-line/60">
+                {activity.map((a) => (
+                  <tr key={`${a.type}-${a.id}`}>
+                    <td className="px-6 py-4 font-semibold text-white">{a.label}</td>
+                    <td className="px-6 py-4 text-xs text-[#9aa3b2]">{a.detail || "—"}</td>
+                    <td
+                      className={`px-6 py-4 tabular-nums ${
+                        a.direction === "in" ? "text-accent" : "text-[#c7cedb]"
+                      }`}
+                    >
+                      {a.direction === "in" ? "+" : a.direction === "out" ? "−" : ""}
+                      {formatUsd(a.usd)}
                     </td>
-                    <td className="px-6 py-4 text-[#c7cedb]">
-                      {t.symbol ?? "USD"}
-                    </td>
-                    <td className="px-6 py-4 text-right tabular-nums text-[#c7cedb]">
-                      {t.amount ? Number(t.amount).toFixed(6) : "—"}
-                    </td>
-                    <td className="px-6 py-4 text-right tabular-nums text-[#c7cedb]">
-                      {t.price ? formatUsd(Number(t.price)) : "—"}
-                    </td>
-                    <td className="px-6 py-4 text-right font-semibold tabular-nums text-white">
-                      {formatUsd(Number(t.usdValue))}
-                    </td>
-                    <td className="px-6 py-4 text-right text-[#7c8698]">
-                      {new Date(t.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                    <td className="px-6 py-4 text-xs text-[#7c8698]">
+                      {new Date(a.createdAt).toLocaleString("en-US")}
                     </td>
                   </tr>
                 ))}

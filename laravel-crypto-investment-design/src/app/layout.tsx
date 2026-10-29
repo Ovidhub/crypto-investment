@@ -1,37 +1,44 @@
 import type { Metadata } from "next";
+import { getSiteContent } from "@/lib/content";
 import type { ReactNode } from "react";
-import { Inter, Space_Grotesk } from "next/font/google";
+import "@fontsource/inter/latin-400.css";
+import "@fontsource/inter/latin-500.css";
+import "@fontsource/inter/latin-600.css";
+import "@fontsource/inter/latin-700.css";
+import "@fontsource/space-grotesk/latin-500.css";
+import "@fontsource/space-grotesk/latin-600.css";
+import "@fontsource/space-grotesk/latin-700.css";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
+/**
+ * Every page renders per request: copy, prices and session all come from the
+ * database, so nothing may be baked in at build time (and the build must never
+ * try to reach the database).
+ */
+export const dynamic = "force-dynamic";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
-  display: "swap",
-});
-
-export const metadata: Metadata = {
-  title: "Enethi — Invest In Crypto, Earn Passive Income Easily",
-  description:
-    "Enethi is a fast, secure crypto investment platform. Track 99+ coins, build a passive income portfolio, and trade with confidence.",
-  keywords: [
-    "crypto",
-    "investment",
-    "bitcoin",
-    "ethereum",
-    "trading",
-    "passive income",
-  ],
-};
+/** Title and description come from the CMS so the brand stays consistent. */
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getSiteContent();
+  const name = content["brand.name"] || "Enethi";
+  const tagline = content["brand.tagline"] || "Crypto investing platform";
+  return {
+    title: `${name} — ${tagline}`,
+    description: content["brand.description"],
+    keywords: [
+      "crypto",
+      "investment",
+      "bitcoin",
+      "ethereum",
+      "trading",
+      "passive income",
+    ],
+  };
+}
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en">
       <body className="bg-ink text-[#e7ebf2] antialiased">{children}</body>
     </html>
   );

@@ -13,6 +13,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -31,7 +32,12 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
         setLoading(false);
         return;
       }
-      const dest = data.role === "admin" ? "/admin" : "/dashboard";
+      const dest =
+        data.role === "admin" || data.role === "owner"
+          ? "/admin"
+          : data.profileComplete === false
+            ? "/onboarding"
+            : "/dashboard";
       router.push(dest);
       router.refresh();
     } catch {
@@ -62,7 +68,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
           <p className="mt-1 text-sm text-[#9aa3b2]">
             {isLogin
               ? "Sign in to access your portfolio."
-              : "Start investing in minutes — $10,000 demo balance included."}
+              : "Create your account in minutes and set up your profile."}
           </p>
 
           <form onSubmit={submit} className="mt-6 space-y-3">
@@ -118,7 +124,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
         </div>
 
         <p className="mt-6 text-center text-xs text-[#6b7488]">
-          Protected by bank-grade encryption. Demo platform — no real funds.
+          Your account is protected by enforced password hashing and rate-limited sign-in.
         </p>
       </div>
     </div>

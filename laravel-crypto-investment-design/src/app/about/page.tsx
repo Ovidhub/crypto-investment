@@ -2,63 +2,76 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Stats from "@/components/Stats";
 import { getCurrentUser } from "@/lib/auth";
+import { copy, getSiteContent } from "@/lib/content";
+import Accent from "@/components/Accent";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 const VALUES = [
   {
-    icon: "🔒",
-    title: "Security first",
-    text: "Cold-storage custody, full insurance and continuous audits keep your assets protected around the clock.",
+    icon: "▤",
+    title: "Booked, not invented",
+    text: "Balances are derived from double-entry journals. A credit to a wallet always has a matching debit somewhere, and the trial balance is checked on the admin screen.",
   },
   {
-    icon: "🌍",
-    title: "Access for everyone",
-    text: "We believe crypto investing should be simple. Enethi works in 160+ countries with no jargon required.",
+    icon: "◉",
+    title: "Labelled honestly",
+    text: "No invented user counts, no unverifiable volume claims and no guaranteed-return language. Every rate we publish is a target, not a promise.",
   },
   {
-    icon: "📈",
-    title: "Built to grow wealth",
-    text: "Automated staking, yield vaults and smart tools help your money compound over the long term.",
+    icon: "⚑",
+    title: "Operator controls",
+    text: "Deposits and withdrawals sit in an approval queue, withdrawals reserve funds before review, and every privileged action lands in an audit trail.",
   },
   {
-    icon: "⚡",
-    title: "Speed & reliability",
-    text: "A matching engine that executes in milliseconds with 99.99% uptime you can count on.",
+    icon: "⌘",
+    title: "Small, readable stack",
+    text: "Next.js, Postgres via Drizzle, and a handful of focused modules for money, the ledger, trading and plans. Nothing hidden behind a vendor.",
   },
 ];
 
-const TEAM = [
-  { name: "Ava Chen", role: "CEO & Co-founder", color: "#b57bff" },
-  { name: "Marcus Reid", role: "CTO & Co-founder", color: "#22e58a" },
-  { name: "Sofia Alvarez", role: "Head of Security", color: "#627eea" },
-  { name: "Daniel Kim", role: "Head of Product", color: "#f7931a" },
+const STACK = [
+  { label: "Framework", value: "Next.js App Router, React 19" },
+  { label: "Data", value: "Postgres + Drizzle ORM" },
+  { label: "Money", value: "Integer-cent arithmetic, no floats in balances" },
+  { label: "Auth", value: "HMAC-signed HTTP-only cookies, scrypt hashes" },
+  { label: "Prices", value: "CoinGecko public API, 60s cache, offline fallback" },
+  { label: "Jobs", value: "/api/cron/accrue, protected by CRON_SECRET" },
+];
+
+const NOT_BUILT = [
+  "Real payment rails or custody — nothing leaves the sandbox.",
+  "Self-serve account deletion (support handles it so the audit trail stays intact).",
+  "Two-factor authentication and device history.",
+  "Automated document checks — verification is reviewed by our team.",
+  "Copy-trading and bot-trading (planned, not shipped).",
 ];
 
 export default async function AboutPage() {
-  const me = await getCurrentUser();
+  const [me, content] = await Promise.all([getCurrentUser(), getSiteContent()]);
   return (
     <>
-      <Navbar loggedIn={!!me} />
+      <Navbar
+        loggedIn={!!me}
+        siteName={copy(content, "brand.name")}
+        logo={content["brand.logo"] ?? ""}
+      />
       <main>
-        <section className="relative overflow-hidden px-5 pb-16 pt-36 sm:px-8">
+        <section className="relative overflow-hidden px-5 pb-16 pt-28 sm:px-8">
           <div className="pointer-events-none absolute inset-0 -z-10">
             <div className="absolute inset-0 grid-bg" />
             <div className="absolute left-1/2 top-0 h-[420px] w-[720px] -translate-x-1/2 rounded-full bg-brand-2/25 blur-[130px]" />
           </div>
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/5 px-4 py-1.5 text-xs font-medium text-[#c7cedb]">
-              About Enethi
+              About this build
             </span>
             <h1 className="mt-6 font-display text-[clamp(2.4rem,5vw,3.8rem)] font-bold leading-[1.02]">
-              We&apos;re making crypto investing{" "}
-              <span className="brand-gradient">simple for everyone</span>
+              <Accent text={copy(content, "about.title")} />
             </h1>
             <p className="mt-6 text-base leading-relaxed text-[#9aa3b2]">
-              Founded in 2021, Enethi is on a mission to open the door to digital
-              wealth. We combine bank-grade security with an experience anyone
-              can use — from first-time buyers to seasoned traders.
+              {copy(content, "about.intro")}
             </p>
           </div>
         </section>
@@ -68,72 +81,84 @@ export default async function AboutPage() {
         <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
           <div className="mb-12 max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand">
-              Our values
+              Design principles
             </p>
             <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3rem)] font-bold">
-              What drives us every day
+              What we optimised for
             </h2>
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
             {VALUES.map((v) => (
-              <div
-                key={v.title}
-                className="rounded-3xl border border-line bg-card p-7"
-              >
-                <div className="grid h-14 w-14 place-items-center rounded-2xl border border-line bg-panel-2 text-2xl">
+              <div key={v.title} className="rounded-3xl border border-line bg-card p-7">
+                <div className="grid h-14 w-14 place-items-center rounded-2xl border border-line bg-panel-2 text-2xl text-brand">
                   {v.icon}
                 </div>
                 <h3 className="mt-5 font-display text-xl font-bold">{v.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-[#9aa3b2]">
-                  {v.text}
-                </p>
+                <p className="mt-3 text-sm leading-relaxed text-[#9aa3b2]">{v.text}</p>
               </div>
             ))}
           </div>
         </section>
 
         <section className="mx-auto max-w-7xl px-5 pb-20 sm:px-8">
-          <div className="mb-12 text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
-              Leadership
-            </p>
-            <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3rem)] font-bold">
-              Meet the team
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
-            {TEAM.map((t) => (
-              <div
-                key={t.name}
-                className="rounded-3xl border border-line bg-card p-6 text-center"
-              >
-                <span
-                  className="mx-auto grid h-16 w-16 place-items-center rounded-full font-display text-xl font-bold text-ink"
-                  style={{ background: `linear-gradient(135deg, ${t.color}, ${t.color}aa)` }}
-                >
-                  {t.name.split(" ").map((n) => n[0]).join("")}
-                </span>
-                <p className="mt-4 font-semibold text-white">{t.name}</p>
-                <p className="text-xs text-[#7c8698]">{t.role}</p>
-              </div>
-            ))}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl border border-line bg-card p-7">
+              <h2 className="font-display text-xl font-bold">Stack</h2>
+              <dl className="mt-5 space-y-3">
+                {STACK.map((s) => (
+                  <div key={s.label} className="flex flex-wrap justify-between gap-2 border-b border-line/60 pb-3 last:border-0">
+                    <dt className="text-xs font-semibold uppercase tracking-wider text-[#7c8698]">
+                      {s.label}
+                    </dt>
+                    <dd className="text-right text-sm text-[#c7cedb]">{s.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <div className="rounded-3xl border border-line bg-card p-7">
+              <h2 className="font-display text-xl font-bold">Deliberately not built</h2>
+              <p className="mt-2 text-sm text-[#9aa3b2]">
+                We would rather say what is not built yet.
+              </p>
+              <ul className="mt-5 space-y-3">
+                {NOT_BUILT.map((item) => (
+                  <li key={item} className="flex gap-3 text-sm text-[#c7cedb]">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white/10 text-[11px] text-[#9aa3b2]">
+                      –
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 
         <section className="mx-auto max-w-7xl px-5 pb-24 sm:px-8">
           <div className="rounded-[2rem] border border-line bg-gradient-to-br from-brand/15 to-accent/5 p-10 text-center">
             <h2 className="font-display text-[clamp(1.8rem,3.5vw,2.6rem)] font-bold">
-              Ready to start your journey?
+              Try the whole workflow
             </h2>
-            <p className="mx-auto mt-3 max-w-md text-sm text-[#9aa3b2]">
-              Join thousands of investors growing their wealth with Enethi.
+            <p className="mx-auto mt-3 max-w-lg text-sm text-[#9aa3b2]">
+              Create an account, get your opening balance, trade at live prices, fund
+              a plan, request a withdrawal, then sign in as an admin and approve
+              it. The books stay balanced the whole way.
             </p>
-            <Link
-              href="/register"
-              className="mt-6 inline-block rounded-full bg-gradient-to-r from-brand to-brand-2 px-7 py-3.5 text-sm font-semibold text-white transition-transform hover:scale-[1.03]"
-            >
-              Create free account
-            </Link>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/register"
+                className="rounded-full bg-gradient-to-r from-brand to-brand-2 px-7 py-3.5 text-sm font-semibold text-white transition-transform hover:scale-[1.03]"
+              >
+                Create an account
+              </Link>
+              <Link
+                href="/legal/risk"
+                className="rounded-full border border-line px-7 py-3.5 text-sm font-semibold text-[#c7cedb] hover:border-brand hover:text-white"
+              >
+                Risk disclosure
+              </Link>
+            </div>
           </div>
         </section>
       </main>

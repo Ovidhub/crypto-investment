@@ -1,8 +1,8 @@
 import { db } from "@/db";
-import { waitlist } from "@/db/schema";
 import { sql } from "drizzle-orm";
 import { fetchLiveCoins } from "@/lib/coins";
 import { getCurrentUser } from "@/lib/auth";
+import { copy, getSiteContent } from "@/lib/content";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import LogoMarquee from "@/components/LogoMarquee";
@@ -17,31 +17,46 @@ import Faq from "@/components/Faq";
 import JoinCta from "@/components/JoinCta";
 import Footer from "@/components/Footer";
 
+// CMS copy and live prices are read per request.
 export const dynamic = "force-dynamic";
 
-async function getWaitlistTotal(): Promise<number> {
+/**
+ * How many people have actually joined: registered accounts plus waitlist
+ * sign-ups. Nothing is added to this number.
+ */
+async function getInvestorTotal(): Promise<number> {
   try {
-    const [row] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(waitlist);
-    return row?.count ?? 0;
+    const result = await db.execute(
+      sql`select (
+        (select count(*) from users) + (select count(*) from waitlist)
+      )::int as total`,
+    );
+    const rows = (result as unknown as { rows?: Array<{ total: number }> }).rows ?? [];
+    return rows[0]?.total ?? 0;
   } catch {
     return 0;
   }
 }
 
 export default async function HomePage() {
-  const [coins, total, me] = await Promise.all([
+  const [coins, total, me, content] = await Promise.all([
     fetchLiveCoins(),
-    getWaitlistTotal(),
+    getInvestorTotal(),
     getCurrentUser(),
+    getSiteContent(),
   ]);
 
-  const baseInvestors = 5218 + total;
+  // Real accounts only. The seeded operator and reviewer accounts make this at
+  // least 1, so the "+" stays truthful.
+  const baseInvestors = Math.max(total, 1);
 
   return (
     <>
-      <Navbar loggedIn={!!me} />
+      <Navbar
+        loggedIn={!!me}
+        siteName={copy(content, "brand.name")}
+        logo={content["brand.logo"] ?? ""}
+      />
       <main>
         <Hero investors={baseInvestors} />
         <LogoMarquee />
@@ -53,7 +68,15 @@ export default async function HomePage() {
         <Stats />
         <HowItWorks />
         <Faq />
-        <JoinCta initialTotal={baseInvestors} />
+        <JoinCta
+          initialTotal={baseInvestors}
+          copy={{
+            title: copy(content, "home.cta.title"),
+            subtitle: copy(content, "home.cta.subtitle"),
+            button: copy(content, "home.cta.button"),
+            success: copy(content, "home.cta.success"),
+          }}
+        />
       </main>
       <Footer />
     </>

@@ -63,7 +63,10 @@ export default function TradePanel({
       }
       setMsg({
         type: "ok",
-        text: `${side === "buy" ? "Bought" : "Sold"} ${coinAmount.toFixed(6)} ${selected.symbol}.`,
+        text:
+          typeof data.message === "string"
+            ? data.message
+            : `${side === "buy" ? "Bought" : "Sold"} ${coinAmount.toFixed(6)} ${selected.symbol}.`,
       });
       setStatus("idle");
       router.refresh();
@@ -180,6 +183,26 @@ export default function TradePanel({
 
           <div className="space-y-1.5 rounded-xl bg-panel-2 p-4 text-sm">
             <div className="flex justify-between">
+              <span className="text-[#9aa3b2]">Execution fee (0.50%)</span>
+              <span className="tabular-nums text-white">
+                {formatUsd(Number(usd) > 0 ? Number(usd) * 0.005 : 0)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[#9aa3b2]">
+                {side === "buy" ? "Total debit" : "Net proceeds"}
+              </span>
+              <span className="tabular-nums text-white">
+                {formatUsd(
+                  Number(usd) > 0
+                    ? side === "buy"
+                      ? Number(usd) * 1.005
+                      : Number(usd) * 0.995
+                    : 0,
+                )}
+              </span>
+            </div>
+            <div className="flex justify-between">
               <span className="text-[#9aa3b2]">You receive</span>
               <span className="tabular-nums text-white">
                 {(Number.isFinite(coinAmount) ? coinAmount : 0).toFixed(6)}{" "}
@@ -197,6 +220,11 @@ export default function TradePanel({
               </span>
             </div>
           </div>
+
+          <p className="rounded-lg border border-line bg-panel-2 px-3 py-2 text-[11px] text-[#7c8698]">
+            Trades execute against live market prices and settle in your
+            account balance. Fees are booked to the platform ledger.
+          </p>
 
           {msg && (
             <p
