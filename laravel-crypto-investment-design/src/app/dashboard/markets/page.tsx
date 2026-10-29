@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getPortfolio } from "@/lib/portfolio";
+import PriceChart from "@/components/PriceChart";
 import TradePanel from "@/components/TradePanel";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,16 @@ export default async function MarketsPage() {
           Trade desk →
         </Link>
       </div>
+      <PriceChart
+        coins={portfolio.coins.map((c) => ({
+          id: c.id,
+          symbol: c.symbol,
+          name: c.name,
+          price: c.price,
+          color: c.color,
+        }))}
+        initialCoinId={portfolio.coins[0]?.id}
+      />
       <TradePanel
         coins={portfolio.coins}
         cash={Number(me.balanceUsd)}

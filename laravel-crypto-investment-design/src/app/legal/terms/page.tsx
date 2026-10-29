@@ -8,7 +8,7 @@ export default function TermsPage() {
       <section>
         <h2 className="font-display text-lg font-bold text-white">1. What this service is</h2>
         <p className="mt-2">
-          Enethi is a crypto investment platform. It lets you fund a wallet, buy and
+          Actuatrades is a crypto investment platform. It lets you fund a wallet, buy and
           hold crypto assets, subscribe to managed plans and take positions on the
           trade desk. By opening an account you accept these terms.
         </p>

@@ -127,7 +127,7 @@ export default function DashboardShell({
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
                 E
               </span>
-              <span className="font-display text-lg font-bold">Enethi</span>
+              <span className="font-display text-lg font-bold">Actuatrades</span>
             </Link>
             {variant === "admin" && (
               <span className="ml-auto rounded-full bg-brand/15 px-2 py-0.5 text-[10px] font-bold text-brand">

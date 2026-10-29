@@ -27,7 +27,7 @@ export default async function Insights() {
             <Image
               src={copy(c, "home.insights.image")}
               unoptimized
-              alt="Enethi crypto app dashboard"
+              alt="Actuatrades crypto app dashboard"
               fill
               className="object-contain drop-shadow-[0_30px_60px_rgba(34,229,138,0.25)]"
               sizes="(max-width: 1024px) 90vw, 440px"

@@ -1,4 +1,4 @@
-# Enethi — crypto investment platform (simulated)
+# Actuatrades — crypto investment platform (simulated)
 
 A complete, working crypto-investment product: accounts, wallets, a double-entry
 ledger, deposit/withdrawal approval queues, investment plans with a daily accrual
@@ -42,8 +42,8 @@ The seed includes a funded customer so the product can be inspected without a
 fresh signup:
 
 ```
-amara@enethi.app
-Enethi-Demo-2026!42
+amara@actuatrades.com
+Actuatrades-Demo-2026!42
 ```
 
 Override with `DEMO_LOGIN_EMAIL` / `DEMO_LOGIN_PASSWORD`. It is an ordinary

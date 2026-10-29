@@ -37,7 +37,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
     description:
       "The name, logo and contact address used across the site, emails and page titles.",
     fields: [
-      { key: "brand.name", label: "Site name", type: "text", value: "Enethi", maxLength: 40 },
+      { key: "brand.name", label: "Site name", type: "text", value: "Actuatrades", maxLength: 40 },
       {
         key: "brand.tagline",
         label: "Page title",
@@ -50,7 +50,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         label: "Meta description",
         type: "textarea",
         value:
-          "Enethi is a crypto investment platform: live markets, managed plans and a double-entry ledger behind every balance.",
+          "Actuatrades is a crypto investment platform: live markets, managed plans and a double-entry ledger behind every balance.",
         maxLength: 300,
       },
       {
@@ -64,7 +64,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         key: "brand.supportEmail",
         label: "Support email",
         type: "text",
-        value: "support@enethi.app",
+        value: "support@actuatrades.com",
         maxLength: 120,
       },
     ],
@@ -94,7 +94,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         label: "Sub-headline",
         type: "textarea",
         value:
-          "Enethi makes it simple to buy, sell and grow 99+ digital assets. Bank-grade security, real-time market data and a portfolio that works for you around the clock.",
+          "Actuatrades makes it simple to buy, sell and grow 99+ digital assets. Bank-grade security, real-time market data and a portfolio that works for you around the clock.",
         maxLength: 400,
       },
       { key: "home.hero.primaryLabel", label: "Primary button", type: "text", value: "Start Investing" },
@@ -156,7 +156,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         label: "Intro paragraph",
         type: "textarea",
         value:
-          "Enethi is a complete crypto investment platform: accounts, wallets, a double-entry ledger, approval queues, plans, referrals, notifications and an admin console, all backed by one source of truth for money.",
+          "Actuatrades is a complete crypto investment platform: accounts, wallets, a double-entry ledger, approval queues, plans, referrals, notifications and an admin console, all backed by one source of truth for money.",
       },
       { key: "home.features.item1.title", label: "Card 1 title", type: "text", value: "Trade on live prices" },
       {
@@ -234,7 +234,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
     title: "Home — why choose us",
     description: "The reasons grid beside the live market panel.",
     fields: [
-      { key: "home.why.eyebrow", label: "Eyebrow", type: "text", value: "Why choose Enethi" },
+      { key: "home.why.eyebrow", label: "Eyebrow", type: "text", value: "Why choose Actuatrades" },
       {
         key: "home.why.title",
         label: "Title",
@@ -259,7 +259,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
     title: "Home — closing call to action",
     description: "The join block at the bottom of the home page.",
     fields: [
-      { key: "home.cta.title", label: "Title", type: "text", value: "Join *Enethi* now" },
+      { key: "home.cta.title", label: "Title", type: "text", value: "Join *Actuatrades* now" },
       {
         key: "home.cta.subtitle",
         label: "Subtitle",
@@ -287,7 +287,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         label: "Intro",
         type: "textarea",
         value:
-          "Enethi started as a question: what would a crypto investment platform look like if every balance had to prove itself against a ledger? This is our answer.",
+          "Actuatrades started as a question: what would a crypto investment platform look like if every balance had to prove itself against a ledger? This is our answer.",
       },
       {
         key: "about.mission",
@@ -319,7 +319,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
     title: "Contact page",
     description: "How customers reach you.",
     fields: [
-      { key: "contact.email", label: "Email", type: "text", value: "support@enethi.app" },
+      { key: "contact.email", label: "Email", type: "text", value: "support@actuatrades.com" },
       { key: "contact.chat", label: "Chat line", type: "text", value: "Available 24/7 in-app" },
       { key: "contact.office", label: "Office line", type: "text", value: "Port Harcourt · Lagos · London" },
       {
@@ -341,7 +341,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         type: "textarea",
         value: "The simplest way to invest in crypto and earn passive income. Secure, fast and built for everyone.",
       },
-      { key: "footer.copyright", label: "Copyright line", type: "text", value: "© 2026 Enethi. All rights reserved." },
+      { key: "footer.copyright", label: "Copyright line", type: "text", value: "© 2026 Actuatrades. All rights reserved." },
     ],
   },
 ];

@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 /** Title and description come from the CMS so the brand stays consistent. */
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getSiteContent();
-  const name = content["brand.name"] || "Enethi";
+  const name = content["brand.name"] || "Actuatrades";
   const tagline = content["brand.tagline"] || "Crypto investing platform";
   return {
     title: `${name} — ${tagline}`,

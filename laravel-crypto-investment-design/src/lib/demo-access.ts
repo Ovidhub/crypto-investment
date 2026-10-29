@@ -8,7 +8,7 @@
  */
 export const DEMO_ACCOUNT = {
   name: "Amara Obi",
-  email: (process.env.DEMO_LOGIN_EMAIL ?? "amara@enethi.app").trim().toLowerCase(),
-  password: process.env.DEMO_LOGIN_PASSWORD ?? "Enethi-Demo-2026!42",
+  email: (process.env.DEMO_LOGIN_EMAIL ?? "amara@actuatrades.com").trim().toLowerCase(),
+  password: process.env.DEMO_LOGIN_PASSWORD ?? "Actuatrades-Demo-2026!42",
   role: "user",
 } as const;

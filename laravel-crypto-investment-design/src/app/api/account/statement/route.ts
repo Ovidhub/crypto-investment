@@ -53,7 +53,7 @@ export async function GET() {
   return new Response(lines.join("\n"), {
     headers: {
       "content-type": "text/csv; charset=utf-8",
-      "content-disposition": `attachment; filename="enethi-statement-${auth.user.id}.csv"`,
+      "content-disposition": `attachment; filename="actuatrades-statement-${auth.user.id}.csv"`,
       "cache-control": "no-store",
     },
   });

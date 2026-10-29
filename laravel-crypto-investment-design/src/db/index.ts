@@ -51,7 +51,7 @@ type DatabaseInstance = {
 };
 
 const globalForDb = globalThis as typeof globalThis & {
-  __enethiDatabase?: DatabaseInstance;
+  __actuatradesDatabase?: DatabaseInstance;
 };
 
 function sslOptions(url: string) {
@@ -131,7 +131,7 @@ function createInstance(): DatabaseInstance {
   return { pool };
 }
 
-const instance = (globalForDb.__enethiDatabase ??= createInstance());
+const instance = (globalForDb.__actuatradesDatabase ??= createInstance());
 
 export const pool = instance.pool;
 export const db: NodePgDatabase = drizzle(pool);

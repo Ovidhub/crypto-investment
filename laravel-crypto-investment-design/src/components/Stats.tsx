@@ -22,7 +22,7 @@ export default function Stats() {
         ))}
       </div>
       <p className="mt-4 text-center text-xs text-[#7c8698]">
-        These are facts about how Enethi is built, not traction metrics.
+        These are facts about how Actuatrades is built, not traction metrics.
       </p>
     </section>
   );

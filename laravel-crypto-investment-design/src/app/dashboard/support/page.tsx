@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 const FAQ = [
   {
     q: "Is any of this real money?",
-    a: "Your balance is held on Enethi's ledger and every movement is booked as a two-sided journal entry. No card or bank details are collected in the app.",
+    a: "Your balance is held on Actuatrades's ledger and every movement is booked as a two-sided journal entry. No card or bank details are collected in the app.",
   },
   {
     q: "Why did my deposit stay pending?",

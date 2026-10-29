@@ -32,7 +32,7 @@ export default async function OnboardingPage({
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
               E
             </span>
-            <span className="font-display text-xl font-bold">Enethi</span>
+            <span className="font-display text-xl font-bold">Actuatrades</span>
           </Link>
           <span className="text-xs text-[#7c8698]">
             {editing ? "Profile settings" : "Step 1 of 1 · takes about a minute"}

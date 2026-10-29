@@ -368,7 +368,7 @@ export function createDemoDatabase(): DemoDatabase {
   const run = (text: string, values: unknown[] = []) =>
     memoryPool.run(text, values);
 
-  const adminEmail = (process.env.ADMIN_EMAIL ?? "admin@enethi.app").toLowerCase();
+  const adminEmail = (process.env.ADMIN_EMAIL ?? "admin@actuatrades.com").toLowerCase();
   // If no hash is configured, use an unknowable random password rather than
   // shipping a public default credential.
   const adminPasswordHash =

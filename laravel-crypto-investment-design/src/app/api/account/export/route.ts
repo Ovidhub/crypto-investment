@@ -19,7 +19,7 @@ export async function GET() {
   return new Response(JSON.stringify(data, null, 2), {
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "content-disposition": `attachment; filename="enethi-data-${auth.user.id}.json"`,
+      "content-disposition": `attachment; filename="actuatrades-data-${auth.user.id}.json"`,
       "cache-control": "no-store",
     },
   });

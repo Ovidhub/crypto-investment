@@ -13,7 +13,7 @@ const SECRET =
   // A random per-process secret keeps forged cookies impossible, at the cost of
   // signing everyone out on restart. Set AUTH_SECRET in production.
   randomBytes(32).toString("hex");
-const COOKIE = "enethi_session";
+const COOKIE = "actuatrades_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 // owner = super admin: everything admin can do, plus website content,

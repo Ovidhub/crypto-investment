@@ -324,7 +324,7 @@ export default function ProfileForm({
               </label>
               <label className="block">
                 <span className="mb-1.5 block text-xs font-semibold text-[#c7cedb]">
-                  What are you mainly using Enethi for?
+                  What are you mainly using Actuatrades for?
                 </span>
                 <select
                   value={values.investmentGoal}

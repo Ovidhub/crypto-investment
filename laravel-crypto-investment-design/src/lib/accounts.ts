@@ -125,7 +125,7 @@ export async function registerUser(input: RegisterInput): Promise<RegisterResult
 
   await notify({
     userId: created.id,
-    title: "Welcome to Enethi",
+    title: "Welcome to Actuatrades",
     body: "Your account is open. Complete your profile so statements and payouts carry the right details, then fund your wallet to start investing.",
   });
 
@@ -201,6 +201,6 @@ export async function exportUserData(userId: number) {
     },
     generatedAt: new Date().toISOString(),
     notice:
-      "Exported from your Enethi account. Balances are reported in USD at the time of export.",
+      "Exported from your Actuatrades account. Balances are reported in USD at the time of export.",
   };
 }

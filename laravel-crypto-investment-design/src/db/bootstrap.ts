@@ -296,7 +296,7 @@ export async function runBootstrap(rawQuery: Runner): Promise<void> {
 
   // Super admin, seeded from the environment. Without this a fresh Postgres
   // database would have no way in.
-  const adminEmail = (process.env.ADMIN_EMAIL ?? "admin@enethi.app").trim().toLowerCase();
+  const adminEmail = (process.env.ADMIN_EMAIL ?? "admin@actuatrades.com").trim().toLowerCase();
   const adminHash =
     process.env.ADMIN_PASSWORD_HASH ?? (await hashPassword(cryptoRandom()));
   await rawQuery(

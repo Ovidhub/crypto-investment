@@ -13,7 +13,7 @@ const LINKS = [
 
 export default function Navbar({
   loggedIn = false,
-  siteName = "Enethi",
+  siteName = "Actuatrades",
   logo = "",
 }: {
   loggedIn?: boolean;

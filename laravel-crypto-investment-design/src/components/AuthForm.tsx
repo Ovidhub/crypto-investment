@@ -58,7 +58,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-2 font-display text-lg font-bold text-ink">
             E
           </span>
-          <span className="font-display text-xl font-bold">Enethi</span>
+          <span className="font-display text-xl font-bold">Actuatrades</span>
         </Link>
 
         <div className="rounded-3xl border border-line bg-card p-8">
@@ -113,7 +113,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
           </form>
 
           <p className="mt-5 text-center text-sm text-[#9aa3b2]">
-            {isLogin ? "New to Enethi? " : "Already have an account? "}
+            {isLogin ? "New to Actuatrades? " : "Already have an account? "}
             <Link
               href={isLogin ? "/register" : "/login"}
               className="font-semibold text-brand hover:underline"
