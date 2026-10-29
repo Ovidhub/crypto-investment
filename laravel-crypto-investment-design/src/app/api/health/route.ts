@@ -11,13 +11,13 @@ export async function GET() {
     await db.execute(sql`select 1`);
     return Response.json({
       ok: true,
-      demoMode: isDemoMode,
+      storage: isDemoMode ? "in-memory" : "postgres",
       adminConfigured,
       sessionSecretConfigured: Boolean(process.env.AUTH_SECRET),
     });
   } catch {
     return Response.json(
-      { ok: false, demoMode: isDemoMode, adminConfigured },
+      { ok: false, storage: isDemoMode ? "in-memory" : "postgres", adminConfigured },
       { status: 500 },
     );
   }
