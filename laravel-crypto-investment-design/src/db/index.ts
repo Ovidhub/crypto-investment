@@ -3,9 +3,40 @@ import { Pool, type PoolClient } from "pg";
 import { createDemoDatabase, type DemoUser } from "./demo";
 import { runBootstrap } from "./bootstrap";
 
-const databaseUrl = process.env.DATABASE_URL;
+/**
+ * Postgres connection string.
+ *
+ * Vercel's storage integrations inject different names depending on the
+ * provider (Neon uses DATABASE_URL, Supabase uses POSTGRES_URL, and both also
+ * export the PG* components). Accept any of them so "connect a database in the
+ * dashboard" is genuinely all that is required.
+ */
+export function resolveDatabaseUrl(): string | undefined {
+  const candidates = [
+    process.env.DATABASE_URL,
+    process.env.POSTGRES_URL,
+    process.env.POSTGRES_PRISMA_URL,
+    process.env.DATABASE_URL_UNPOOLED,
+    process.env.POSTGRES_URL_NON_POOLING,
+  ];
+  for (const candidate of candidates) {
+    if (candidate && candidate.trim()) return candidate.trim();
+  }
+  const { PGHOST, PGUSER, PGDATABASE } = process.env;
+  if (PGHOST && PGUSER && PGDATABASE) {
+    const user = encodeURIComponent(PGUSER);
+    const password = process.env.PGPASSWORD
+      ? `:${encodeURIComponent(process.env.PGPASSWORD)}`
+      : "";
+    const port = process.env.PGPORT ?? "5432";
+    return `postgresql://${user}${password}@${PGHOST}:${port}/${PGDATABASE}?sslmode=require`;
+  }
+  return undefined;
+}
 
-/** True when the app is running against the in-memory demo database. */
+const databaseUrl = resolveDatabaseUrl();
+
+/** True when no database is configured, so the in-memory engine is used. */
 export const isDemoMode = !databaseUrl;
 
 type DatabaseInstance = {

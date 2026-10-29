@@ -27,12 +27,14 @@ npm run dev                # http://localhost:3000
 No database is required to try it locally: without `DATABASE_URL` the app boots
 an in-process Postgres (pg-mem) with a full seed.
 
-> **On Vercel you must set `DATABASE_URL`.** Serverless functions are separate
+> **On Vercel you must connect a database.** Serverless functions are separate
 > processes, so the in-memory database is not shared between them: an account
 > created by one request is invisible to the next, and sign-in fails with
-> "Invalid email or password". With `DATABASE_URL` set, the app creates its
-> schema and seed data on first use (see `src/db/bootstrap.ts`) — no migration
-> step needed.
+> "Invalid email or password". Add one via **Storage → Neon → Connect to
+> Project**; the app accepts `DATABASE_URL`, `POSTGRES_URL`,
+> `POSTGRES_PRISMA_URL` or the `PG*` components, whichever the integration
+> injects. It then creates its schema and seed data on first use (see
+> `src/db/bootstrap.ts`) — no migration step needed.
 
 ### Reviewer account
 
