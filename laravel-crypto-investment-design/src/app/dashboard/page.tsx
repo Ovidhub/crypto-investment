@@ -23,6 +23,7 @@ import Notice from "@/components/Notice";
 import EmptyState from "@/components/EmptyState";
 import SimTradeTicket from "@/components/SimTradeTicket";
 import MarketNews from "@/components/MarketNews";
+import PriceChart from "@/components/PriceChart";
 
 export const dynamic = "force-dynamic";
 
@@ -204,6 +205,20 @@ export default async function DashboardOverview() {
         </div>
       </div>
 
+      <PriceChart
+        compact
+        coins={coins.map((c) => ({
+          id: c.id,
+          symbol: c.symbol,
+          name: c.name,
+          price: c.price,
+          color: c.color,
+        }))}
+        initialCoinId={coins[0]?.id}
+      />
+
+      <MarketNews limit={6} columns={2} />
+
       <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
         <div className="space-y-6">
           <div className="rounded-2xl border border-line bg-card">
@@ -354,8 +369,6 @@ export default async function DashboardOverview() {
               </div>
             )}
           </div>
-
-          <MarketNews />
 
           <div className="rounded-2xl border border-line bg-card">
             <div className="flex items-center justify-between border-b border-line px-6 py-4">

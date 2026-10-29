@@ -17,7 +17,8 @@ const RANGES = ["1D", "7D", "30D", "90D", "1Y"] as const;
 type Range = (typeof RANGES)[number];
 
 const WIDTH = 720;
-const HEIGHT = 260;
+const FULL_HEIGHT = 260;
+const COMPACT_HEIGHT = 190;
 const PAD_TOP = 16;
 const PAD_BOTTOM = 24;
 
@@ -46,10 +47,14 @@ function axisLabel(ts: number, range: Range): string {
 export default function PriceChart({
   coins,
   initialCoinId,
+  compact = false,
 }: {
   coins: CoinOption[];
   initialCoinId?: string;
+  /** Shorter frame for the dashboard overview, where the chart sits beside a ticket. */
+  compact?: boolean;
 }) {
+  const HEIGHT = compact ? COMPACT_HEIGHT : FULL_HEIGHT;
   const [coinId, setCoinId] = useState(initialCoinId ?? coins[0]?.id ?? "bitcoin");
   const [range, setRange] = useState<Range>("1D");
   // Results are keyed by selection, so switching coin or range shows a loading
@@ -136,10 +141,11 @@ export default function PriceChart({
     const area = `${line} L${WIDTH},${HEIGHT - PAD_BOTTOM} L0,${HEIGHT - PAD_BOTTOM} Z`;
 
     return { points, min, max, x, y, line, area };
-  }, [data]);
+  }, [data, HEIGHT]);
 
   const up = (data?.changePct ?? 0) >= 0;
   const stroke = up ? "#0ecb81" : "#f6465d";
+  const fillId = `chartFill-${compact ? "compact" : "full"}`;
 
   function onMove(event: React.PointerEvent<SVGSVGElement>) {
     if (!geometry || !svgRef.current) return;
@@ -174,7 +180,9 @@ export default function PriceChart({
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-[11px] text-[#7c8698]">Live price history · CoinGecko</p>
+            <p className="mt-1 text-[11px] text-[#7c8698]">
+              {compact ? "Live chart" : "Live price history"} · CoinGecko
+            </p>
           </div>
         </div>
 
@@ -234,14 +242,15 @@ export default function PriceChart({
             <svg
               ref={svgRef}
               viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-              className="h-[260px] w-full touch-none"
+              style={{ height: HEIGHT }}
+              className="w-full touch-none"
               role="img"
               aria-label={`${coin?.name ?? coinId} price chart over ${range}`}
               onPointerMove={onMove}
               onPointerLeave={() => setHover(null)}
             >
               <defs>
-                <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={stroke} stopOpacity="0.28" />
                   <stop offset="100%" stopColor={stroke} stopOpacity="0" />
                 </linearGradient>
@@ -263,7 +272,7 @@ export default function PriceChart({
                 );
               })}
 
-              <path d={geometry.area} fill="url(#chartFill)" />
+              <path d={geometry.area} fill={`url(#${fillId})`} />
               <path
                 d={geometry.line}
                 fill="none"
