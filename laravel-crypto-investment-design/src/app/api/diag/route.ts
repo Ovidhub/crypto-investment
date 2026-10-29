@@ -1,101 +1,67 @@
 import { NextResponse } from "next/server";
+import { BOOTSTRAP_DDL } from "@/db/bootstrap";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/** TEMPORARY: connection diagnostics that bypass the shared pool/bootstrap. */
+/** TEMPORARY: runs the schema bootstrap statement by statement, timed. */
 export async function GET() {
-  const names = [
-    "DATABASE_URL",
-    "POSTGRES_URL",
-    "POSTGRES_PRISMA_URL",
-    "DATABASE_URL_UNPOOLED",
-    "POSTGRES_URL_NON_POOLING",
-    "PGHOST",
-    "PGUSER",
-    "PGDATABASE",
-  ];
-  const present: Record<string, boolean> = {};
-  for (const name of names) present[name] = Boolean(process.env[name]);
-
   const raw =
     process.env.DATABASE_URL ??
     process.env.POSTGRES_URL ??
     process.env.POSTGRES_PRISMA_URL ??
     "";
-
-  let host = "(none)";
-  try {
-    const parsed = new URL(raw);
-    host = `${parsed.hostname}${parsed.port ? `:${parsed.port}` : ""}`;
-  } catch {
-    host = raw ? "(unparseable)" : "(none)";
-  }
+  const out: Record<string, unknown> = {
+    hasUrl: Boolean(raw),
+    statements: [] as Array<Record<string, unknown>>,
+  };
 
   const started = Date.now();
-
-  // Independent probe: does the app's own pooled connection answer?
-  const app: Record<string, unknown> = {};
-  try {
-    const dbModule = await Promise.race([
-      import("@/db"),
-      new Promise((resolve) => setTimeout(() => resolve(null), 5_000)),
-    ]);
-    if (!dbModule) {
-      app.imported = false;
-      app.note = "module import timed out";
-    } else {
-      const mod = dbModule as typeof import("@/db");
-      app.imported = true;
-      app.demoMode = mod.isDemoMode;
-      const t0 = Date.now();
-      try {
-        const row = await Promise.race([
-          mod.pool.query("select 1 as ok"),
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("pool query exceeded 20s")), 20_000),
-          ),
-        ]);
-        app.poolQueryMs = Date.now() - t0;
-        app.poolOk = Array.isArray((row as { rows?: unknown[] }).rows);
-      } catch (error) {
-        app.poolQueryMs = Date.now() - t0;
-        app.poolError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-      }
-    }
-  } catch (error) {
-    app.imported = false;
-    app.error = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-  }
-
-  let result: unknown;
   try {
     const { Client } = await import("pg");
     const client = new Client({
       connectionString: raw,
       ssl: { rejectUnauthorized: false },
       connectionTimeoutMillis: 6_000,
-      query_timeout: 8_000,
+      query_timeout: 5_000,
     });
     await client.connect();
-    const rows = await client.query("select now() as now, current_database() as db");
+    out.connected = true;
+    await client.query("SET statement_timeout = 4000");
+    const existing = await client.query(
+      `select table_name from information_schema.tables where table_schema = 'public' order by 1`,
+    );
+    out.tables = existing.rows.map((r: { table_name: string }) => r.table_name);
+
+    const list = BOOTSTRAP_DDL.split(";")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const statements = out.statements as Array<Record<string, unknown>>;
+    for (const statement of list) {
+      const t0 = Date.now();
+      const head = statement.split("\n")[0].slice(0, 70);
+      if (Date.now() - started > 20_000) {
+        statements.push({ head, skipped: true });
+        continue;
+      }
+      try {
+        await client.query(statement);
+        statements.push({ head, ms: Date.now() - t0 });
+      } catch (error) {
+        statements.push({
+          head,
+          ms: Date.now() - t0,
+          error: error instanceof Error ? `${error.name}: ${error.message}` : String(error),
+        });
+      }
+    }
     await client.end();
-    result = { connected: true, db: rows.rows[0] };
   } catch (error) {
-    result = {
-      connected: false,
-      error: error instanceof Error ? `${error.name}: ${error.message}` : String(error),
-    };
+    out.connected = false;
+    out.error = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
   }
 
-  return NextResponse.json({
-    app,
-    host,
-    present,
-    result,
-    ms: Date.now() - started,
-    phase: process.env.NEXT_PHASE ?? null,
-    vercelEnv: process.env.VERCEL_ENV ?? null,
-  });
+  out.totalMs = Date.now() - started;
+  return NextResponse.json(out);
 }

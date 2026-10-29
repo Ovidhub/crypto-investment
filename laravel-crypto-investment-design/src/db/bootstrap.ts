@@ -13,7 +13,7 @@ import { DEMO_ACCOUNT } from "@/lib/demo-access";
 
 type Runner = (text: string, values?: unknown[]) => Promise<unknown>;
 
-const DDL = `
+export const BOOTSTRAP_DDL = `
 CREATE TABLE IF NOT EXISTS waitlist (
   id serial PRIMARY KEY,
   name varchar(120) NOT NULL,
@@ -275,7 +275,7 @@ const PLANS: Array<[string, string, string, string, string, string, number, numb
 ];
 
 export async function runBootstrap(rawQuery: Runner): Promise<void> {
-  await rawQuery(DDL);
+  await rawQuery(BOOTSTRAP_DDL);
 
   for (const [key, enabled] of FLAGS) {
     await rawQuery(
